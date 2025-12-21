@@ -20,7 +20,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | SETUP-001 | Configurar repositório Git e estrutura inicial | ⚪ | 🔴 | 2h | - | ✅ |
 | SETUP-002 | Configurar Docker e docker-compose para desenvolvimento | 🟠 | 🔴 | 4h | SETUP-001 | ✅ |
 | SETUP-003 | Configurar PostgreSQL no Docker | 🟠 | 🔴 | 2h | SETUP-002 | ✅ |
-| SETUP-004 | Configurar Redis no Docker | 🟠 | 🔴 | 2h | SETUP-002 | ⏳ |
+| SETUP-004 | Configurar Redis no Docker | 🟠 | 🔴 | 2h | SETUP-002 | ✅ |
 | SETUP-005 | Configurar variáveis de ambiente (.env.example) | ⚪ | 🔴 | 1h | SETUP-002 | ⏳ |
 | SETUP-006 | Configurar CI/CD básico (GitHub Actions) | 🟠 | 🟡 | 4h | SETUP-001 | ⏳ |
 
