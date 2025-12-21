@@ -1,0 +1,40 @@
+name: Docker Build
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+      
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/gestao-financeira:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/gestao-financeira:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/gestao-financeira:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/gestao-financeira:buildcache,mode=max
+        continue-on-error: true
+
