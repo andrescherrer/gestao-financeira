@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"gestao-financeira/backend/pkg/database"
+	"gestao-financeira/backend/pkg/health"
 )
 
 func main() {
@@ -54,8 +55,13 @@ func main() {
 		MaxAge:           86400, // 24 horas
 	}))
 
-	// Health check endpoint
-	app.Get("/health", healthCheck)
+	// Initialize health checker
+	healthChecker := health.NewHealthChecker()
+
+	// Health check endpoints
+	app.Get("/health", healthChecker.HealthCheck)
+	app.Get("/health/live", healthChecker.LivenessCheck)
+	app.Get("/health/ready", healthChecker.ReadinessCheck)
 
 	// API v1 routes (will be added in future tasks)
 	api := app.Group("/api/v1")
@@ -101,15 +107,6 @@ func main() {
 	log.Println("Server exited")
 }
 
-// healthCheck handles the /health endpoint
-func healthCheck(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"status":  "ok",
-		"service": "gestao-financeira",
-		"version": "1.0.0",
-		"time":    time.Now().Format(time.RFC3339),
-	})
-}
 
 // customErrorHandler handles errors globally
 func customErrorHandler(c *fiber.Ctx, err error) error {
