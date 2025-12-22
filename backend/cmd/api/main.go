@@ -108,8 +108,20 @@ func main() {
 			})
 		})
 
-		// Setup authentication routes
+		// Setup authentication routes (public)
 		routes.SetupAuthRoutes(app, authHandler)
+
+		// Protected routes example (will be used in future tasks)
+		// protected := api.Group("", middleware.AuthMiddleware(jwtService))
+		// {
+		// 	protected.Get("/profile", func(c *fiber.Ctx) error {
+		// 		userID := middleware.GetUserID(c)
+		// 		return c.JSON(fiber.Map{
+		// 			"user_id": userID,
+		// 			"message": "This is a protected route",
+		// 		})
+		// 	})
+		// }
 	}
 
 	// Get port from environment or use default
