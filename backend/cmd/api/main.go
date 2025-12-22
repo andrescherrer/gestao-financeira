@@ -78,11 +78,8 @@ func main() {
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit
 
-	// Shutdown with timeout
-	ctx, cancel := fiber.AcquireCtx(nil)
-	defer cancel()
-
-	if err := app.ShutdownWithContext(ctx); err != nil {
+	// Shutdown gracefully
+	if err := app.Shutdown(); err != nil {
 		panic(err)
 	}
 }
