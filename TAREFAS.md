@@ -72,10 +72,10 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | ID-006 | Implementar GormUserRepository | 🔵 | 🔴 | 6h | ID-005, BE-004 | ✅ |
 | ID-007 | Criar migration para tabela users | 🔵 | 🔴 | 2h | ID-006 | ✅ |
 | ID-008 | Implementar RegisterUserUseCase | 🔵 | 🔴 | 4h | ID-004, ID-005 | ✅ |
-| ID-009 | Implementar LoginUseCase com JWT | 🔵 | 🔴 | 6h | ID-004, ID-005 | ⏳ |
+| ID-009 | Implementar LoginUseCase com JWT | 🔵 | 🔴 | 6h | ID-004, ID-005 | ✅ |
 | ID-010 | Criar AuthHandler (Register, Login) | 🔵 | 🔴 | 4h | ID-008, ID-009 | ✅ |
 | ID-011 | Criar middleware de autenticação JWT | 🔵 | 🔴 | 4h | ID-009 | ⏳ |
-| ID-012 | Configurar rotas de autenticação (/api/v1/auth/*) | 🔵 | 🔴 | 2h | ID-010 | ⏳ |
+| ID-012 | Configurar rotas de autenticação (/api/v1/auth/*) | 🔵 | 🔴 | 2h | ID-010 | ✅ |
 | ID-013 | Testes unitários para Identity Context | 🟤 | 🟡 | 8h | ID-004, ID-008, ID-009 | ⏳ |
 
 **Entregável Sprint 1.3:** API de autenticação funcionando (registro e login)

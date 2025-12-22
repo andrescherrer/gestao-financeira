@@ -8,6 +8,7 @@ import (
 
 	"gestao-financeira/backend/internal/identity/application/usecases"
 	"gestao-financeira/backend/internal/identity/infrastructure/persistence"
+	"gestao-financeira/backend/internal/identity/infrastructure/services"
 	"gestao-financeira/backend/internal/identity/presentation/handlers"
 	"gestao-financeira/backend/internal/identity/presentation/routes"
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
@@ -47,11 +48,15 @@ func main() {
 	// Initialize repositories
 	userRepository := persistence.NewGormUserRepository(db)
 
+	// Initialize services
+	jwtService := services.NewJWTService()
+
 	// Initialize use cases
 	registerUserUseCase := usecases.NewRegisterUserUseCase(userRepository, eventBus)
+	loginUseCase := usecases.NewLoginUseCase(userRepository, jwtService)
 
 	// Initialize handlers
-	authHandler := handlers.NewAuthHandler(registerUserUseCase)
+	authHandler := handlers.NewAuthHandler(registerUserUseCase, loginUseCase)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{

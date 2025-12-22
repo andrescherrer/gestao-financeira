@@ -11,6 +11,6 @@ func SetupAuthRoutes(app *fiber.App, authHandler *handlers.AuthHandler) {
 	auth := app.Group("/api/v1/auth")
 	{
 		auth.Post("/register", authHandler.Register)
-		// Login route will be added in ID-010
+		auth.Post("/login", authHandler.Login)
 	}
 }
