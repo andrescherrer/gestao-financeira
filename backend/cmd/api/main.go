@@ -6,6 +6,11 @@ import (
 	"syscall"
 	"time"
 
+	"gestao-financeira/backend/internal/identity/application/usecases"
+	"gestao-financeira/backend/internal/identity/infrastructure/persistence"
+	"gestao-financeira/backend/internal/identity/presentation/handlers"
+	"gestao-financeira/backend/internal/identity/presentation/routes"
+	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
 	"gestao-financeira/backend/pkg/database"
 	"gestao-financeira/backend/pkg/health"
 	"gestao-financeira/backend/pkg/logger"
@@ -28,13 +33,25 @@ func main() {
 	log.Info().Msg("Starting Gestão Financeira API")
 
 	// Initialize database connection
-	_, err := database.NewDatabase()
+	db, err := database.NewDatabase()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to connect to database")
 	}
 	defer database.Close()
 
 	log.Info().Msg("Database connection established")
+
+	// Initialize Event Bus
+	eventBus := eventbus.NewEventBus()
+
+	// Initialize repositories
+	userRepository := persistence.NewGormUserRepository(db)
+
+	// Initialize use cases
+	registerUserUseCase := usecases.NewRegisterUserUseCase(userRepository, eventBus)
+
+	// Initialize handlers
+	authHandler := handlers.NewAuthHandler(registerUserUseCase)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -76,16 +93,18 @@ func main() {
 	app.Get("/health/live", healthChecker.LivenessCheck)
 	app.Get("/health/ready", healthChecker.ReadinessCheck)
 
-	// API v1 routes (will be added in future tasks)
+	// API v1 routes
 	api := app.Group("/api/v1")
 	{
-		// Routes will be added here
 		api.Get("/", func(c *fiber.Ctx) error {
 			return c.JSON(fiber.Map{
 				"message": "Gestão Financeira API v1",
 				"status":  "running",
 			})
 		})
+
+		// Setup authentication routes
+		routes.SetupAuthRoutes(app, authHandler)
 	}
 
 	// Get port from environment or use default
