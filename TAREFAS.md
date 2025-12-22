@@ -68,7 +68,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | ID-002 | Criar value object PasswordHash (bcrypt) | 🔵 | 🔴 | 4h | BE-001 | ✅ |
 | ID-003 | Criar value object UserName | 🔵 | 🔴 | 2h | BE-001 | ✅ |
 | ID-004 | Criar entidade User (agregado raiz) | 🔵 | 🔴 | 4h | ID-001, ID-002, ID-003 | ✅ |
-| ID-005 | Criar interface UserRepository | 🔵 | 🔴 | 1h | ID-004 | ⏳ |
+| ID-005 | Criar interface UserRepository | 🔵 | 🔴 | 1h | ID-004 | ✅ |
 | ID-006 | Implementar GormUserRepository | 🔵 | 🔴 | 6h | ID-005, BE-004 | ⏳ |
 | ID-007 | Criar migration para tabela users | 🔵 | 🔴 | 2h | ID-006 | ⏳ |
 | ID-008 | Implementar RegisterUserUseCase | 🔵 | 🔴 | 4h | ID-004, ID-005 | ⏳ |
