@@ -104,7 +104,7 @@ func TestLoginUseCase_Execute(t *testing.T) {
 			mockRepo := newMockUserRepository()
 			tt.setupMock(mockRepo)
 
-			jwtService := &mockJWTService{}
+			jwtService := services.NewJWTService()
 			useCase := NewLoginUseCase(mockRepo, jwtService)
 
 			output, err := useCase.Execute(tt.input)
