@@ -51,4 +51,3 @@ func parseLevel(level string) zerolog.Level {
 func GetLogger() zerolog.Logger {
 	return Logger
 }
-

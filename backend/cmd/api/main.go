@@ -6,14 +6,15 @@ import (
 	"syscall"
 	"time"
 
+	"gestao-financeira/backend/pkg/database"
+	"gestao-financeira/backend/pkg/health"
+	"gestao-financeira/backend/pkg/logger"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/rs/zerolog/log"
-	"gestao-financeira/backend/pkg/database"
-	"gestao-financeira/backend/pkg/health"
-	"gestao-financeira/backend/pkg/logger"
 )
 
 func main() {
@@ -37,10 +38,10 @@ func main() {
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
-		AppName:       "Gestão Financeira API",
-		ServerHeader:  "Fiber",
-		ErrorHandler:  customErrorHandler,
-		ReadTimeout:   10 * time.Second,
+		AppName:      "Gestão Financeira API",
+		ServerHeader: "Fiber",
+		ErrorHandler: customErrorHandler,
+		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	})
@@ -119,7 +120,6 @@ func main() {
 
 	log.Info().Msg("Server exited")
 }
-
 
 // customErrorHandler handles errors globally
 func customErrorHandler(c *fiber.Ctx, err error) error {
