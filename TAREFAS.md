@@ -64,7 +64,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| ID-001 | Criar value object Email com validação | 🔵 | 🔴 | 2h | BE-001 | ⏳ |
+| ID-001 | Criar value object Email com validação | 🔵 | 🔴 | 2h | BE-001 | ✅ |
 | ID-002 | Criar value object PasswordHash (bcrypt) | 🔵 | 🔴 | 4h | BE-001 | ⏳ |
 | ID-003 | Criar value object UserName | 🔵 | 🔴 | 2h | BE-001 | ⏳ |
 | ID-004 | Criar entidade User (agregado raiz) | 🔵 | 🔴 | 4h | ID-001, ID-002, ID-003 | ⏳ |
