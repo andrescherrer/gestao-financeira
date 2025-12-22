@@ -38,7 +38,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | BE-004 | Configurar conexão com PostgreSQL (GORM) | 🔵 | 🔴 | 4h | SETUP-003, BE-002 | ⏳ |
 | BE-005 | Implementar health check endpoint (/health) | 🔵 | 🔴 | 2h | BE-003 | ⏳ |
 | BE-006 | Configurar logger estruturado (zerolog) | 🔵 | 🟡 | 2h | BE-002 | ⏳ |
-| BE-007 | Criar Dockerfile multi-stage para backend | 🟠 | 🔴 | 2h | BE-002 | ⏳ |
+| BE-007 | Criar Dockerfile multi-stage para backend | 🟠 | 🔴 | 2h | BE-002 | ✅ |
 | BE-008 | Testar build e execução em Docker | 🟤 | 🔴 | 2h | BE-007, SETUP-002 | ⏳ |
 
 **Entregável Sprint 1.1:** API rodando em Docker com health check funcionando
