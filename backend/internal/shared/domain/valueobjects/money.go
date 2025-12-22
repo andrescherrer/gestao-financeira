@@ -173,8 +173,8 @@ func (m Money) GreaterThan(other Money) (bool, error) {
 // LessThan checks if this Money is less than other Money.
 // Both must have the same currency.
 func (m Money) LessThan(other Money) (bool, error) {
-	if m.currency != other.currency {
-		return false, fmt.Errorf("cannot compare money with different currencies: %s and %s", m.currency, other.currency)
+	if !m.currency.Equals(other.currency) {
+		return false, fmt.Errorf("cannot compare money with different currencies: %s and %s", m.currency.Code(), other.currency.Code())
 	}
 
 	return m.amount < other.amount, nil
