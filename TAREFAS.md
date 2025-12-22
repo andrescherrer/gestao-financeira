@@ -51,7 +51,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 |----|--------|------|------------|---------|--------------|--------|
 | SK-001 | Criar value object Money (amount, currency) | 🔵 | 🔴 | 4h | BE-001 | ✅ |
 | SK-002 | Criar value object Currency (BRL, USD, EUR) | 🔵 | 🔴 | 2h | SK-001 | ✅ |
-| SK-003 | Criar value object AccountContext (Personal, Business) | 🔵 | 🔴 | 2h | BE-001 | ⏳ |
+| SK-003 | Criar value object AccountContext (Personal, Business) | 🔵 | 🔴 | 2h | BE-001 | ✅ |
 | SK-004 | Criar domain events base (DomainEvent interface) | 🔵 | 🔴 | 2h | BE-001 | ⏳ |
 | SK-005 | Implementar Event Bus simples | 🔵 | 🟡 | 4h | SK-004 | ⏳ |
 | SK-006 | Testes unitários para value objects | 🟤 | 🟡 | 4h | SK-001, SK-002, SK-003 | ⏳ |
