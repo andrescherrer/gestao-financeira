@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -9,19 +8,32 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/rs/zerolog/log"
 	"gestao-financeira/backend/pkg/database"
 	"gestao-financeira/backend/pkg/health"
+	"gestao-financeira/backend/pkg/logger"
 )
 
 func main() {
+	// Initialize structured logger
+	logLevel := os.Getenv("LOG_LEVEL")
+	if logLevel == "" {
+		logLevel = "info"
+	}
+	logger.InitLogger(logLevel)
+
+	log.Info().Msg("Starting Gestão Financeira API")
+
 	// Initialize database connection
 	_, err := database.NewDatabase()
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Fatal().Err(err).Msg("Failed to connect to database")
 	}
 	defer database.Close()
+
+	log.Info().Msg("Database connection established")
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -35,7 +47,7 @@ func main() {
 
 	// Global middlewares
 	app.Use(recover.New())
-	app.Use(logger.New(logger.Config{
+	app.Use(fiberlogger.New(fiberlogger.Config{
 		Format:     "[${time}] ${status} - ${latency} ${method} ${path}\n",
 		TimeFormat: "2006-01-02 15:04:05",
 		TimeZone:   "America/Sao_Paulo",
@@ -83,8 +95,9 @@ func main() {
 
 	// Start server in a goroutine
 	go func() {
+		log.Info().Str("port", port).Msg("Server starting")
 		if err := app.Listen(":" + port); err != nil {
-			panic(err)
+			log.Fatal().Err(err).Msg("Failed to start server")
 		}
 	}()
 
@@ -94,17 +107,17 @@ func main() {
 	<-quit
 
 	// Shutdown gracefully
-	log.Println("Shutting down server...")
+	log.Info().Msg("Shutting down server...")
 	if err := app.Shutdown(); err != nil {
-		log.Printf("Error shutting down server: %v", err)
+		log.Error().Err(err).Msg("Error shutting down server")
 	}
 
 	// Close database connection
 	if err := database.Close(); err != nil {
-		log.Printf("Error closing database: %v", err)
+		log.Error().Err(err).Msg("Error closing database")
 	}
 
-	log.Println("Server exited")
+	log.Info().Msg("Server exited")
 }
 
 
@@ -118,9 +131,21 @@ func customErrorHandler(c *fiber.Ctx, err error) error {
 		message = e.Message
 	}
 
-	// Log error (in production, use structured logging)
+	// Log error with structured logging
 	if code == fiber.StatusInternalServerError {
-		// TODO: Add structured logging here
+		log.Error().
+			Err(err).
+			Str("path", c.Path()).
+			Str("method", c.Method()).
+			Int("status", code).
+			Msg("Internal server error")
+	} else {
+		log.Warn().
+			Err(err).
+			Str("path", c.Path()).
+			Str("method", c.Method()).
+			Int("status", code).
+			Msg("Request error")
 	}
 
 	return c.Status(code).JSON(fiber.Map{

@@ -6,6 +6,7 @@ toolchain go1.24.11
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.10
+	github.com/rs/zerolog v1.34.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
 )
