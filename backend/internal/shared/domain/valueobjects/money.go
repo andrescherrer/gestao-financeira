@@ -8,29 +8,31 @@ import (
 // Money represents a monetary value with amount and currency.
 // The amount is stored in cents (int64) to avoid floating-point precision issues.
 type Money struct {
-	amount   int64  // amount in cents
-	currency string // currency code (e.g., "BRL", "USD", "EUR")
+	amount   int64    // amount in cents
+	currency Currency // currency value object
 }
 
 // NewMoney creates a new Money value object from cents.
-func NewMoney(cents int64, currency string) (Money, error) {
-	if currency == "" {
-		return Money{}, errors.New("currency cannot be empty")
-	}
-
+func NewMoney(cents int64, currency Currency) (Money, error) {
 	return Money{
 		amount:   cents,
 		currency: currency,
 	}, nil
 }
 
-// NewMoneyFromFloat creates a new Money value object from a float64 amount.
-// The amount is converted to cents (multiplied by 100).
-func NewMoneyFromFloat(amount float64, currency string) (Money, error) {
-	if currency == "" {
-		return Money{}, errors.New("currency cannot be empty")
+// NewMoneyFromString creates a new Money value object from cents with a string currency code.
+func NewMoneyFromString(cents int64, currencyCode string) (Money, error) {
+	currency, err := NewCurrency(currencyCode)
+	if err != nil {
+		return Money{}, err
 	}
 
+	return NewMoney(cents, currency)
+}
+
+// NewMoneyFromFloat creates a new Money value object from a float64 amount.
+// The amount is converted to cents (multiplied by 100).
+func NewMoneyFromFloat(amount float64, currency Currency) (Money, error) {
 	cents := int64(amount * 100)
 	return Money{
 		amount:   cents,
@@ -38,9 +40,30 @@ func NewMoneyFromFloat(amount float64, currency string) (Money, error) {
 	}, nil
 }
 
+// NewMoneyFromFloatString creates a new Money value object from a float64 amount with a string currency code.
+func NewMoneyFromFloatString(amount float64, currencyCode string) (Money, error) {
+	currency, err := NewCurrency(currencyCode)
+	if err != nil {
+		return Money{}, err
+	}
+
+	return NewMoneyFromFloat(amount, currency)
+}
+
 // Zero creates a Money with zero amount for the given currency.
-func Zero(currency string) (Money, error) {
-	return NewMoney(0, currency)
+func Zero(currency Currency) Money {
+	money, _ := NewMoney(0, currency)
+	return money
+}
+
+// ZeroFromString creates a Money with zero amount for the given currency code.
+func ZeroFromString(currencyCode string) (Money, error) {
+	currency, err := NewCurrency(currencyCode)
+	if err != nil {
+		return Money{}, err
+	}
+
+	return Zero(currency), nil
 }
 
 // Amount returns the amount in cents.
@@ -48,9 +71,14 @@ func (m Money) Amount() int64 {
 	return m.amount
 }
 
-// Currency returns the currency code.
-func (m Money) Currency() string {
+// Currency returns the Currency value object.
+func (m Money) Currency() Currency {
 	return m.currency
+}
+
+// CurrencyCode returns the currency code as a string.
+func (m Money) CurrencyCode() string {
+	return m.currency.Code()
 }
 
 // Float64 returns the amount as a float64 (amount / 100).
@@ -60,8 +88,8 @@ func (m Money) Float64() float64 {
 
 // Add adds two Money values. Both must have the same currency.
 func (m Money) Add(other Money) (Money, error) {
-	if m.currency != other.currency {
-		return Money{}, fmt.Errorf("cannot add money with different currencies: %s and %s", m.currency, other.currency)
+	if !m.currency.Equals(other.currency) {
+		return Money{}, fmt.Errorf("cannot add money with different currencies: %s and %s", m.currency.Code(), other.currency.Code())
 	}
 
 	return Money{
@@ -72,8 +100,8 @@ func (m Money) Add(other Money) (Money, error) {
 
 // Subtract subtracts other Money from this Money. Both must have the same currency.
 func (m Money) Subtract(other Money) (Money, error) {
-	if m.currency != other.currency {
-		return Money{}, fmt.Errorf("cannot subtract money with different currencies: %s and %s", m.currency, other.currency)
+	if !m.currency.Equals(other.currency) {
+		return Money{}, fmt.Errorf("cannot subtract money with different currencies: %s and %s", m.currency.Code(), other.currency.Code())
 	}
 
 	return Money{
@@ -129,14 +157,14 @@ func (m Money) IsNegative() bool {
 
 // Equals checks if two Money values are equal (same amount and currency).
 func (m Money) Equals(other Money) bool {
-	return m.amount == other.amount && m.currency == other.currency
+	return m.amount == other.amount && m.currency.Equals(other.currency)
 }
 
 // GreaterThan checks if this Money is greater than other Money.
 // Both must have the same currency.
 func (m Money) GreaterThan(other Money) (bool, error) {
-	if m.currency != other.currency {
-		return false, fmt.Errorf("cannot compare money with different currencies: %s and %s", m.currency, other.currency)
+	if !m.currency.Equals(other.currency) {
+		return false, fmt.Errorf("cannot compare money with different currencies: %s and %s", m.currency.Code(), other.currency.Code())
 	}
 
 	return m.amount > other.amount, nil
@@ -155,8 +183,8 @@ func (m Money) LessThan(other Money) (bool, error) {
 // GreaterThanOrEqual checks if this Money is greater than or equal to other Money.
 // Both must have the same currency.
 func (m Money) GreaterThanOrEqual(other Money) (bool, error) {
-	if m.currency != other.currency {
-		return false, fmt.Errorf("cannot compare money with different currencies: %s and %s", m.currency, other.currency)
+	if !m.currency.Equals(other.currency) {
+		return false, fmt.Errorf("cannot compare money with different currencies: %s and %s", m.currency.Code(), other.currency.Code())
 	}
 
 	return m.amount >= other.amount, nil
@@ -165,8 +193,8 @@ func (m Money) GreaterThanOrEqual(other Money) (bool, error) {
 // LessThanOrEqual checks if this Money is less than or equal to other Money.
 // Both must have the same currency.
 func (m Money) LessThanOrEqual(other Money) (bool, error) {
-	if m.currency != other.currency {
-		return false, fmt.Errorf("cannot compare money with different currencies: %s and %s", m.currency, other.currency)
+	if !m.currency.Equals(other.currency) {
+		return false, fmt.Errorf("cannot compare money with different currencies: %s and %s", m.currency.Code(), other.currency.Code())
 	}
 
 	return m.amount <= other.amount, nil
@@ -174,21 +202,12 @@ func (m Money) LessThanOrEqual(other Money) (bool, error) {
 
 // String returns a string representation of Money.
 func (m Money) String() string {
-	return fmt.Sprintf("%.2f %s", m.Float64(), m.currency)
+	return fmt.Sprintf("%.2f %s", m.Float64(), m.currency.Code())
 }
 
 // Format returns a formatted string representation of Money.
 // Example: "R$ 1.234,56" for BRL or "$1,234.56" for USD.
 func (m Money) Format() string {
 	amount := m.Float64()
-	switch m.currency {
-	case "BRL":
-		return fmt.Sprintf("R$ %.2f", amount)
-	case "USD":
-		return fmt.Sprintf("$%.2f", amount)
-	case "EUR":
-		return fmt.Sprintf("€%.2f", amount)
-	default:
-		return fmt.Sprintf("%.2f %s", amount, m.currency)
-	}
+	return fmt.Sprintf("%s %.2f", m.currency.Symbol(), amount)
 }
