@@ -34,7 +34,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 |----|--------|------|------------|---------|--------------|--------|
 | BE-001 | Criar estrutura de pastas Go (cmd, internal, pkg) | 🔵 | 🔴 | 1h | SETUP-001 | ✅ |
 | BE-002 | Inicializar go.mod e dependências básicas (Fiber, GORM) | 🔵 | 🔴 | 2h | BE-001 | ✅ |
-| BE-003 | Configurar Fiber com middlewares básicos (logger, recover, CORS) | 🔵 | 🔴 | 4h | BE-002 | ⏳ |
+| BE-003 | Configurar Fiber com middlewares básicos (logger, recover, CORS) | 🔵 | 🔴 | 4h | BE-002 | ✅ |
 | BE-004 | Configurar conexão com PostgreSQL (GORM) | 🔵 | 🔴 | 4h | SETUP-003, BE-002 | ⏳ |
 | BE-005 | Implementar health check endpoint (/health) | 🔵 | 🔴 | 2h | BE-003 | ⏳ |
 | BE-006 | Configurar logger estruturado (zerolog) | 🔵 | 🟡 | 2h | BE-002 | ⏳ |
