@@ -3,8 +3,9 @@ package health
 import (
 	"time"
 
-	"github.com/gofiber/fiber/v2"
 	"gestao-financeira/backend/pkg/database"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // HealthChecker handles health check endpoints
@@ -68,4 +69,3 @@ func (h *HealthChecker) HealthCheck(c *fiber.Ctx) error {
 		"time":    time.Now().Format(time.RFC3339),
 	})
 }
-

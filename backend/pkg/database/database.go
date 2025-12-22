@@ -115,4 +115,3 @@ func Ping() error {
 
 	return sqlDB.Ping()
 }
-
