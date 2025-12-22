@@ -104,13 +104,15 @@ func TestUserName_String(t *testing.T) {
 }
 
 func TestUserName_Initials(t *testing.T) {
+	singleName, _ := NewUserNameFromFullName("Madonna")
+	
 	tests := []struct {
 		name     string
 		userName UserName
 		want     string
 	}{
 		{"full name", MustUserName("John", "Doe"), "JD"},
-		{"single name", MustUserName("Madonna", ""), "M"},
+		{"single name", singleName, "M"},
 		{"lowercase", MustUserName("john", "doe"), "JD"},
 		{"with hyphen", MustUserName("Jean-Pierre", "Dupont"), "JD"},
 	}
