@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,9 +11,17 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"gestao-financeira/backend/pkg/database"
 )
 
 func main() {
+	// Initialize database connection
+	db, err := database.NewDatabase()
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer database.Close()
+
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
 		AppName:       "Gestão Financeira API",
@@ -79,9 +88,17 @@ func main() {
 	<-quit
 
 	// Shutdown gracefully
+	log.Println("Shutting down server...")
 	if err := app.Shutdown(); err != nil {
-		panic(err)
+		log.Printf("Error shutting down server: %v", err)
 	}
+
+	// Close database connection
+	if err := database.Close(); err != nil {
+		log.Printf("Error closing database: %v", err)
+	}
+
+	log.Println("Server exited")
 }
 
 // healthCheck handles the /health endpoint
