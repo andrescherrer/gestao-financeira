@@ -1,7 +1,6 @@
 package health
 
 import (
-	"context"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -26,9 +25,6 @@ func (h *HealthChecker) LivenessCheck(c *fiber.Ctx) error {
 
 // ReadinessCheck checks if the application is ready to serve traffic
 func (h *HealthChecker) ReadinessCheck(c *fiber.Ctx) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
 	checks := make(map[string]string)
 	allHealthy := true
 
