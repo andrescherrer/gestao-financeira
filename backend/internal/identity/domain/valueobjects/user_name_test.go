@@ -105,7 +105,7 @@ func TestUserName_String(t *testing.T) {
 
 func TestUserName_Initials(t *testing.T) {
 	singleName, _ := NewUserNameFromFullName("Madonna")
-	
+
 	tests := []struct {
 		name     string
 		userName UserName
