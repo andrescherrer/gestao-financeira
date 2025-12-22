@@ -10,21 +10,6 @@ import (
 	"gestao-financeira/backend/internal/identity/infrastructure/services"
 )
 
-// mockJWTService is a mock implementation of JWTService for testing.
-type mockJWTService struct{}
-
-func (m *mockJWTService) GenerateToken(userID, email string) (string, error) {
-	return "mock-jwt-token-" + userID, nil
-}
-
-func (m *mockJWTService) ValidateToken(tokenString string) (*services.Claims, error) {
-	return nil, nil
-}
-
-func (m *mockJWTService) GetTokenExpiration(tokenString string) (interface{}, error) {
-	return nil, nil
-}
-
 func TestLoginUseCase_Execute(t *testing.T) {
 	// Create a test user
 	email, _ := valueobjects.NewEmail("user@example.com")
