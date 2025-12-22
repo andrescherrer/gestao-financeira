@@ -63,6 +63,42 @@ func NewUser(
 	return user, nil
 }
 
+// FromPersistence reconstructs a User aggregate from persisted data.
+// This method does not trigger domain events, as it's used for loading existing data.
+func FromPersistence(
+	id valueobjects.UserID,
+	email valueobjects.Email,
+	passwordHash valueobjects.PasswordHash,
+	name valueobjects.UserName,
+	createdAt time.Time,
+	updatedAt time.Time,
+	isActive bool,
+) (*User, error) {
+	if id.IsEmpty() {
+		return nil, errors.New("user ID cannot be empty")
+	}
+	if email.IsEmpty() {
+		return nil, errors.New("user email cannot be empty")
+	}
+	if passwordHash.IsEmpty() {
+		return nil, errors.New("user password hash cannot be empty")
+	}
+	if name.IsEmpty() {
+		return nil, errors.New("user name cannot be empty")
+	}
+
+	return &User{
+		id:           id,
+		email:        email,
+		passwordHash: passwordHash,
+		name:         name,
+		createdAt:    createdAt,
+		updatedAt:    updatedAt,
+		isActive:     isActive,
+		events:       []events.DomainEvent{},
+	}, nil
+}
+
 // ID returns the user ID.
 func (u *User) ID() valueobjects.UserID {
 	return u.id
@@ -76,6 +112,11 @@ func (u *User) Email() valueobjects.Email {
 // Name returns the user name.
 func (u *User) Name() valueobjects.UserName {
 	return u.name
+}
+
+// PasswordHash returns the user password hash.
+func (u *User) PasswordHash() valueobjects.PasswordHash {
+	return u.passwordHash
 }
 
 // IsActive returns whether the user is active.
