@@ -118,7 +118,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | AC-003 | Criar interface AccountRepository | 🔵 | 🔴 | 1h | AC-002 | ✅ |
 | AC-004 | Implementar GormAccountRepository | 🔵 | 🔴 | 6h | AC-003, BE-004 | ✅ |
 | AC-005 | Criar migration para tabela accounts | 🔵 | 🔴 | 2h | AC-004 | ✅ |
-| AC-006 | Implementar CreateAccountUseCase | 🔵 | 🔴 | 4h | AC-002, AC-003 | ⏳ |
+| AC-006 | Implementar CreateAccountUseCase | 🔵 | 🔴 | 4h | AC-002, AC-003 | ✅ |
 | AC-007 | Implementar ListAccountsUseCase | 🔵 | 🔴 | 2h | AC-003 | ⏳ |
 | AC-008 | Implementar GetAccountUseCase | 🔵 | 🔴 | 2h | AC-003 | ⏳ |
 | AC-009 | Criar AccountHandler (CRUD) | 🔵 | 🔴 | 6h | AC-006, AC-007, AC-008 | ⏳ |
