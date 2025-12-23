@@ -475,9 +475,10 @@ paths:
     post:
       consumes:
       - application/json
-      description: Authenticates a user and returns a JWT token
+      description: Authenticates a user with email and password, returns a JWT token
+        for API access
       parameters:
-      - description: User login credentials
+      - description: User login credentials (email and password)
         in: body
         name: request
         required: true
@@ -487,16 +488,21 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: JWT token and user data
           schema:
             $ref: '#/definitions/gestao-financeira_backend_internal_identity_application_dtos.LoginOutput'
         "400":
-          description: Bad request
+          description: Bad request - invalid input data
           schema:
             additionalProperties: true
             type: object
         "401":
-          description: Unauthorized - invalid credentials
+          description: Unauthorized - invalid email or password
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden - user account is inactive
           schema:
             additionalProperties: true
             type: object
@@ -512,7 +518,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a new user account
+      description: Creates a new user account with email, password, first name and
+        last name
       parameters:
       - description: User registration data
         in: body
@@ -524,16 +531,16 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: User data
           schema:
             $ref: '#/definitions/gestao-financeira_backend_internal_identity_application_dtos.RegisterUserOutput'
         "400":
-          description: Bad request
+          description: Bad request - invalid input data
           schema:
             additionalProperties: true
             type: object
         "409":
-          description: Conflict - user already exists
+          description: Conflict - user with this email already exists
           schema:
             additionalProperties: true
             type: object

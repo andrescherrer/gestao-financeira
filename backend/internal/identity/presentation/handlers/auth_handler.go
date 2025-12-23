@@ -29,14 +29,15 @@ func NewAuthHandler(
 
 // Register handles user registration requests.
 // @Summary Register a new user
-// @Description Creates a new user account
+// @Description Creates a new user account with email, password, first name and last name
 // @Tags auth
 // @Accept json
 // @Produce json
 // @Param request body dtos.RegisterUserInput true "User registration data"
-// @Success 201 {object} dtos.RegisterUserOutput
-// @Failure 400 {object} map[string]interface{} "Bad request"
-// @Failure 409 {object} map[string]interface{} "Conflict - user already exists"
+// @Success 201 {object} map[string]interface{} "User registered successfully"
+// @Success 201 {object} dtos.RegisterUserOutput "User data"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data"
+// @Failure 409 {object} map[string]interface{} "Conflict - user with this email already exists"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/v1/auth/register [post]
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
@@ -139,14 +140,16 @@ func (h *AuthHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
 
 // Login handles user login requests.
 // @Summary Login user
-// @Description Authenticates a user and returns a JWT token
+// @Description Authenticates a user with email and password, returns a JWT token for API access
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param request body dtos.LoginInput true "User login credentials"
-// @Success 200 {object} dtos.LoginOutput
-// @Failure 400 {object} map[string]interface{} "Bad request"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - invalid credentials"
+// @Param request body dtos.LoginInput true "User login credentials (email and password)"
+// @Success 200 {object} map[string]interface{} "Login successful"
+// @Success 200 {object} dtos.LoginOutput "JWT token and user data"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - invalid email or password"
+// @Failure 403 {object} map[string]interface{} "Forbidden - user account is inactive"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/v1/auth/login [post]
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
