@@ -29,16 +29,15 @@ func NewAuthHandler(
 
 // Register handles user registration requests.
 // @Summary Register a new user
-// @Description Creates a new user account with email, password, first name and last name
+// @Description Creates a new user account with the provided email, password, first name, and last name.
 // @Tags auth
 // @Accept json
 // @Produce json
 // @Param request body dtos.RegisterUserInput true "User registration data"
-// @Success 201 {object} map[string]interface{} "User registered successfully"
-// @Success 201 {object} dtos.RegisterUserOutput "User data"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data"
-// @Failure 409 {object} map[string]interface{} "Conflict - user with this email already exists"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Success 201 {object} map[string]interface{} "User registered successfully" "Example: {\"message\": \"User registered successfully\", \"data\": {\"user_id\": \"uuid\", \"email\": \"user@example.com\", \"first_name\": \"John\", \"last_name\": \"Doe\", \"full_name\": \"John Doe\"}}"
+// @Failure 400 {object} map[string]interface{} "Bad request - Invalid input data (e.g., invalid email format, password too short, missing fields)"
+// @Failure 409 {object} map[string]interface{} "Conflict - User with this email already exists"
+// @Failure 500 {object} map[string]interface{} "Internal server error - An unexpected error occurred"
 // @Router /api/v1/auth/register [post]
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	// Parse request body

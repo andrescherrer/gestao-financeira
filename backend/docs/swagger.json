@@ -279,7 +279,7 @@
         },
         "/api/v1/auth/register": {
             "post": {
-                "description": "Creates a new user account with email, password, first name and last name",
+                "description": "Creates a new user account with the provided email, password, first name, and last name.",
                 "consumes": [
                     "application/json"
                 ],
@@ -303,27 +303,28 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "User data",
+                        "description": "User registered successfully\" \"Example: {\\\"message\\\": \\\"User registered successfully\\\", \\\"data\\\": {\\\"user_id\\\": \\\"uuid\\\", \\\"email\\\": \\\"user@example.com\\\", \\\"first_name\\\": \\\"John\\\", \\\"last_name\\\": \\\"Doe\\\", \\\"full_name\\\": \\\"John Doe\\\"}}",
                         "schema": {
-                            "$ref": "#/definitions/gestao-financeira_backend_internal_identity_application_dtos.RegisterUserOutput"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Bad request - invalid input data",
+                        "description": "Bad request - Invalid input data (e.g., invalid email format, password too short, missing fields)",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "409": {
-                        "description": "Conflict - user with this email already exists",
+                        "description": "Conflict - User with this email already exists",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Internal server error - An unexpected error occurred",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -876,6 +877,7 @@
             }
         },
         "gestao-financeira_backend_internal_identity_application_dtos.RegisterUserInput": {
+            "description": "User registration input with email, password, first name and last name",
             "type": "object",
             "required": [
                 "email",
@@ -885,39 +887,27 @@
             ],
             "properties": {
                 "email": {
-                    "type": "string"
+                    "description": "Email address of the user (must be a valid email format)",
+                    "type": "string",
+                    "example": "user@example.com"
                 },
                 "first_name": {
+                    "description": "First name of the user (minimum 2 characters)",
                     "type": "string",
-                    "minLength": 2
+                    "minLength": 2,
+                    "example": "John"
                 },
                 "last_name": {
+                    "description": "Last name of the user (minimum 2 characters)",
                     "type": "string",
-                    "minLength": 2
+                    "minLength": 2,
+                    "example": "Doe"
                 },
                 "password": {
+                    "description": "Password for the user account (minimum 8 characters)",
                     "type": "string",
-                    "minLength": 8
-                }
-            }
-        },
-        "gestao-financeira_backend_internal_identity_application_dtos.RegisterUserOutput": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "full_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
+                    "minLength": 8,
+                    "example": "SecurePass123"
                 }
             }
         },

@@ -141,16 +141,26 @@ definitions:
         type: string
     type: object
   gestao-financeira_backend_internal_identity_application_dtos.RegisterUserInput:
+    description: User registration input with email, password, first name and last
+      name
     properties:
       email:
+        description: Email address of the user (must be a valid email format)
+        example: user@example.com
         type: string
       first_name:
+        description: First name of the user (minimum 2 characters)
+        example: John
         minLength: 2
         type: string
       last_name:
+        description: Last name of the user (minimum 2 characters)
+        example: Doe
         minLength: 2
         type: string
       password:
+        description: Password for the user account (minimum 8 characters)
+        example: SecurePass123
         minLength: 8
         type: string
     required:
@@ -158,19 +168,6 @@ definitions:
     - first_name
     - last_name
     - password
-    type: object
-  gestao-financeira_backend_internal_identity_application_dtos.RegisterUserOutput:
-    properties:
-      email:
-        type: string
-      first_name:
-        type: string
-      full_name:
-        type: string
-      last_name:
-        type: string
-      user_id:
-        type: string
     type: object
   gestao-financeira_backend_internal_transaction_application_dtos.CreateTransactionInput:
     properties:
@@ -531,8 +528,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a new user account with email, password, first name and
-        last name
+      description: Creates a new user account with the provided email, password, first
+        name, and last name.
       parameters:
       - description: User registration data
         in: body
@@ -544,21 +541,26 @@ paths:
       - application/json
       responses:
         "201":
-          description: User data
+          description: 'User registered successfully" "Example: {\"message\": \"User
+            registered successfully\", \"data\": {\"user_id\": \"uuid\", \"email\":
+            \"user@example.com\", \"first_name\": \"John\", \"last_name\": \"Doe\",
+            \"full_name\": \"John Doe\"}}'
           schema:
-            $ref: '#/definitions/gestao-financeira_backend_internal_identity_application_dtos.RegisterUserOutput'
+            additionalProperties: true
+            type: object
         "400":
-          description: Bad request - invalid input data
+          description: Bad request - Invalid input data (e.g., invalid email format,
+            password too short, missing fields)
           schema:
             additionalProperties: true
             type: object
         "409":
-          description: Conflict - user with this email already exists
+          description: Conflict - User with this email already exists
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal server error
+          description: Internal server error - An unexpected error occurred
           schema:
             additionalProperties: true
             type: object
