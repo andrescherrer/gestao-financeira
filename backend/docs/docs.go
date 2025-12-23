@@ -30,7 +30,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Lists all accounts for the authenticated user, optionally filtered by context",
+                "description": "Lists all accounts for the authenticated user. Optionally filter by context (PERSONAL or BUSINESS).",
                 "consumes": [
                     "application/json"
                 ],
@@ -51,20 +51,20 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "List of accounts with count",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_account_application_dtos.ListAccountsOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Bad request - invalid user ID or context",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - missing or invalid JWT token",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -85,7 +85,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Creates a new account for the authenticated user",
+                "description": "Creates a new account for the authenticated user. Supports BANK, WALLET, INVESTMENT, and CREDIT_CARD account types.",
                 "consumes": [
                     "application/json"
                 ],
@@ -98,7 +98,7 @@ const docTemplate = `{
                 "summary": "Create a new account",
                 "parameters": [
                     {
-                        "description": "Account creation data",
+                        "description": "Account creation data (name, type, initial_balance, currency, context)",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -109,20 +109,27 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Account data",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_account_application_dtos.CreateAccountOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Bad request - invalid input data",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - account already exists",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -145,7 +152,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Retrieves a specific account by its ID",
+                "description": "Retrieves a specific account by its ID. Only returns accounts that belong to the authenticated user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -159,7 +166,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Account ID",
+                        "description": "Account ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -167,27 +174,34 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Account data",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_account_application_dtos.GetAccountOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Bad request - invalid account ID format",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - account does not belong to user",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Not found",
+                        "description": "Not found - account does not exist",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true

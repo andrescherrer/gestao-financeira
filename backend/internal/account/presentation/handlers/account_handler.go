@@ -33,17 +33,19 @@ func NewAccountHandler(
 
 // Create handles account creation requests.
 // @Summary Create a new account
-// @Description Creates a new account for the authenticated user
+// @Description Creates a new account for the authenticated user. Supports BANK, WALLET, INVESTMENT, and CREDIT_CARD account types.
 // @Tags accounts
 // @Accept json
 // @Produce json
-// @Param request body dtos.CreateAccountInput true "Account creation data"
-// @Success 201 {object} dtos.CreateAccountOutput
-// @Failure 400 {object} map[string]interface{} "Bad request"
-// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Security Bearer
+// @Param request body dtos.CreateAccountInput true "Account creation data (name, type, initial_balance, currency, context)"
+// @Success 201 {object} map[string]interface{} "Account created successfully"
+// @Success 201 {object} dtos.CreateAccountOutput "Account data"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
+// @Failure 409 {object} map[string]interface{} "Conflict - account already exists"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/v1/accounts [post]
-// @Security Bearer
 func (h *AccountHandler) Create(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -82,17 +84,18 @@ func (h *AccountHandler) Create(c *fiber.Ctx) error {
 
 // List handles account listing requests.
 // @Summary List accounts
-// @Description Lists all accounts for the authenticated user, optionally filtered by context
+// @Description Lists all accounts for the authenticated user. Optionally filter by context (PERSONAL or BUSINESS).
 // @Tags accounts
 // @Accept json
 // @Produce json
+// @Security Bearer
 // @Param context query string false "Filter by context (PERSONAL or BUSINESS)"
-// @Success 200 {object} dtos.ListAccountsOutput
-// @Failure 400 {object} map[string]interface{} "Bad request"
-// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Success 200 {object} map[string]interface{} "Accounts retrieved successfully"
+// @Success 200 {object} dtos.ListAccountsOutput "List of accounts with count"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID or context"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/v1/accounts [get]
-// @Security Bearer
 func (h *AccountHandler) List(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -127,18 +130,20 @@ func (h *AccountHandler) List(c *fiber.Ctx) error {
 
 // Get handles account retrieval requests.
 // @Summary Get account by ID
-// @Description Retrieves a specific account by its ID
+// @Description Retrieves a specific account by its ID. Only returns accounts that belong to the authenticated user.
 // @Tags accounts
 // @Accept json
 // @Produce json
-// @Param id path string true "Account ID"
-// @Success 200 {object} dtos.GetAccountOutput
-// @Failure 400 {object} map[string]interface{} "Bad request"
-// @Failure 401 {object} map[string]interface{} "Unauthorized"
-// @Failure 404 {object} map[string]interface{} "Not found"
+// @Security Bearer
+// @Param id path string true "Account ID (UUID)"
+// @Success 200 {object} map[string]interface{} "Account retrieved successfully"
+// @Success 200 {object} dtos.GetAccountOutput "Account data"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid account ID format"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
+// @Failure 403 {object} map[string]interface{} "Forbidden - account does not belong to user"
+// @Failure 404 {object} map[string]interface{} "Not found - account does not exist"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/v1/accounts/{id} [get]
-// @Security Bearer
 func (h *AccountHandler) Get(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
