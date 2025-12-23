@@ -173,7 +173,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
 | FE-001 | Criar projeto Next.js 14 com TypeScript | 🟣 | 🔴 | 2h | - | ✅ |
-| FE-002 | Configurar Tailwind CSS | 🟣 | 🔴 | 2h | FE-001 | ⏳ |
+| FE-002 | Configurar Tailwind CSS | 🟣 | 🔴 | 2h | FE-001 | ✅ |
 | FE-003 | Instalar e configurar shadcn/ui | 🟣 | 🔴 | 4h | FE-002 | ⏳ |
 | FE-004 | Instalar dependências (React Hook Form, Zod, Axios, TanStack Query) | 🟣 | 🔴 | 1h | FE-001 | ⏳ |
 | FE-005 | Configurar estrutura de pastas (app, components, lib) | 🟣 | 🔴 | 2h | FE-001 | ⏳ |
