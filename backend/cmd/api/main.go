@@ -16,6 +16,10 @@ import (
 	"gestao-financeira/backend/internal/identity/presentation/handlers"
 	"gestao-financeira/backend/internal/identity/presentation/routes"
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
+	transactionusecases "gestao-financeira/backend/internal/transaction/application/usecases"
+	transactionpersistence "gestao-financeira/backend/internal/transaction/infrastructure/persistence"
+	transactionhandlers "gestao-financeira/backend/internal/transaction/presentation/handlers"
+	transactionroutes "gestao-financeira/backend/internal/transaction/presentation/routes"
 	"gestao-financeira/backend/pkg/database"
 	"gestao-financeira/backend/pkg/health"
 	"gestao-financeira/backend/pkg/logger"
@@ -52,6 +56,7 @@ func main() {
 	// Initialize repositories
 	userRepository := persistence.NewGormUserRepository(db)
 	accountRepository := accountpersistence.NewGormAccountRepository(db)
+	transactionRepository := transactionpersistence.NewGormTransactionRepository(db)
 
 	// Initialize services
 	jwtService := services.NewJWTService()
@@ -65,9 +70,23 @@ func main() {
 	listAccountsUseCase := accountusecases.NewListAccountsUseCase(accountRepository)
 	getAccountUseCase := accountusecases.NewGetAccountUseCase(accountRepository)
 
+	// Initialize transaction use cases
+	createTransactionUseCase := transactionusecases.NewCreateTransactionUseCase(transactionRepository, eventBus)
+	listTransactionsUseCase := transactionusecases.NewListTransactionsUseCase(transactionRepository)
+	getTransactionUseCase := transactionusecases.NewGetTransactionUseCase(transactionRepository)
+	updateTransactionUseCase := transactionusecases.NewUpdateTransactionUseCase(transactionRepository, eventBus)
+	deleteTransactionUseCase := transactionusecases.NewDeleteTransactionUseCase(transactionRepository)
+
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUserUseCase, loginUseCase)
 	accountHandler := accounthandlers.NewAccountHandler(createAccountUseCase, listAccountsUseCase, getAccountUseCase)
+	transactionHandler := transactionhandlers.NewTransactionHandler(
+		createTransactionUseCase,
+		listTransactionsUseCase,
+		getTransactionUseCase,
+		updateTransactionUseCase,
+		deleteTransactionUseCase,
+	)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -124,6 +143,9 @@ func main() {
 
 		// Setup account routes (protected)
 		accountroutes.SetupAccountRoutes(app, accountHandler, jwtService)
+
+		// Setup transaction routes (protected)
+		transactionroutes.SetupTransactionRoutes(app, transactionHandler, jwtService)
 	}
 
 	// Get port from environment or use default
