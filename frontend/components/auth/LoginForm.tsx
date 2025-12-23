@@ -53,21 +53,29 @@ export function LoginForm({
         password: data.password,
       };
 
+      // Chamar API de login através do hook useAuth
       await login(loginData);
 
-      // Redirecionar para a página original ou dashboard
-      const params = new URLSearchParams(window.location.search);
-      const redirect = params.get("redirect") || "/";
-      window.location.href = redirect;
-
+      // Login bem-sucedido - token já foi salvo pelo hook
       // Chamar callback de sucesso se fornecido
       onSuccess?.();
+
+      // Redirecionar para a página original ou dashboard
+      // Usar setTimeout para garantir que o estado foi atualizado
+      setTimeout(() => {
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get("redirect") || "/";
+        window.location.href = redirect;
+      }, 100);
     } catch (err: any) {
-      setError(
+      // Tratar erros da API
+      const errorMessage =
         err.response?.data?.error ||
-          err.message ||
-          "Erro ao fazer login. Verifique suas credenciais."
-      );
+        err.response?.data?.message ||
+        err.message ||
+        "Erro ao fazer login. Verifique suas credenciais.";
+      
+      setError(errorMessage);
     }
   };
 
