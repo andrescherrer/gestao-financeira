@@ -341,7 +341,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Lists all transactions for the authenticated user, optionally filtered by account or type",
+                "description": "Lists all transactions for the authenticated user. Optionally filter by account_id and/or type (INCOME or EXPENSE).",
                 "consumes": [
                     "application/json"
                 ],
@@ -355,33 +355,33 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Filter by account ID",
+                        "description": "Filter by account ID (UUID)",
                         "name": "account_id",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Filter by type (INCOME or EXPENSE)",
+                        "description": "Filter by transaction type (INCOME or EXPENSE)",
                         "name": "type",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "List of transactions with count",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.ListTransactionsOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Bad request - invalid user ID, account ID or type",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - missing or invalid JWT token",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -402,7 +402,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Creates a new transaction for the authenticated user",
+                "description": "Creates a new transaction (INCOME or EXPENSE) for the authenticated user. Links transaction to an account.",
                 "consumes": [
                     "application/json"
                 ],
@@ -415,7 +415,7 @@ const docTemplate = `{
                 "summary": "Create a new transaction",
                 "parameters": [
                     {
-                        "description": "Transaction creation data",
+                        "description": "Transaction creation data (account_id, type, amount, currency, description, date)",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -426,20 +426,20 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Transaction data",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.CreateTransactionOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Bad request - invalid input data or account not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - missing or invalid JWT token",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -462,7 +462,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Retrieves a specific transaction by its ID",
+                "description": "Retrieves a specific transaction by its ID. Only returns transactions that belong to the authenticated user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -476,7 +476,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Transaction ID",
+                        "description": "Transaction ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -484,27 +484,34 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Transaction data",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.GetTransactionOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Bad request - invalid transaction ID format",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - transaction does not belong to user",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Not found",
+                        "description": "Not found - transaction does not exist",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -525,7 +532,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Updates an existing transaction (partial update supported)",
+                "description": "Updates an existing transaction. Supports partial updates - only provided fields will be updated. At least one field must be provided.",
                 "consumes": [
                     "application/json"
                 ],
@@ -539,13 +546,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Transaction ID",
+                        "description": "Transaction ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Transaction update data",
+                        "description": "Transaction update data (all fields optional: type, amount, currency, description, date)",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -556,27 +563,34 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Updated transaction data",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.UpdateTransactionOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Bad request - invalid transaction ID, invalid data, or no fields provided",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - transaction does not belong to user",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Not found",
+                        "description": "Not found - transaction does not exist",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -597,7 +611,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Deletes a transaction by its ID (soft delete)",
+                "description": "Deletes a transaction by its ID (soft delete). The transaction is marked as deleted but not permanently removed from the database.",
                 "consumes": [
                     "application/json"
                 ],
@@ -611,7 +625,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Transaction ID",
+                        "description": "Transaction ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -619,27 +633,27 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Deletion confirmation",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.DeleteTransactionOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Bad request - invalid transaction ID format",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - missing or invalid JWT token",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Not found",
+                        "description": "Not found - transaction does not exist",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true

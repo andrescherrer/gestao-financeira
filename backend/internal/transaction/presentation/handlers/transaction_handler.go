@@ -39,17 +39,18 @@ func NewTransactionHandler(
 
 // Create handles transaction creation requests.
 // @Summary Create a new transaction
-// @Description Creates a new transaction for the authenticated user
+// @Description Creates a new transaction (INCOME or EXPENSE) for the authenticated user. Links transaction to an account.
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Param request body dtos.CreateTransactionInput true "Transaction creation data"
-// @Success 201 {object} dtos.CreateTransactionOutput
-// @Failure 400 {object} map[string]interface{} "Bad request"
-// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Security Bearer
+// @Param request body dtos.CreateTransactionInput true "Transaction creation data (account_id, type, amount, currency, description, date)"
+// @Success 201 {object} map[string]interface{} "Transaction created successfully"
+// @Success 201 {object} dtos.CreateTransactionOutput "Transaction data"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data or account not found"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/v1/transactions [post]
-// @Security Bearer
 func (h *TransactionHandler) Create(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -88,18 +89,19 @@ func (h *TransactionHandler) Create(c *fiber.Ctx) error {
 
 // List handles transaction listing requests.
 // @Summary List transactions
-// @Description Lists all transactions for the authenticated user, optionally filtered by account or type
+// @Description Lists all transactions for the authenticated user. Optionally filter by account_id and/or type (INCOME or EXPENSE).
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Param account_id query string false "Filter by account ID"
-// @Param type query string false "Filter by type (INCOME or EXPENSE)"
-// @Success 200 {object} dtos.ListTransactionsOutput
-// @Failure 400 {object} map[string]interface{} "Bad request"
-// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Security Bearer
+// @Param account_id query string false "Filter by account ID (UUID)"
+// @Param type query string false "Filter by transaction type (INCOME or EXPENSE)"
+// @Success 200 {object} map[string]interface{} "Transactions retrieved successfully"
+// @Success 200 {object} dtos.ListTransactionsOutput "List of transactions with count"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID, account ID or type"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/v1/transactions [get]
-// @Security Bearer
 func (h *TransactionHandler) List(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -136,18 +138,20 @@ func (h *TransactionHandler) List(c *fiber.Ctx) error {
 
 // Get handles transaction retrieval requests.
 // @Summary Get transaction by ID
-// @Description Retrieves a specific transaction by its ID
+// @Description Retrieves a specific transaction by its ID. Only returns transactions that belong to the authenticated user.
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Param id path string true "Transaction ID"
-// @Success 200 {object} dtos.GetTransactionOutput
-// @Failure 400 {object} map[string]interface{} "Bad request"
-// @Failure 401 {object} map[string]interface{} "Unauthorized"
-// @Failure 404 {object} map[string]interface{} "Not found"
+// @Security Bearer
+// @Param id path string true "Transaction ID (UUID)"
+// @Success 200 {object} map[string]interface{} "Transaction retrieved successfully"
+// @Success 200 {object} dtos.GetTransactionOutput "Transaction data"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid transaction ID format"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
+// @Failure 403 {object} map[string]interface{} "Forbidden - transaction does not belong to user"
+// @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/v1/transactions/{id} [get]
-// @Security Bearer
 func (h *TransactionHandler) Get(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -195,19 +199,21 @@ func (h *TransactionHandler) Get(c *fiber.Ctx) error {
 
 // Update handles transaction update requests.
 // @Summary Update a transaction
-// @Description Updates an existing transaction (partial update supported)
+// @Description Updates an existing transaction. Supports partial updates - only provided fields will be updated. At least one field must be provided.
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Param id path string true "Transaction ID"
-// @Param request body dtos.UpdateTransactionInput true "Transaction update data"
-// @Success 200 {object} dtos.UpdateTransactionOutput
-// @Failure 400 {object} map[string]interface{} "Bad request"
-// @Failure 401 {object} map[string]interface{} "Unauthorized"
-// @Failure 404 {object} map[string]interface{} "Not found"
+// @Security Bearer
+// @Param id path string true "Transaction ID (UUID)"
+// @Param request body dtos.UpdateTransactionInput true "Transaction update data (all fields optional: type, amount, currency, description, date)"
+// @Success 200 {object} map[string]interface{} "Transaction updated successfully"
+// @Success 200 {object} dtos.UpdateTransactionOutput "Updated transaction data"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid transaction ID, invalid data, or no fields provided"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
+// @Failure 403 {object} map[string]interface{} "Forbidden - transaction does not belong to user"
+// @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/v1/transactions/{id} [put]
-// @Security Bearer
 func (h *TransactionHandler) Update(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -263,18 +269,19 @@ func (h *TransactionHandler) Update(c *fiber.Ctx) error {
 
 // Delete handles transaction deletion requests.
 // @Summary Delete a transaction
-// @Description Deletes a transaction by its ID (soft delete)
+// @Description Deletes a transaction by its ID (soft delete). The transaction is marked as deleted but not permanently removed from the database.
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Param id path string true "Transaction ID"
-// @Success 200 {object} dtos.DeleteTransactionOutput
-// @Failure 400 {object} map[string]interface{} "Bad request"
-// @Failure 401 {object} map[string]interface{} "Unauthorized"
-// @Failure 404 {object} map[string]interface{} "Not found"
+// @Security Bearer
+// @Param id path string true "Transaction ID (UUID)"
+// @Success 200 {object} map[string]interface{} "Transaction deleted successfully"
+// @Success 200 {object} dtos.DeleteTransactionOutput "Deletion confirmation"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid transaction ID format"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
+// @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
 // @Router /api/v1/transactions/{id} [delete]
-// @Security Bearer
 func (h *TransactionHandler) Delete(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
