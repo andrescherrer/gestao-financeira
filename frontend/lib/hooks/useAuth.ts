@@ -94,14 +94,17 @@ export function useAuth() {
   // Mutation para registro
   const registerMutation = useMutation({
     mutationFn: async (userData: RegisterRequest) => {
-      return await authService.register(userData);
+      // Chamar API de registro
+      const response = await authService.register(userData);
+      return response;
     },
     onSuccess: () => {
-      // Após registro bem-sucedido, redirecionar para login
-      router.push("/login");
+      // Nota: Redirecionamento é feito no componente (RegisterForm)
+      // para permitir mostrar mensagem de sucesso antes
     },
     onError: (error: any) => {
       console.error("Register error:", error);
+      // Erro será tratado no componente que chama a mutation
     },
   });
 

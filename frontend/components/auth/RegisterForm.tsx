@@ -67,18 +67,28 @@ export function RegisterForm({
         last_name: data.lastName,
       };
 
+      // Chamar API de registro através do hook useAuth
       await registerUser(registerData);
 
+      // Registro bem-sucedido
       setSuccess(true);
 
       // Chamar callback de sucesso se fornecido
       onSuccess?.();
+
+      // Redirecionar para login após 2 segundos (para mostrar mensagem de sucesso)
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 2000);
     } catch (err: any) {
-      setError(
+      // Tratar erros da API
+      const errorMessage =
         err.response?.data?.error ||
-          err.message ||
-          "Erro ao criar conta. Tente novamente."
-      );
+        err.response?.data?.message ||
+        err.message ||
+        "Erro ao criar conta. Tente novamente.";
+      
+      setError(errorMessage);
     }
   };
 
