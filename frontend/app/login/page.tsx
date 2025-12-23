@@ -1,59 +1,10 @@
-"use client";
+import { LoginForm } from "@/components/auth/LoginForm";
 
-import { useState } from "react";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAuth } from "@/lib/hooks/useAuth";
-import type { LoginRequest } from "@/lib/api/types";
-
-const loginSchema = z.object({
-  email: z.string().email("Email inválido"),
-  password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres"),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
-
+/**
+ * Página de Login
+ * Usa o componente LoginForm para renderizar o formulário
+ */
 export default function LoginPage() {
-  const { login, isLoggingIn, loginError } = useAuth();
-  const [error, setError] = useState<string | null>(null);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  });
-
-  const onSubmit = async (data: LoginFormData) => {
-    setError(null);
-
-    try {
-      const loginData: LoginRequest = {
-        email: data.email,
-        password: data.password,
-      };
-
-      await login(loginData);
-      
-      // Redirecionar para a página original ou dashboard
-      const params = new URLSearchParams(window.location.search);
-      const redirect = params.get("redirect") || "/";
-      window.location.href = redirect;
-    } catch (err: any) {
-      setError(
-        err.response?.data?.error || 
-        err.message || 
-        "Erro ao fazer login. Verifique suas credenciais."
-      );
-    }
-  };
-
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg border bg-card p-8 shadow-lg">
@@ -64,54 +15,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {(error || loginError) && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              {error || (loginError as any)?.response?.data?.error || (loginError as any)?.message || "Erro ao fazer login"}
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              {...register("email")}
-              disabled={isLoggingIn}
-            />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              {...register("password")}
-              disabled={isLoggingIn}
-            />
-            {errors.password && (
-              <p className="text-sm text-destructive">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isLoggingIn}>
-            {isLoggingIn ? "Entrando..." : "Entrar"}
-          </Button>
-        </form>
-
-        <div className="text-center text-sm">
-          <span className="text-muted-foreground">Não tem uma conta? </span>
-          <Link href="/register" className="text-primary hover:underline">
-            Criar conta
-          </Link>
-        </div>
+        <LoginForm />
       </div>
     </div>
   );
