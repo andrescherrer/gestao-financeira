@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +8,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authService } from "@/lib/api/auth";
+import { useAuth } from "@/lib/hooks/useAuth";
 import type { LoginRequest } from "@/lib/api/types";
 
 const loginSchema = z.object({
@@ -20,8 +19,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, isLoggingIn, loginError } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -33,7 +31,6 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
     setError(null);
 
     try {
@@ -42,21 +39,14 @@ export default function LoginPage() {
         password: data.password,
       };
 
-      const response = await authService.login(loginData);
-      
-      // Salvar token
-      authService.saveToken(response.token);
-
-      // Redirecionar para dashboard
-      router.push("/");
+      await login(loginData);
+      // Redirecionamento é feito pelo hook useAuth
     } catch (err: any) {
       setError(
         err.response?.data?.error || 
         err.message || 
         "Erro ao fazer login. Verifique suas credenciais."
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -71,9 +61,9 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {error && (
+          {(error || loginError) && (
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              {error}
+              {error || (loginError as any)?.response?.data?.error || (loginError as any)?.message || "Erro ao fazer login"}
             </div>
           )}
 
@@ -84,7 +74,7 @@ export default function LoginPage() {
               type="email"
               placeholder="seu@email.com"
               {...register("email")}
-              disabled={isLoading}
+              disabled={isLoggingIn}
             />
             {errors.email && (
               <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -98,7 +88,7 @@ export default function LoginPage() {
               type="password"
               placeholder="••••••••"
               {...register("password")}
-              disabled={isLoading}
+              disabled={isLoggingIn}
             />
             {errors.password && (
               <p className="text-sm text-destructive">
@@ -107,8 +97,8 @@ export default function LoginPage() {
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Entrando..." : "Entrar"}
+          <Button type="submit" className="w-full" disabled={isLoggingIn}>
+            {isLoggingIn ? "Entrando..." : "Entrar"}
           </Button>
         </form>
 

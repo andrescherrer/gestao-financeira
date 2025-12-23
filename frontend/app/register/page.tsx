@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +8,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authService } from "@/lib/api/auth";
+import { useAuth } from "@/lib/hooks/useAuth";
 import type { RegisterRequest } from "@/lib/api/types";
 
 const registerSchema = z.object({
@@ -26,8 +25,7 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const { register: registerUser, isRegistering, registerError } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
@@ -40,7 +38,6 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    setIsLoading(true);
     setError(null);
     setSuccess(false);
 
@@ -52,22 +49,17 @@ export default function RegisterPage() {
         last_name: data.lastName,
       };
 
-      await authService.register(registerData);
+      await registerUser(registerData);
       
       setSuccess(true);
       
-      // Redirecionar para login após 2 segundos
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
+      // Redirecionamento é feito pelo hook useAuth
     } catch (err: any) {
       setError(
         err.response?.data?.error || 
         err.message || 
         "Erro ao criar conta. Tente novamente."
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -88,9 +80,9 @@ export default function RegisterPage() {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {error && (
+          {(error || registerError) && (
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              {error}
+              {error || (registerError as any)?.response?.data?.error || (registerError as any)?.message || "Erro ao criar conta"}
             </div>
           )}
 
@@ -102,7 +94,7 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="João"
                 {...register("firstName")}
-                disabled={isLoading}
+                disabled={isRegistering}
               />
               {errors.firstName && (
                 <p className="text-sm text-destructive">{errors.firstName.message}</p>
@@ -116,7 +108,7 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="Silva"
                 {...register("lastName")}
-                disabled={isLoading}
+                disabled={isRegistering}
               />
               {errors.lastName && (
                 <p className="text-sm text-destructive">{errors.lastName.message}</p>
@@ -131,7 +123,7 @@ export default function RegisterPage() {
               type="email"
               placeholder="seu@email.com"
               {...register("email")}
-              disabled={isLoading}
+              disabled={isRegistering}
             />
             {errors.email && (
               <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -145,7 +137,7 @@ export default function RegisterPage() {
               type="password"
               placeholder="••••••••"
               {...register("password")}
-              disabled={isLoading}
+              disabled={isRegistering}
             />
             {errors.password && (
               <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -159,7 +151,7 @@ export default function RegisterPage() {
               type="password"
               placeholder="••••••••"
               {...register("confirmPassword")}
-              disabled={isLoading}
+              disabled={isRegistering}
             />
             {errors.confirmPassword && (
               <p className="text-sm text-destructive">
@@ -168,8 +160,8 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading || success}>
-            {isLoading ? "Criando conta..." : success ? "Conta criada!" : "Criar Conta"}
+          <Button type="submit" className="w-full" disabled={isRegistering || success}>
+            {isRegistering ? "Criando conta..." : success ? "Conta criada!" : "Criar Conta"}
           </Button>
         </form>
 
