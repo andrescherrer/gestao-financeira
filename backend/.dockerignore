@@ -23,7 +23,8 @@
 
 # Documentation
 *.md
-docs/
+# Note: docs/ directory is needed for Swagger, so we don't ignore it
+# The docs/ directory will be generated during Docker build
 
 # Environment
 .env
