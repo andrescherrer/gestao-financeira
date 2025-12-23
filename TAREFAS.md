@@ -192,7 +192,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 |----|--------|------|------------|---------|--------------|--------|
 | FE-AUTH-001 | Criar página de Login (/login) | 🟣 | 🔴 | 4h | FE-006, FE-007 | ✅ |
 | FE-AUTH-002 | Criar página de Registro (/register) | 🟣 | 🔴 | 4h | FE-006, FE-007 | ✅ |
-| FE-AUTH-003 | Criar hook useAuth para gerenciar autenticação | 🟣 | 🔴 | 4h | FE-007 | ⏳ |
+| FE-AUTH-003 | Criar hook useAuth para gerenciar autenticação | 🟣 | 🔴 | 4h | FE-007 | ✅ |
 | FE-AUTH-004 | Implementar proteção de rotas (middleware) | 🟣 | 🔴 | 4h | FE-AUTH-003 | ⏳ |
 | FE-AUTH-005 | Criar componente de formulário de login (React Hook Form + Zod) | 🟣 | 🔴 | 4h | FE-003, FE-004 | ⏳ |
 | FE-AUTH-006 | Criar componente de formulário de registro | 🟣 | 🔴 | 4h | FE-003, FE-004 | ⏳ |
