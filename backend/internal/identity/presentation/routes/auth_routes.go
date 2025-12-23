@@ -7,8 +7,8 @@ import (
 )
 
 // SetupAuthRoutes configures authentication routes.
-func SetupAuthRoutes(app *fiber.App, authHandler *handlers.AuthHandler) {
-	auth := app.Group("/api/v1/auth")
+func SetupAuthRoutes(router fiber.Router, authHandler *handlers.AuthHandler) {
+	auth := router.Group("/auth")
 	{
 		auth.Post("/register", authHandler.Register)
 		auth.Post("/login", authHandler.Login)

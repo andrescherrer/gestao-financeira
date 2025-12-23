@@ -167,13 +167,13 @@ func main() {
 		})
 
 		// Setup authentication routes (public)
-		routes.SetupAuthRoutes(app, authHandler)
+		routes.SetupAuthRoutes(api, authHandler)
 
 		// Setup account routes (protected)
-		accountroutes.SetupAccountRoutes(app, accountHandler, jwtService)
+		accountroutes.SetupAccountRoutes(api, accountHandler, jwtService)
 
 		// Setup transaction routes (protected)
-		transactionroutes.SetupTransactionRoutes(app, transactionHandler, jwtService)
+		transactionroutes.SetupTransactionRoutes(api, transactionHandler, jwtService)
 	}
 
 	// Get port from environment or use default

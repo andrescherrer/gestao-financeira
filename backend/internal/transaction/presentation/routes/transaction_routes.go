@@ -9,8 +9,8 @@ import (
 )
 
 // SetupTransactionRoutes configures transaction routes.
-func SetupTransactionRoutes(app *fiber.App, transactionHandler *handlers.TransactionHandler, jwtService *services.JWTService) {
-	transactions := app.Group("/api/v1/transactions")
+func SetupTransactionRoutes(router fiber.Router, transactionHandler *handlers.TransactionHandler, jwtService *services.JWTService) {
+	transactions := router.Group("/transactions")
 
 	// Apply authentication middleware to all transaction routes
 	transactions.Use(middleware.AuthMiddleware(jwtService))

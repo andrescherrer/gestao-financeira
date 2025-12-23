@@ -9,8 +9,8 @@ import (
 )
 
 // SetupAccountRoutes configures account routes.
-func SetupAccountRoutes(app *fiber.App, accountHandler *handlers.AccountHandler, jwtService *services.JWTService) {
-	accounts := app.Group("/api/v1/accounts")
+func SetupAccountRoutes(router fiber.Router, accountHandler *handlers.AccountHandler, jwtService *services.JWTService) {
+	accounts := router.Group("/accounts")
 
 	// Apply authentication middleware to all account routes
 	accounts.Use(middleware.AuthMiddleware(jwtService))
