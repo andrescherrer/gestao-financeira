@@ -2,6 +2,33 @@
 
 Este documento detalha as tarefas práticas para implementação do sistema, organizadas por fases e prioridades.
 
+## 📊 Status Geral do Projeto
+
+**Última verificação:** 2025-01-27
+
+### ✅ Concluído
+- **Setup Inicial** (SETUP-001 a SETUP-006): ✅ Completo
+- **Sprint 1.1: Setup Backend** (BE-001 a BE-008): ✅ Completo
+- **Sprint 1.2: Shared Kernel** (SK-001 a SK-006): ✅ Completo
+- **Sprint 1.3: Identity Context** (ID-001 a ID-013): ✅ Completo
+
+### ⏳ Em Progresso / Pendente
+- **Sprint 1.4: Account Management** (AC-001 a AC-011): ⏳ Estrutura criada, implementação pendente
+- **Sprint 1.5: Transaction Context** (TX-001 a TX-015): ⏳ Estrutura criada, implementação pendente
+- **Sprint 1.6: Swagger** (DOC-001 a DOC-006): ⏳ Não iniciado
+- **Sprint 1.7: Setup Frontend** (FE-001 a FE-009): ⏳ Estrutura criada, implementação pendente
+- **Demais sprints**: ⏳ Não iniciadas
+
+### 📈 Progresso
+- **Fase 1 (Fundação e MVP)**: ~30% concluído
+  - Backend base: ✅ 100%
+  - Identity Context: ✅ 100%
+  - Account Management: ⏳ 0%
+  - Transaction Context: ⏳ 0%
+  - Frontend: ⏳ 0%
+
+---
+
 ## 📋 Legenda
 
 - **Prioridade**: 🔴 Alta | 🟡 Média | 🟢 Baixa
