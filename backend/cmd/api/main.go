@@ -148,7 +148,7 @@ func main() {
 	app.Get("/health/ready", healthChecker.ReadinessCheck)
 
 	// Swagger documentation
-	app.Get("/swagger/*", fiberSwagger.WrapHandler(fiberSwagger.HandlerDefault))
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
 	// API v1 routes
 	api := app.Group("/api/v1")
