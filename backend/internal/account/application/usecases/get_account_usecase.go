@@ -61,4 +61,3 @@ func (uc *GetAccountUseCase) Execute(input dtos.GetAccountInput) (*dtos.GetAccou
 
 	return output, nil
 }
-
