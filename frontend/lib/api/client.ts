@@ -1,7 +1,8 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { env } from '@/lib/config/env';
 
-// Base URL da API - será sobrescrita por variável de ambiente
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+// Base URL da API - obtida das variáveis de ambiente
+const API_BASE_URL = env.apiUrl;
 
 // Criar instância do Axios
 export const apiClient: AxiosInstance = axios.create({
