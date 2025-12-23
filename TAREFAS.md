@@ -122,7 +122,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | AC-007 | Implementar ListAccountsUseCase | 🔵 | 🔴 | 2h | AC-003 | ✅ |
 | AC-008 | Implementar GetAccountUseCase | 🔵 | 🔴 | 2h | AC-003 | ✅ |
 | AC-009 | Criar AccountHandler (CRUD) | 🔵 | 🔴 | 6h | AC-006, AC-007, AC-008 | ✅ |
-| AC-010 | Configurar rotas de accounts (/api/v1/accounts/*) | 🔵 | 🔴 | 2h | AC-009, ID-011 | ⏳ |
+| AC-010 | Configurar rotas de accounts (/api/v1/accounts/*) | 🔵 | 🔴 | 2h | AC-009, ID-011 | ✅ |
 | AC-011 | Testes unitários para Account Context | 🟤 | 🟡 | 6h | AC-002, AC-006 | ⏳ |
 
 **Entregável Sprint 1.4:** API de contas funcionando (CRUD completo)
