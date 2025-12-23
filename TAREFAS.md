@@ -113,7 +113,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| AC-001 | Criar value object AccountID | 🔵 | 🔴 | 1h | BE-001 | ⏳ |
+| AC-001 | Criar value object AccountID | 🔵 | 🔴 | 1h | BE-001 | ✅ |
 | AC-002 | Criar entidade Account (agregado raiz) | 🔵 | 🔴 | 4h | SK-001, SK-003, AC-001 | ⏳ |
 | AC-003 | Criar interface AccountRepository | 🔵 | 🔴 | 1h | AC-002 | ⏳ |
 | AC-004 | Implementar GormAccountRepository | 🔵 | 🔴 | 6h | AC-003, BE-004 | ⏳ |
