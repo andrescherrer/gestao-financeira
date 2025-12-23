@@ -45,7 +45,7 @@ func NewAccountHandler(
 // @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
 // @Failure 409 {object} map[string]interface{} "Conflict - account already exists"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /api/v1/accounts [post]
+// @Router /accounts [post]
 func (h *AccountHandler) Create(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -95,7 +95,7 @@ func (h *AccountHandler) Create(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID or context"
 // @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /api/v1/accounts [get]
+// @Router /accounts [get]
 func (h *AccountHandler) List(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -143,7 +143,7 @@ func (h *AccountHandler) List(c *fiber.Ctx) error {
 // @Failure 403 {object} map[string]interface{} "Forbidden - account does not belong to user"
 // @Failure 404 {object} map[string]interface{} "Not found - account does not exist"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /api/v1/accounts/{id} [get]
+// @Router /accounts/{id} [get]
 func (h *AccountHandler) Get(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)

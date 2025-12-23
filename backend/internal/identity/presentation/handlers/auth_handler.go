@@ -38,7 +38,7 @@ func NewAuthHandler(
 // @Failure 400 {object} map[string]interface{} "Bad request - Invalid input data (e.g., invalid email format, password too short, missing fields)"
 // @Failure 409 {object} map[string]interface{} "Conflict - User with this email already exists"
 // @Failure 500 {object} map[string]interface{} "Internal server error - An unexpected error occurred"
-// @Router /api/v1/auth/register [post]
+// @Router /auth/register [post]
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	// Parse request body
 	var input dtos.RegisterUserInput
@@ -150,7 +150,7 @@ func (h *AuthHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
 // @Failure 401 {object} map[string]interface{} "Unauthorized - invalid email or password"
 // @Failure 403 {object} map[string]interface{} "Forbidden - user account is inactive"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /api/v1/auth/login [post]
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	// Parse request body
 	var input dtos.LoginInput

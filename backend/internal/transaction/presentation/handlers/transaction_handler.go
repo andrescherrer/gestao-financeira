@@ -50,7 +50,7 @@ func NewTransactionHandler(
 // @Failure 400 {object} map[string]interface{} "Bad request - invalid input data or account not found"
 // @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /api/v1/transactions [post]
+// @Router /transactions [post]
 func (h *TransactionHandler) Create(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -101,7 +101,7 @@ func (h *TransactionHandler) Create(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID, account ID or type"
 // @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /api/v1/transactions [get]
+// @Router /transactions [get]
 func (h *TransactionHandler) List(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -151,7 +151,7 @@ func (h *TransactionHandler) List(c *fiber.Ctx) error {
 // @Failure 403 {object} map[string]interface{} "Forbidden - transaction does not belong to user"
 // @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /api/v1/transactions/{id} [get]
+// @Router /transactions/{id} [get]
 func (h *TransactionHandler) Get(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -213,7 +213,7 @@ func (h *TransactionHandler) Get(c *fiber.Ctx) error {
 // @Failure 403 {object} map[string]interface{} "Forbidden - transaction does not belong to user"
 // @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /api/v1/transactions/{id} [put]
+// @Router /transactions/{id} [put]
 func (h *TransactionHandler) Update(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)
@@ -281,7 +281,7 @@ func (h *TransactionHandler) Update(c *fiber.Ctx) error {
 // @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
 // @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
-// @Router /api/v1/transactions/{id} [delete]
+// @Router /transactions/{id} [delete]
 func (h *TransactionHandler) Delete(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
 	userID := middleware.GetUserID(c)

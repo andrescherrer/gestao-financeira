@@ -23,7 +23,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/accounts": {
+        "/accounts": {
             "get": {
                 "security": [
                     {
@@ -145,7 +145,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/accounts/{id}": {
+        "/accounts/{id}": {
             "get": {
                 "security": [
                     {
@@ -217,7 +217,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/auth/login": {
+        "/auth/login": {
             "post": {
                 "description": "Authenticates a user with email and password, returns a JWT token for API access",
                 "consumes": [
@@ -279,7 +279,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/auth/register": {
+        "/auth/register": {
             "post": {
                 "description": "Creates a new user account with the provided email, password, first name, and last name.",
                 "consumes": [
@@ -335,7 +335,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/transactions": {
+        "/transactions": {
             "get": {
                 "security": [
                     {
@@ -456,7 +456,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/transactions/{id}": {
+        "/transactions/{id}": {
             "get": {
                 "security": [
                     {
