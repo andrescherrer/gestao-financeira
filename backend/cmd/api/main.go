@@ -6,6 +6,10 @@ import (
 	"syscall"
 	"time"
 
+	accountusecases "gestao-financeira/backend/internal/account/application/usecases"
+	accountpersistence "gestao-financeira/backend/internal/account/infrastructure/persistence"
+	accounthandlers "gestao-financeira/backend/internal/account/presentation/handlers"
+	accountroutes "gestao-financeira/backend/internal/account/presentation/routes"
 	"gestao-financeira/backend/internal/identity/application/usecases"
 	"gestao-financeira/backend/internal/identity/infrastructure/persistence"
 	"gestao-financeira/backend/internal/identity/infrastructure/services"
@@ -47,6 +51,7 @@ func main() {
 
 	// Initialize repositories
 	userRepository := persistence.NewGormUserRepository(db)
+	accountRepository := accountpersistence.NewGormAccountRepository(db)
 
 	// Initialize services
 	jwtService := services.NewJWTService()
@@ -55,8 +60,14 @@ func main() {
 	registerUserUseCase := usecases.NewRegisterUserUseCase(userRepository, eventBus)
 	loginUseCase := usecases.NewLoginUseCase(userRepository, jwtService)
 
+	// Initialize account use cases
+	createAccountUseCase := accountusecases.NewCreateAccountUseCase(accountRepository, eventBus)
+	listAccountsUseCase := accountusecases.NewListAccountsUseCase(accountRepository)
+	getAccountUseCase := accountusecases.NewGetAccountUseCase(accountRepository)
+
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUserUseCase, loginUseCase)
+	accountHandler := accounthandlers.NewAccountHandler(createAccountUseCase, listAccountsUseCase, getAccountUseCase)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -111,17 +122,8 @@ func main() {
 		// Setup authentication routes (public)
 		routes.SetupAuthRoutes(app, authHandler)
 
-		// Protected routes example (will be used in future tasks)
-		// protected := api.Group("", middleware.AuthMiddleware(jwtService))
-		// {
-		// 	protected.Get("/profile", func(c *fiber.Ctx) error {
-		// 		userID := middleware.GetUserID(c)
-		// 		return c.JSON(fiber.Map{
-		// 			"user_id": userID,
-		// 			"message": "This is a protected route",
-		// 		})
-		// 	})
-		// }
+		// Setup account routes (protected)
+		accountroutes.SetupAccountRoutes(app, accountHandler, jwtService)
 	}
 
 	// Get port from environment or use default
