@@ -190,7 +190,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| FE-AUTH-001 | Configurar TanStack Query Provider | 🟣 | 🔴 | 1h | FE-004 | ✅ |
+| FE-AUTH-001 | Criar página de Login (/login) | 🟣 | 🔴 | 4h | FE-006, FE-007 | ✅ |
 | FE-AUTH-002 | Criar página de Registro (/register) | 🟣 | 🔴 | 4h | FE-006, FE-007 | ⏳ |
 | FE-AUTH-003 | Criar hook useAuth para gerenciar autenticação | 🟣 | 🔴 | 4h | FE-007 | ⏳ |
 | FE-AUTH-004 | Implementar proteção de rotas (middleware) | 🟣 | 🔴 | 4h | FE-AUTH-003 | ⏳ |
