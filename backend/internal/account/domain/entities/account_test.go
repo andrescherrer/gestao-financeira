@@ -251,3 +251,85 @@ func TestAccount_GetEvents(t *testing.T) {
 		t.Error("Account.ClearEvents() should clear all events")
 	}
 }
+
+func TestAccount_Getters(t *testing.T) {
+	userID := identityvalueobjects.GenerateUserID()
+	accountName, _ := valueobjects.NewAccountName("Conta Corrente")
+	accountType := valueobjects.BankType()
+	initialBalance, _ := sharedvalueobjects.NewMoney(10000, sharedvalueobjects.MustCurrency("BRL"))
+	context := sharedvalueobjects.PersonalContext()
+
+	account, _ := NewAccount(userID, accountName, accountType, initialBalance, context)
+
+	// Test all getters
+	if account.ID().IsEmpty() {
+		t.Error("Account.ID() should not be empty")
+	}
+
+	if account.UserID().IsEmpty() {
+		t.Error("Account.UserID() should not be empty")
+	}
+
+	if account.Name().IsEmpty() {
+		t.Error("Account.Name() should not be empty")
+	}
+
+	if account.AccountType().Value() != "BANK" {
+		t.Errorf("Account.AccountType() = %v, want BANK", account.AccountType().Value())
+	}
+
+	if !account.Balance().Equals(initialBalance) {
+		t.Errorf("Account.Balance() = %v, want %v", account.Balance(), initialBalance)
+	}
+
+	if account.Context().Value() != "PERSONAL" {
+		t.Errorf("Account.Context() = %v, want PERSONAL", account.Context().Value())
+	}
+
+	if !account.IsActive() {
+		t.Error("Account.IsActive() = false, want true")
+	}
+
+	// Test timestamps
+	if account.CreatedAt().IsZero() {
+		t.Error("Account.CreatedAt() should not be zero")
+	}
+
+	if account.UpdatedAt().IsZero() {
+		t.Error("Account.UpdatedAt() should not be zero")
+	}
+}
+
+func TestAccount_Credit_DifferentCurrency(t *testing.T) {
+	userID := identityvalueobjects.GenerateUserID()
+	accountName, _ := valueobjects.NewAccountName("Conta Corrente")
+	accountType := valueobjects.BankType()
+	initialBalance, _ := sharedvalueobjects.NewMoney(10000, sharedvalueobjects.MustCurrency("BRL"))
+	context := sharedvalueobjects.PersonalContext()
+
+	account, _ := NewAccount(userID, accountName, accountType, initialBalance, context)
+
+	// Try to credit with different currency
+	usdAmount, _ := sharedvalueobjects.NewMoney(5000, sharedvalueobjects.MustCurrency("USD"))
+	err := account.Credit(usdAmount)
+	if err == nil {
+		t.Error("Account.Credit() should fail with different currency")
+	}
+}
+
+func TestAccount_Debit_DifferentCurrency(t *testing.T) {
+	userID := identityvalueobjects.GenerateUserID()
+	accountName, _ := valueobjects.NewAccountName("Conta Corrente")
+	accountType := valueobjects.BankType()
+	initialBalance, _ := sharedvalueobjects.NewMoney(10000, sharedvalueobjects.MustCurrency("BRL"))
+	context := sharedvalueobjects.PersonalContext()
+
+	account, _ := NewAccount(userID, accountName, accountType, initialBalance, context)
+
+	// Try to debit with different currency
+	usdAmount, _ := sharedvalueobjects.NewMoney(5000, sharedvalueobjects.MustCurrency("USD"))
+	err := account.Debit(usdAmount)
+	if err == nil {
+		t.Error("Account.Debit() should fail with different currency")
+	}
+}
