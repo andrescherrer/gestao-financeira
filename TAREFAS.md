@@ -147,7 +147,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | TX-012 | Implementar DeleteTransactionUseCase | 🔵 | 🔴 | 2h | TX-004, TX-005 | ✅ |
 | TX-013 | Criar TransactionHandler (CRUD completo) | 🔵 | 🔴 | 6h | TX-008, TX-009, TX-010, TX-011, TX-012 | ✅ |
 | TX-014 | Configurar rotas de transactions (/api/v1/transactions/*) | 🔵 | 🔴 | 2h | TX-013, ID-011 | ✅ |
-| TX-015 | Testes unitários para Transaction Context | 🟤 | 🟡 | 8h | TX-004, TX-008 | ⏳ |
+| TX-015 | Testes unitários para Transaction Context | 🟤 | 🟡 | 8h | TX-004, TX-008 | ✅ |
 
 **Entregável Sprint 1.5:** API de transações funcionando (CRUD completo)
 
