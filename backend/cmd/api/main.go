@@ -29,7 +29,26 @@ import (
 	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/rs/zerolog/log"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
+
+	_ "gestao-financeira/backend/docs" // swagger docs
 )
+
+// @title Gestão Financeira API
+// @version 1.0
+// @description API REST para gestão financeira pessoal e profissional. Gerencia usuários, contas e transações financeiras.
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email support@gestaofinanceira.com
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host localhost:8080
+// @BasePath /api/v1
+// @schemes http https
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
 	// Initialize structured logger
@@ -127,6 +146,9 @@ func main() {
 	app.Get("/health", healthChecker.HealthCheck)
 	app.Get("/health/live", healthChecker.LivenessCheck)
 	app.Get("/health/ready", healthChecker.ReadinessCheck)
+
+	// Swagger documentation
+	app.Get("/swagger/*", fiberSwagger.WrapHandler(fiberSwagger.HandlerDefault))
 
 	// API v1 routes
 	api := app.Group("/api/v1")

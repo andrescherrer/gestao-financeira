@@ -1,0 +1,770 @@
+basePath: /api/v1
+definitions:
+  gestao-financeira_backend_internal_account_application_dtos.AccountOutput:
+    properties:
+      account_id:
+        type: string
+      balance:
+        type: number
+      context:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_account_application_dtos.CreateAccountInput:
+    properties:
+      context:
+        enum:
+        - PERSONAL
+        - BUSINESS
+        type: string
+      currency:
+        enum:
+        - BRL
+        - USD
+        - EUR
+        type: string
+      initial_balance:
+        minimum: 0
+        type: number
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      type:
+        enum:
+        - BANK
+        - WALLET
+        - INVESTMENT
+        - CREDIT_CARD
+        type: string
+      user_id:
+        type: string
+    required:
+    - context
+    - currency
+    - name
+    - type
+    - user_id
+    type: object
+  gestao-financeira_backend_internal_account_application_dtos.CreateAccountOutput:
+    properties:
+      account_id:
+        type: string
+      balance:
+        type: number
+      context:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_account_application_dtos.GetAccountOutput:
+    properties:
+      account_id:
+        type: string
+      balance:
+        type: number
+      context:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_account_application_dtos.ListAccountsOutput:
+    properties:
+      accounts:
+        items:
+          $ref: '#/definitions/gestao-financeira_backend_internal_account_application_dtos.AccountOutput'
+        type: array
+      count:
+        type: integer
+    type: object
+  gestao-financeira_backend_internal_identity_application_dtos.LoginInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  gestao-financeira_backend_internal_identity_application_dtos.LoginOutput:
+    properties:
+      email:
+        type: string
+      expires_in:
+        description: Token expiration in seconds
+        type: integer
+      first_name:
+        type: string
+      full_name:
+        type: string
+      last_name:
+        type: string
+      token:
+        type: string
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_identity_application_dtos.RegisterUserInput:
+    properties:
+      email:
+        type: string
+      first_name:
+        minLength: 2
+        type: string
+      last_name:
+        minLength: 2
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    type: object
+  gestao-financeira_backend_internal_identity_application_dtos.RegisterUserOutput:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      full_name:
+        type: string
+      last_name:
+        type: string
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_transaction_application_dtos.CreateTransactionInput:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      currency:
+        enum:
+        - BRL
+        - USD
+        - EUR
+        type: string
+      date:
+        description: 'ISO 8601 format: YYYY-MM-DD'
+        type: string
+      description:
+        maxLength: 500
+        minLength: 3
+        type: string
+      type:
+        enum:
+        - INCOME
+        - EXPENSE
+        type: string
+      user_id:
+        type: string
+    required:
+    - account_id
+    - amount
+    - currency
+    - date
+    - description
+    - type
+    - user_id
+    type: object
+  gestao-financeira_backend_internal_transaction_application_dtos.CreateTransactionOutput:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      created_at:
+        type: string
+      currency:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      transaction_id:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_transaction_application_dtos.DeleteTransactionOutput:
+    properties:
+      message:
+        type: string
+      transaction_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_transaction_application_dtos.GetTransactionOutput:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      created_at:
+        type: string
+      currency:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      transaction_id:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_transaction_application_dtos.ListTransactionsOutput:
+    properties:
+      count:
+        type: integer
+      transactions:
+        items:
+          $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.TransactionOutput'
+        type: array
+    type: object
+  gestao-financeira_backend_internal_transaction_application_dtos.TransactionOutput:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      created_at:
+        type: string
+      currency:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      transaction_id:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_transaction_application_dtos.UpdateTransactionInput:
+    properties:
+      amount:
+        type: number
+      currency:
+        enum:
+        - BRL
+        - USD
+        - EUR
+        type: string
+      date:
+        description: 'ISO 8601 format: YYYY-MM-DD'
+        type: string
+      description:
+        maxLength: 500
+        minLength: 3
+        type: string
+      transaction_id:
+        type: string
+      type:
+        enum:
+        - INCOME
+        - EXPENSE
+        type: string
+    required:
+    - transaction_id
+    type: object
+  gestao-financeira_backend_internal_transaction_application_dtos.UpdateTransactionOutput:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      currency:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      transaction_id:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@gestaofinanceira.com
+    name: API Support
+  description: API REST para gestão financeira pessoal e profissional. Gerencia usuários,
+    contas e transações financeiras.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Gestão Financeira API
+  version: "1.0"
+paths:
+  /api/v1/accounts:
+    get:
+      consumes:
+      - application/json
+      description: Lists all accounts for the authenticated user, optionally filtered
+        by context
+      parameters:
+      - description: Filter by context (PERSONAL or BUSINESS)
+        in: query
+        name: context
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_account_application_dtos.ListAccountsOutput'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: List accounts
+      tags:
+      - accounts
+    post:
+      consumes:
+      - application/json
+      description: Creates a new account for the authenticated user
+      parameters:
+      - description: Account creation data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/gestao-financeira_backend_internal_account_application_dtos.CreateAccountInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_account_application_dtos.CreateAccountOutput'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Create a new account
+      tags:
+      - accounts
+  /api/v1/accounts/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific account by its ID
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_account_application_dtos.GetAccountOutput'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get account by ID
+      tags:
+      - accounts
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns a JWT token
+      parameters:
+      - description: User login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/gestao-financeira_backend_internal_identity_application_dtos.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_identity_application_dtos.LoginOutput'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - invalid credentials
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login user
+      tags:
+      - auth
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account
+      parameters:
+      - description: User registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/gestao-financeira_backend_internal_identity_application_dtos.RegisterUserInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_identity_application_dtos.RegisterUserOutput'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict - user already exists
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+      tags:
+      - auth
+  /api/v1/transactions:
+    get:
+      consumes:
+      - application/json
+      description: Lists all transactions for the authenticated user, optionally filtered
+        by account or type
+      parameters:
+      - description: Filter by account ID
+        in: query
+        name: account_id
+        type: string
+      - description: Filter by type (INCOME or EXPENSE)
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.ListTransactionsOutput'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: List transactions
+      tags:
+      - transactions
+    post:
+      consumes:
+      - application/json
+      description: Creates a new transaction for the authenticated user
+      parameters:
+      - description: Transaction creation data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.CreateTransactionInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.CreateTransactionOutput'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Create a new transaction
+      tags:
+      - transactions
+  /api/v1/transactions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a transaction by its ID (soft delete)
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.DeleteTransactionOutput'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete a transaction
+      tags:
+      - transactions
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific transaction by its ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.GetTransactionOutput'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get transaction by ID
+      tags:
+      - transactions
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing transaction (partial update supported)
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Transaction update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.UpdateTransactionInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.UpdateTransactionOutput'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Update a transaction
+      tags:
+      - transactions
+schemes:
+- http
+- https
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
