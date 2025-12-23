@@ -27,6 +27,8 @@ export const authService = {
   saveToken(token: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_token', token);
+      // Também salvar em cookie para o middleware
+      document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`; // 7 dias
     }
   },
 
@@ -36,6 +38,8 @@ export const authService = {
   removeToken(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
+      // Remover cookie também
+      document.cookie = 'auth_token=; path=/; max-age=0';
     }
   },
 

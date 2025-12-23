@@ -40,7 +40,11 @@ export default function LoginPage() {
       };
 
       await login(loginData);
-      // Redirecionamento é feito pelo hook useAuth
+      
+      // Redirecionar para a página original ou dashboard
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect") || "/";
+      window.location.href = redirect;
     } catch (err: any) {
       setError(
         err.response?.data?.error || 
