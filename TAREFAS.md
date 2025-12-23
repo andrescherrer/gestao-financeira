@@ -133,10 +133,10 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| TX-001 | Criar value object TransactionID | 🔵 | 🔴 | 1h | BE-001 | ⏳ |
-| TX-002 | Criar value object TransactionType (Income, Expense) | 🔵 | 🔴 | 2h | BE-001 | ⏳ |
-| TX-003 | Criar value object TransactionDescription | 🔵 | 🔴 | 1h | BE-001 | ⏳ |
-| TX-004 | Criar entidade Transaction (agregado raiz) | 🔵 | 🔴 | 6h | SK-001, TX-001, TX-002, TX-003 | ⏳ |
+| TX-001 | Criar value object TransactionID | 🔵 | 🔴 | 1h | BE-001 | ✅ |
+| TX-002 | Criar value object TransactionType (Income, Expense) | 🔵 | 🔴 | 2h | BE-001 | ✅ |
+| TX-003 | Criar value object TransactionDescription | 🔵 | 🔴 | 1h | BE-001 | ✅ |
+| TX-004 | Criar entidade Transaction (agregado raiz) | 🔵 | 🔴 | 6h | SK-001, TX-001, TX-002, TX-003 | ✅ |
 | TX-005 | Criar interface TransactionRepository | 🔵 | 🔴 | 1h | TX-004 | ⏳ |
 | TX-006 | Implementar GormTransactionRepository | 🔵 | 🔴 | 6h | TX-005, BE-004 | ⏳ |
 | TX-007 | Criar migration para tabela transactions | 🔵 | 🔴 | 2h | TX-006 | ⏳ |
