@@ -185,7 +185,23 @@ func main() {
 	// Start server in a goroutine
 	go func() {
 		log.Info().Str("port", port).Msg("Server starting")
-		if err := app.Listen(":" + port); err != nil {
+		// Create listener
+		ln, err := net.Listen("tcp", ":"+port)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to create listener")
+		}
+		
+		// Create custom HTTP server with increased MaxHeaderBytes
+		// Fiber's app can be used with custom HTTP server
+		server := &http.Server{
+			Handler:        app.Handler(),
+			ReadTimeout:    10 * time.Second,
+			WriteTimeout:   10 * time.Second,
+			IdleTimeout:    120 * time.Second,
+			MaxHeaderBytes: 16384, // 16KB header limit (default is 1MB, but some systems have lower limits)
+		}
+		
+		if err := server.Serve(ln); err != nil {
 			log.Fatal().Err(err).Msg("Failed to start server")
 		}
 	}()
