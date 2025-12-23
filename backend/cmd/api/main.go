@@ -115,6 +115,12 @@ func main() {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
+		// Increase header size limit to prevent 431 errors
+		// Default is 4096 bytes, increasing to 16384 bytes (16KB)
+		ReadBufferSize:  16384,
+		WriteBufferSize: 16384,
+		// Body size limit (default is 4MB, increasing to 10MB)
+		BodyLimit: 10 * 1024 * 1024,
 	})
 
 	// Global middlewares
