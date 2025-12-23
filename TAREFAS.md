@@ -140,7 +140,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | TX-005 | Criar interface TransactionRepository | 🔵 | 🔴 | 1h | TX-004 | ✅ |
 | TX-006 | Implementar GormTransactionRepository | 🔵 | 🔴 | 6h | TX-005, BE-004 | ✅ |
 | TX-007 | Criar migration para tabela transactions | 🔵 | 🔴 | 2h | TX-006 | ✅ |
-| TX-008 | Implementar CreateTransactionUseCase | 🔵 | 🔴 | 4h | TX-004, TX-005, AC-003 | ⏳ |
+| TX-008 | Implementar CreateTransactionUseCase | 🔵 | 🔴 | 4h | TX-004, TX-005, AC-003 | ✅ |
 | TX-009 | Implementar ListTransactionsUseCase | 🔵 | 🔴 | 4h | TX-005 | ⏳ |
 | TX-010 | Implementar GetTransactionUseCase | 🔵 | 🔴 | 2h | TX-005 | ⏳ |
 | TX-011 | Implementar UpdateTransactionUseCase | 🔵 | 🔴 | 4h | TX-004, TX-005 | ⏳ |
