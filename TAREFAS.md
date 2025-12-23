@@ -178,7 +178,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | FE-004 | Instalar dependências (React Hook Form, Zod, Axios, TanStack Query) | 🟣 | 🔴 | 1h | FE-001 | ✅ |
 | FE-005 | Configurar estrutura de pastas (app, components, lib) | 🟣 | 🔴 | 2h | FE-001 | ✅ |
 | FE-006 | Criar layout base (Header, Sidebar, Footer) | 🟣 | 🔴 | 4h | FE-003 | ✅ |
-| FE-007 | Configurar cliente API (Axios) | 🟣 | 🔴 | 4h | FE-004 | ⏳ |
+| FE-007 | Configurar cliente API (Axios) | 🟣 | 🔴 | 4h | FE-004 | ✅ |
 | FE-008 | Configurar variáveis de ambiente (.env.local) | 🟣 | 🔴 | 1h | FE-001 | ⏳ |
 | FE-009 | Criar Dockerfile para frontend | 🟠 | 🟡 | 2h | FE-001 | ⏳ |
 
