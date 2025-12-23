@@ -59,9 +59,15 @@ export function useAuth() {
   // Mutation para login
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginRequest): Promise<LoginResponse> => {
+      // Chamar API de login
       const response = await authService.login(credentials);
+      
+      // Salvar token (localStorage + cookie)
       authService.saveToken(response.token);
+      
+      // Atualizar estado do usuário
       setUser(response.user);
+      
       return response;
     },
     onSuccess: (data) => {
@@ -71,14 +77,17 @@ export function useAuth() {
         isAuthenticated: true,
         isLoading: false,
       });
+      
       // Invalidar outras queries que dependem de autenticação
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      // Redirecionar para dashboard
-      router.push("/");
+      
+      // Nota: Redirecionamento é feito no componente (LoginForm)
+      // para permitir controle de redirect customizado
     },
     onError: (error: any) => {
       console.error("Login error:", error);
+      // Erro será tratado no componente que chama a mutation
     },
   });
 
