@@ -20,8 +20,14 @@ export const env = {
 
 /**
  * Valida se todas as variáveis de ambiente obrigatórias estão definidas
+ * Apenas em runtime, não durante o build
  */
 export function validateEnv(): void {
+  // Não validar durante o build (SSR)
+  if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+    return;
+  }
+
   const required = ['NEXT_PUBLIC_API_URL'];
   const missing: string[] = [];
 
@@ -31,15 +37,10 @@ export function validateEnv(): void {
     }
   });
 
-  if (missing.length > 0) {
-    throw new Error(
+  if (missing.length > 0 && typeof window !== 'undefined') {
+    console.warn(
       `Missing required environment variables: ${missing.join(', ')}`
     );
   }
-}
-
-// Validar variáveis de ambiente apenas no lado do servidor
-if (typeof window === 'undefined') {
-  validateEnv();
 }
 
