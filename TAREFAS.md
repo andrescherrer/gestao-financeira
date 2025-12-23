@@ -162,7 +162,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | DOC-003 | Adicionar anotações Swagger nos handlers de Account | 🔵 | 🔴 | 2h | AC-009, DOC-001 | ✅ |
 | DOC-004 | Adicionar anotações Swagger nos handlers de Transaction | 🔵 | 🔴 | 2h | TX-013, DOC-001 | ✅ |
 | DOC-005 | Configurar rota /swagger/* no Fiber | 🔵 | 🔴 | 1h | DOC-001 | ✅ |
-| DOC-006 | Gerar e testar documentação Swagger | 🔵 | 🔴 | 1h | DOC-002, DOC-003, DOC-004, DOC-005 | ⏳ |
+| DOC-006 | Gerar e testar documentação Swagger | 🔵 | 🔴 | 1h | DOC-002, DOC-003, DOC-004, DOC-005 | ✅ |
 
 **Entregável Sprint 1.6:** Swagger documentado e acessível
 
