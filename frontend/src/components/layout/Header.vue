@@ -22,72 +22,71 @@
           ></span>
         </Button>
 
-        <!-- Avatar do Usuário -->
-        <div v-if="authStore.user" class="flex items-center gap-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-sm font-semibold text-white shadow-sm">
-            {{ userInitials }}
-          </div>
-          <div class="hidden flex-col sm:flex">
-            <span class="text-sm font-semibold text-foreground">{{ userName }}</span>
-            <span class="text-xs text-muted-foreground">{{ authStore.user.email }}</span>
-          </div>
-          <!-- Menu Dropdown do Usuário -->
-          <div class="relative" ref="userMenuRef">
+        <!-- Avatar do Usuário com Dropdown Menu -->
+        <DropdownMenu v-if="authStore.user">
+          <DropdownMenuTrigger as-child>
             <Button
               variant="ghost"
-              size="icon"
-              @click="showUserMenu = !showUserMenu"
+              class="flex items-center gap-2 h-auto p-1 hover:bg-accent"
             >
-              <ChevronDown class="h-4 w-4" />
+              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-sm font-semibold text-white shadow-sm">
+                {{ userInitials }}
+              </div>
+              <div class="hidden flex-col items-start sm:flex">
+                <span class="text-sm font-semibold text-foreground">{{ userName }}</span>
+                <span class="text-xs text-muted-foreground">{{ authStore.user.email }}</span>
+              </div>
+              <ChevronDown class="h-4 w-4 text-muted-foreground" />
             </Button>
-            <div
-              v-if="showUserMenu"
-              class="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-popover p-1 shadow-lg"
-            >
-              <Button
-                variant="ghost"
-                class="flex w-full items-center gap-2 justify-start"
-                @click="handleLogout"
-              >
-                <LogOut class="h-4 w-4" />
-                <span>Sair</span>
-              </Button>
-            </div>
-          </div>
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" class="w-56">
+            <DropdownMenuLabel>
+              <div class="flex flex-col space-y-1">
+                <p class="text-sm font-medium leading-none">{{ userName }}</p>
+                <p class="text-xs leading-none text-muted-foreground">{{ authStore.user.email }}</p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem @click="handleProfile">
+              <User class="h-4 w-4" />
+              <span>Perfil</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem @click="handleSettings">
+              <Settings class="h-4 w-4" />
+              <span>Configurações</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem @click="handleLogout" class="text-destructive focus:text-destructive">
+              <LogOut class="h-4 w-4" />
+              <span>Sair</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { Button } from '@/components/ui/button'
-import { Bell, ChevronDown, LogOut } from 'lucide-vue-next'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Bell, ChevronDown, LogOut, User, Settings } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-const showUserMenu = ref(false)
 const hasNotifications = ref(false)
-const userMenuRef = ref<HTMLElement | null>(null)
-
-function handleClickOutside(event: MouseEvent) {
-  if (userMenuRef.value && !userMenuRef.value.contains(event.target as Node)) {
-    showUserMenu.value = false
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
 
 const userName = computed(() => {
   if (!authStore.user) return 'Usuário'
@@ -124,8 +123,17 @@ const pageTitle = computed(() => {
 })
 
 function handleLogout() {
-  showUserMenu.value = false
   authStore.logout()
   router.push('/login')
+}
+
+function handleProfile() {
+  // TODO: Implementar página de perfil
+  console.log('Perfil')
+}
+
+function handleSettings() {
+  // TODO: Implementar página de configurações
+  console.log('Configurações')
 }
 </script>
