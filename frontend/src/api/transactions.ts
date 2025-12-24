@@ -114,7 +114,7 @@ export const transactionService = {
         description: string
         date: string
         created_at: string
-        updated_at: string
+        updated_at?: string // Backend não retorna updated_at na criação
       }
     }>('/transactions', data)
     
