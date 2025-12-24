@@ -25,10 +25,18 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading.value = true
     try {
       const response = await authService.login(credentials)
+      // Salvar token primeiro
+      authService.saveToken(response.token)
+      // Depois atualizar o estado
       token.value = response.token
       user.value = response.user
-      authService.saveToken(response.token)
       return response
+    } catch (error) {
+      // Limpar token em caso de erro
+      token.value = null
+      user.value = null
+      authService.removeToken()
+      throw error
     } finally {
       isLoading.value = false
     }

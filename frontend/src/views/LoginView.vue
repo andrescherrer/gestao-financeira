@@ -91,6 +91,8 @@ async function handleSubmit(values: any) {
   error.value = null
   try {
     await authStore.login(values)
+    // Aguardar um tick para garantir que o token foi salvo
+    await new Promise(resolve => setTimeout(resolve, 100))
     const redirect = (route.query.redirect as string) || '/'
     router.push(redirect)
   } catch (err: any) {

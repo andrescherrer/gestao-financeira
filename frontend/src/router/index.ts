@@ -64,8 +64,13 @@ const router = createRouter({
 // Navigation guard
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
-  authStore.init()
+  
+  // Inicializar apenas se não estiver inicializado
+  if (!authStore.token) {
+    authStore.init()
+  }
 
+  // Aguardar um tick para garantir que o estado foi atualizado
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'login', query: { redirect: to.fullPath } })
   } else if (to.meta.requiresGuest && authStore.isAuthenticated) {

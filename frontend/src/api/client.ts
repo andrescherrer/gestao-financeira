@@ -1,5 +1,7 @@
 import axios, { type AxiosInstance, type AxiosError } from 'axios'
 import { env } from '@/config/env'
+import router from '@/router'
+import { useAuthStore } from '@/stores/auth'
 
 /**
  * Cliente HTTP configurado
@@ -35,10 +37,21 @@ apiClient.interceptors.response.use(
 
       // 401 Unauthorized - token inválido ou expirado
       if (status === 401) {
-        localStorage.removeItem('auth_token')
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login'
+        // Ignorar 401 em rotas de autenticação (login/register)
+        const currentPath = window.location.pathname
+        if (currentPath === '/login' || currentPath === '/register') {
+          return Promise.reject(error)
         }
+
+        const authStore = useAuthStore()
+        authStore.logout()
+        
+        // Usar setTimeout para evitar problemas de importação circular
+        setTimeout(() => {
+          if (router.currentRoute.value.path !== '/login') {
+            router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
+          }
+        }, 0)
       }
     }
 
