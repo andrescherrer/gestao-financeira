@@ -245,7 +245,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | FE-TX-003 | Criar componente TransactionTable | 🟣 | 🔴 | 4h | FE-003 | ✅ |
 | FE-TX-004 | Criar página de detalhes da transação (/transactions/:id) | 🟣 | 🔴 | 4h | FE-TX-001 | ✅ |
 | FE-TX-005 | Criar página de criação de transação (/transactions/new) | 🟣 | 🔴 | 4h | FE-TX-001 | ✅ |
-| FE-TX-006 | Criar formulário de transação (Vue Composition API) | 🟣 | 🔴 | 6h | FE-TX-005 | ⏳ |
+| FE-TX-006 | Criar formulário de transação (Vue Composition API) | 🟣 | 🔴 | 6h | FE-TX-005 | ✅ |
 | FE-TX-007 | Integrar com API de transações (listar) | 🟣 | 🔴 | 2h | FE-TX-002, DOC-006 | ⏳ |
 | FE-TX-008 | Integrar com API de transações (criar) | 🟣 | 🔴 | 2h | FE-TX-005, DOC-006 | ⏳ |
 | FE-TX-009 | Integrar com API de transações (detalhes) | 🟣 | 🔴 | 2h | FE-TX-004, DOC-006 | ⏳ |
