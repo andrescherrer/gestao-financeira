@@ -6,20 +6,20 @@
     <div class="flex h-full flex-col">
       <!-- Logo e Nome -->
       <div class="border-b border-gray-200 px-6 py-5">
-        <RouterLink to="/" class="flex items-center gap-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700">
+        <RouterLink to="/" class="flex items-center gap-3 transition-opacity hover:opacity-80">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 shadow-sm">
+            <!-- Logo com ondas estilizado -->
             <svg
               class="h-6 w-6 text-white"
+              viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+              <circle cx="12" cy="12" r="3" />
             </svg>
           </div>
           <span class="text-lg font-bold text-gray-900">Gestão Financeira</span>
