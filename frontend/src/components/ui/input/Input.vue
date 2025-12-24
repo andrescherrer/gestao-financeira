@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from "vue"
-import { useVModel } from "@vueuse/core"
 import { computed } from "vue"
 import { cn } from "@/lib/utils"
 
@@ -14,20 +13,20 @@ const props = defineProps<{
   name?: string
   placeholder?: string
   disabled?: boolean
-  onInput?: (event: Event) => void
-  onChange?: (event: Event) => void
-  onBlur?: (event: Event) => void
 }>()
 
 const emits = defineEmits<{
   (e: "update:modelValue", payload: string | number): void
+  (e: "input", event: Event): void
+  (e: "change", event: Event): void
+  (e: "blur", event: Event): void
 }>()
 
 // Suporta tanto v-model quanto value do vee-validate Field
-const modelValue = computed({
+const inputValue = computed({
   get: () => {
     // Se tem value (do vee-validate Field), usa value
-    if (props.value !== undefined) {
+    if (props.value !== undefined && props.value !== null) {
       return props.value
     }
     // Caso contrário, usa modelValue (v-model)
@@ -35,32 +34,21 @@ const modelValue = computed({
   },
   set: (val: string | number) => {
     emits("update:modelValue", val)
-    // Se tem onChange (do vee-validate Field), chama também
-    if (props.onChange) {
-      const event = new Event('change', { bubbles: true })
-      Object.defineProperty(event, 'target', {
-        value: { value: val },
-        enumerable: true
-      })
-      props.onChange(event as any)
-    }
   }
 })
 
 function handleInput(event: Event) {
   const target = event.target as HTMLInputElement
-  modelValue.value = target.value
-  // Chama onInput se fornecido (do vee-validate Field)
-  if (props.onInput) {
-    props.onInput(event)
-  }
+  inputValue.value = target.value
+  emits("input", event)
+}
+
+function handleChange(event: Event) {
+  emits("change", event)
 }
 
 function handleBlur(event: Event) {
-  // Chama onBlur se fornecido (do vee-validate Field)
-  if (props.onBlur) {
-    props.onBlur(event)
-  }
+  emits("blur", event)
 }
 </script>
 
@@ -69,10 +57,11 @@ function handleBlur(event: Event) {
     :id="id"
     :name="name"
     :type="type || 'text'"
-    :value="modelValue"
+    :value="inputValue"
     :placeholder="placeholder"
     :disabled="disabled"
     @input="handleInput"
+    @change="handleChange"
     @blur="handleBlur"
     :class="cn('flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50', props.class)"
   />
