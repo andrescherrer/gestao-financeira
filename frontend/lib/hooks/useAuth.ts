@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { authService } from "@/lib/api/auth";
 import type { LoginRequest, RegisterRequest, LoginResponse } from "@/lib/api/types";
 
@@ -17,98 +17,98 @@ interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  isLoading: boolean;
 }
 
 const AUTH_QUERY_KEY = ["auth"];
 
 /**
  * Hook para gerenciar autenticação
+ * 
+ * Estratégia:
+ * - Token no localStorage é a fonte de verdade para autenticação
+ * - User é mantido no cache do TanStack Query para persistir entre navegações
+ * - Estado local (useState) é usado apenas como fallback temporário
  */
 export function useAuth() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
 
-  // Verificar se está autenticado (verifica token no localStorage)
-  // Isso é reativo porque é recalculado a cada render
+  // Verificar se tem token no localStorage (síncrono, sempre disponível)
+  // Recalculado a cada render para ser reativo
   const hasToken = typeof window !== 'undefined' && authService.isAuthenticated();
 
-  // Query para verificar autenticação e obter dados do usuário
+  // Query para manter o cache do user sincronizado
+  // Esta query NÃO é usada para determinar autenticação (token é a fonte de verdade)
   const { data: authData, isLoading: isLoadingAuth } = useQuery<AuthState>({
     queryKey: AUTH_QUERY_KEY,
     queryFn: async () => {
       const token = authService.getToken();
       if (!token) {
-        return { user: null, isAuthenticated: false, isLoading: false };
+        return { user: null, isAuthenticated: false };
       }
 
-      // Se tiver token, buscar dados do cache primeiro, depois do estado local
-      // Em uma implementação completa, faria uma requisição para validar o token
+      // Buscar user do cache (não do estado local, pois pode estar vazio)
       const cachedAuth = queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY);
-      const cachedUser = cachedAuth?.user;
       
+      // Se tem cache com user, usar
+      if (cachedAuth?.user) {
+        return {
+          user: cachedAuth.user,
+          isAuthenticated: true,
+        };
+      }
+
+      // Se não tem cache, retornar autenticado mas sem user (será preenchido pelo cache quando disponível)
       return {
-        user: cachedUser || user || null,
+        user: null,
         isAuthenticated: true,
-        isLoading: false,
       };
     },
-    enabled: true, // Sempre habilitada para verificar token
-    staleTime: 5 * 60 * 1000, // 5 minutos
-    gcTime: 10 * 60 * 1000, // 10 minutos (mantém cache por mais tempo)
+    enabled: true,
+    staleTime: Infinity, // Cache nunca fica stale (até ser invalidado explicitamente)
+    gcTime: Infinity, // Cache nunca expira (até ser limpo explicitamente)
     retry: false,
+    // Usar cache como initialData se disponível
+    initialData: () => {
+      return queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY);
+    },
+    // Manter dados anteriores enquanto carrega
+    placeholderData: (previousData) => previousData,
   });
 
   // Mutation para login
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginRequest): Promise<LoginResponse> => {
-      // Chamar API de login
       const response = await authService.login(credentials);
-      
-      // Salvar token (localStorage + cookie)
       authService.saveToken(response.token);
-      
-      // Atualizar estado do usuário
       setUser(response.user);
-      
       return response;
     },
     onSuccess: (data) => {
-      // Atualizar cache de autenticação
+      // Atualizar cache IMEDIATAMENTE após login
       queryClient.setQueryData<AuthState>(AUTH_QUERY_KEY, {
         user: data.user,
         isAuthenticated: true,
-        isLoading: false,
       });
+      setUser(data.user);
       
-      // Invalidar outras queries que dependem de autenticação
+      // Invalidar outras queries
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      
-      // Nota: Redirecionamento é feito no componente (LoginForm)
-      // para permitir controle de redirect customizado
     },
     onError: (error: any) => {
       console.error("Login error:", error);
-      // Erro será tratado no componente que chama a mutation
     },
   });
 
   // Mutation para registro
   const registerMutation = useMutation({
     mutationFn: async (userData: RegisterRequest) => {
-      // Chamar API de registro
-      const response = await authService.register(userData);
-      return response;
-    },
-    onSuccess: () => {
-      // Nota: Redirecionamento é feito no componente (RegisterForm)
-      // para permitir mostrar mensagem de sucesso antes
+      return await authService.register(userData);
     },
     onError: (error: any) => {
       console.error("Register error:", error);
-      // Erro será tratado no componente que chama a mutation
     },
   });
 
@@ -116,19 +116,14 @@ export function useAuth() {
   const logout = useCallback(() => {
     authService.removeToken();
     setUser(null);
-    // Limpar cache de autenticação
     queryClient.setQueryData<AuthState>(AUTH_QUERY_KEY, {
       user: null,
       isAuthenticated: false,
-      isLoading: false,
     });
-    // Invalidar todas as queries
     queryClient.clear();
-    // Redirecionar para login
     router.push("/login");
   }, [queryClient, router]);
 
-  // Função para login (wrapper da mutation)
   const login = useCallback(
     async (credentials: LoginRequest) => {
       return loginMutation.mutateAsync(credentials);
@@ -136,7 +131,6 @@ export function useAuth() {
     [loginMutation]
   );
 
-  // Função para registro (wrapper da mutation)
   const register = useCallback(
     async (userData: RegisterRequest) => {
       return registerMutation.mutateAsync(userData);
@@ -144,43 +138,34 @@ export function useAuth() {
     [registerMutation]
   );
 
-  // Efeito para sincronizar user com authData e cache
+  // Sincronizar user do cache/query com estado local
   useEffect(() => {
     if (authData?.user) {
       setUser(authData.user);
     } else if (!hasToken) {
       setUser(null);
-    } else if (hasToken && !user && !authData?.user) {
-      // Se tem token mas não tem user, tentar buscar do cache
-      const cachedAuth = queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY);
-      if (cachedAuth?.user) {
-        setUser(cachedAuth.user);
-      }
     }
-  }, [authData, hasToken, user, queryClient]);
+  }, [authData, hasToken]);
 
-  // Determinar se está autenticado: tem token OU tem user no cache/estado
-  const hasUser = !!(user || authData?.user);
-  const finalIsAuthenticated = hasToken || hasUser;
+  // Determinar user final: prioridade cache > estado local
+  const finalUser = authData?.user || user || null;
+  
+  // isAuthenticated: token é a fonte de verdade
+  const isAuthenticated = hasToken;
+  
+  // isLoading: apenas durante mutations ou primeira verificação sem token
+  const isLoading = (!hasToken && isLoadingAuth) || loginMutation.isPending || registerMutation.isPending;
 
   return {
-    // Estado
-    user: user || authData?.user || null,
-    // Se tem token, está autenticado (mesmo que user ainda não tenha sido carregado)
-    isAuthenticated: finalIsAuthenticated,
-    // Loading apenas durante a primeira verificação (sem token) ou durante mutations
-    isLoading: (isLoadingAuth && !hasToken) || loginMutation.isPending || registerMutation.isPending,
-
-    // Ações
+    user: finalUser,
+    isAuthenticated,
+    isLoading,
     login,
     register,
     logout,
-
-    // Estados das mutations
     isLoggingIn: loginMutation.isPending,
     isRegistering: registerMutation.isPending,
     loginError: loginMutation.error,
     registerError: registerMutation.error,
   };
 }
-
