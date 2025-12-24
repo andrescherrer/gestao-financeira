@@ -19,7 +19,11 @@ apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token')
     if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`
+      // Garantir que o token não está vazio
+      const trimmedToken = token.trim()
+      if (trimmedToken) {
+        config.headers.Authorization = `Bearer ${trimmedToken}`
+      }
     }
     return config
   },
@@ -43,15 +47,31 @@ apiClient.interceptors.response.use(
           return Promise.reject(error)
         }
 
-        const authStore = useAuthStore()
-        authStore.logout()
-        
-        // Usar setTimeout para evitar problemas de importação circular
-        setTimeout(() => {
-          if (router.currentRoute.value.path !== '/login') {
-            router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
-          }
-        }, 0)
+        // Verificar se realmente não há token antes de redirecionar
+        const token = localStorage.getItem('auth_token')
+        if (!token) {
+          // Não há token, redirecionar para login
+          const authStore = useAuthStore()
+          authStore.logout()
+          
+          // Usar setTimeout para evitar problemas de importação circular
+          setTimeout(() => {
+            if (router.currentRoute.value.path !== '/login') {
+              router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
+            }
+          }, 0)
+        } else {
+          // Há token mas foi rejeitado - pode ser token inválido ou expirado
+          // Limpar token e redirecionar
+          const authStore = useAuthStore()
+          authStore.logout()
+          
+          setTimeout(() => {
+            if (router.currentRoute.value.path !== '/login') {
+              router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
+            }
+          }, 0)
+        }
       }
     }
 

@@ -8,7 +8,8 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(null)
 
   const isAuthenticated = computed(() => {
-    return !!token.value || authService.isAuthenticated()
+    // Sempre verificar o localStorage como fonte da verdade
+    return !!token.value || !!authService.getToken()
   })
 
   const isLoading = ref(false)
@@ -18,6 +19,10 @@ export const useAuthStore = defineStore('auth', () => {
     const storedToken = authService.getToken()
     if (storedToken) {
       token.value = storedToken
+    } else {
+      // Garantir que o estado está limpo se não há token
+      token.value = null
+      user.value = null
     }
   }
 

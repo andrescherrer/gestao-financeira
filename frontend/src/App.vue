@@ -8,7 +8,11 @@ import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 
+// Inicializar imediatamente ao montar o app
+authStore.init()
+
 onMounted(() => {
+  // Garantir que está inicializado após montagem
   authStore.init()
 })
 </script>
