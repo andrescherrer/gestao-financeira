@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { LoadingSpinner } from "@/components/auth/LoadingSpinner";
@@ -12,7 +12,11 @@ interface ProtectedRouteProps {
 
 /**
  * Componente para proteger rotas no lado do cliente
- * Redireciona para login se não estiver autenticado
+ * 
+ * ESTRATÉGIA SIMPLIFICADA:
+ * - Verifica token no localStorage (síncrono, instantâneo)
+ * - Se não tem token, redireciona imediatamente
+ * - Não depende de estados assíncronos ou loading
  */
 export function ProtectedRoute({
   children,
@@ -20,14 +24,20 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const [shouldRedirect, setShouldRedirect] = useState(false);
 
+  // Verificar autenticação de forma síncrona
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    // Se não está autenticado e não está fazendo login/registro, redirecionar
+    if (!isAuthenticated && !isLoading) {
+      setShouldRedirect(true);
       router.push(redirectTo);
+    } else {
+      setShouldRedirect(false);
     }
   }, [isAuthenticated, isLoading, router, redirectTo]);
 
-  // Mostrar loading enquanto verifica autenticação
+  // Se está fazendo login/registro, mostrar loading
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -36,12 +46,11 @@ export function ProtectedRoute({
     );
   }
 
-  // Se não estiver autenticado, não renderizar nada (redirecionamento em andamento)
-  if (!isAuthenticated) {
+  // Se não está autenticado, não renderizar nada (redirecionamento em andamento)
+  if (!isAuthenticated || shouldRedirect) {
     return null;
   }
 
   // Renderizar conteúdo protegido
   return <>{children}</>;
 }
-

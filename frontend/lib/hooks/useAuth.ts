@@ -24,23 +24,22 @@ const AUTH_QUERY_KEY = ["auth"];
 /**
  * Hook para gerenciar autenticação
  * 
- * Estratégia:
- * - Token no localStorage é a fonte de verdade para autenticação
- * - User é mantido no cache do TanStack Query para persistir entre navegações
- * - Estado local (useState) é usado apenas como fallback temporário
+ * Estratégia SIMPLIFICADA:
+ * - Token no localStorage é a ÚNICA fonte de verdade
+ * - User é mantido no cache do TanStack Query
+ * - isAuthenticated = tem token? SIM = true, NÃO = false
  */
 export function useAuth() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Verificar se tem token no localStorage (síncrono, sempre disponível)
-  // Recalculado a cada render para ser reativo
-  const hasToken = typeof window !== 'undefined' && authService.isAuthenticated();
+  // Verificar token de forma síncrona (sempre disponível)
+  const hasToken = typeof window !== 'undefined' && !!authService.getToken();
 
-  // Query para manter o cache do user sincronizado
-  // Esta query NÃO é usada para determinar autenticação (token é a fonte de verdade)
-  const { data: authData, isLoading: isLoadingAuth } = useQuery<AuthState>({
+  // Query para manter o cache do user
+  const { data: authData } = useQuery<AuthState>({
     queryKey: AUTH_QUERY_KEY,
     queryFn: async () => {
       const token = authService.getToken();
@@ -48,10 +47,9 @@ export function useAuth() {
         return { user: null, isAuthenticated: false };
       }
 
-      // Buscar user do cache (não do estado local, pois pode estar vazio)
+      // Buscar user do cache
       const cachedAuth = queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY);
       
-      // Se tem cache com user, usar
       if (cachedAuth?.user) {
         return {
           user: cachedAuth.user,
@@ -59,23 +57,29 @@ export function useAuth() {
         };
       }
 
-      // Se não tem cache, retornar autenticado mas sem user (será preenchido pelo cache quando disponível)
       return {
         user: null,
         isAuthenticated: true,
       };
     },
     enabled: true,
-    staleTime: Infinity, // Cache nunca fica stale (até ser invalidado explicitamente)
-    gcTime: Infinity, // Cache nunca expira (até ser limpo explicitamente)
+    staleTime: Infinity,
+    gcTime: Infinity,
     retry: false,
-    // Usar cache como initialData se disponível
-    initialData: () => {
-      return queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY);
-    },
-    // Manter dados anteriores enquanto carrega
+    initialData: () => queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY),
     placeholderData: (previousData) => previousData,
   });
+
+  // Inicializar: buscar user do cache se disponível
+  useEffect(() => {
+    if (!isInitialized && typeof window !== 'undefined') {
+      const cachedAuth = queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY);
+      if (cachedAuth?.user) {
+        setUser(cachedAuth.user);
+      }
+      setIsInitialized(true);
+    }
+  }, [isInitialized, queryClient]);
 
   // Mutation para login
   const loginMutation = useMutation({
@@ -86,14 +90,11 @@ export function useAuth() {
       return response;
     },
     onSuccess: (data) => {
-      // Atualizar cache IMEDIATAMENTE após login
       queryClient.setQueryData<AuthState>(AUTH_QUERY_KEY, {
         user: data.user,
         isAuthenticated: true,
       });
       setUser(data.user);
-      
-      // Invalidar outras queries
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
@@ -102,7 +103,6 @@ export function useAuth() {
     },
   });
 
-  // Mutation para registro
   const registerMutation = useMutation({
     mutationFn: async (userData: RegisterRequest) => {
       return await authService.register(userData);
@@ -112,7 +112,6 @@ export function useAuth() {
     },
   });
 
-  // Função para logout
   const logout = useCallback(() => {
     authService.removeToken();
     setUser(null);
@@ -147,18 +146,18 @@ export function useAuth() {
     }
   }, [authData, hasToken]);
 
-  // Determinar user final: prioridade cache > estado local
+  // User final: cache > estado local
   const finalUser = authData?.user || user || null;
   
-  // isAuthenticated: token é a fonte de verdade
+  // AUTENTICAÇÃO: token é a ÚNICA fonte de verdade
   const isAuthenticated = hasToken;
   
-  // isLoading: apenas durante mutations ou primeira verificação sem token
-  const isLoading = (!hasToken && isLoadingAuth) || loginMutation.isPending || registerMutation.isPending;
+  // Loading: apenas durante mutations
+  const isLoading = loginMutation.isPending || registerMutation.isPending;
 
   return {
     user: finalUser,
-    isAuthenticated,
+    isAuthenticated, // SIMPLES: tem token? true : false
     isLoading,
     login,
     register,
