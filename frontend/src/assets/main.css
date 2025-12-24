@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* PrimeVue Styles */
+@import 'primevue/resources/themes/aura-light-green/theme.css';
+@import 'primeicons/primeicons.css';
