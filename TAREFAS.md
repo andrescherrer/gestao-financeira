@@ -222,7 +222,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
 | FE-ACC-001 | Criar store Pinia para contas (useAccountsStore) | 🟣 | 🔴 | 2h | FE-007 | ✅ |
-| FE-ACC-002 | Criar página de lista de contas (/accounts) | 🟣 | 🔴 | 4h | FE-ACC-001 | 🚧 |
+| FE-ACC-002 | Criar página de lista de contas (/accounts) | 🟣 | 🔴 | 4h | FE-ACC-001 | ✅ |
 | FE-ACC-003 | Criar componente AccountCard | 🟣 | 🔴 | 2h | FE-003 | ⏳ |
 | FE-ACC-004 | Criar página de detalhes da conta (/accounts/:id) | 🟣 | 🔴 | 4h | FE-ACC-001 | 🚧 |
 | FE-ACC-005 | Criar página de criação de conta (/accounts/new) | 🟣 | 🔴 | 4h | FE-ACC-001 | 🚧 |
