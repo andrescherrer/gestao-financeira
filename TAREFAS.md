@@ -20,7 +20,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 1.6: Swagger** (DOC-001 a DOC-006): ✅ Completo
 - **Sprint 1.7: Setup Frontend** (FE-001 a FE-009): 🚧 Parcial (Vue 3 configurado, falta layout e UI library)
 - **Sprint 1.8: Módulo de Autenticação** (FE-AUTH-001 a FE-AUTH-010): ✅ Completo
-- **Sprint 1.9: Módulo de Contas** (FE-ACC-001 a FE-ACC-010): 🚧 Estrutura básica criada, implementação pendente
+- **Sprint 1.9: Módulo de Contas** (FE-ACC-001 a FE-ACC-010): ✅ Completo
 - **Sprint 1.10: Módulo de Transações** (FE-TX-001 a FE-TX-010): 🚧 Estrutura básica criada, implementação pendente
 - **Demais sprints**: ⏳ Não iniciadas
 
@@ -232,7 +232,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | FE-ACC-009 | Integrar com API de contas (detalhes) | 🟣 | 🔴 | 2h | FE-ACC-004, DOC-006 | ✅ |
 | FE-ACC-010 | Implementar loading e error states | 🟣 | 🟡 | 2h | FE-ACC-007, FE-ACC-008 | ✅ |
 
-**Entregável Sprint 1.9:** Módulo de contas funcionando no frontend (estrutura básica criada, implementação pendente)
+**Entregável Sprint 1.9:** ✅ Módulo de contas funcionando no frontend - Completo
 
 ---
 
