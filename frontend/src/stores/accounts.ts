@@ -32,14 +32,32 @@ export const useAccountsStore = defineStore('accounts', () => {
     isLoading.value = true
     error.value = null
     try {
+      // Verificar se há token antes de fazer a requisição
+      const token = localStorage.getItem('auth_token')
+      if (!token) {
+        throw new Error('Token de autenticação não encontrado. Faça login novamente.')
+      }
+      
       const response = await accountService.list(context)
       accounts.value = response.accounts || []
       return { accounts: response.accounts, count: response.count }
     } catch (err: any) {
-      error.value =
-        err.response?.data?.message ||
-        err.message ||
-        'Erro ao listar contas'
+      const errorMessage = err.response?.data?.error || 
+                           err.response?.data?.message ||
+                           err.message ||
+                           'Erro ao listar contas'
+      error.value = errorMessage
+      
+      // Log detalhado do erro em desenvolvimento
+      if (import.meta.env.DEV) {
+        console.error('[Accounts Store] Erro ao listar contas:', {
+          message: errorMessage,
+          status: err.response?.status,
+          statusText: err.response?.statusText,
+          data: err.response?.data,
+        })
+      }
+      
       throw err
     } finally {
       isLoading.value = false

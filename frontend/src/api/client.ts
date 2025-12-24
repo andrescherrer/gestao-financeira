@@ -21,6 +21,24 @@ apiClient.interceptors.request.use(
       const trimmedToken = token.trim()
       if (trimmedToken) {
         config.headers.Authorization = `Bearer ${trimmedToken}`
+        // Debug: log apenas em desenvolvimento
+        if (import.meta.env.DEV) {
+          console.log('[API Client] Token adicionado ao header:', {
+            url: config.url,
+            hasToken: !!trimmedToken,
+            tokenLength: trimmedToken.length,
+          })
+        }
+      } else {
+        console.warn('[API Client] Token encontrado mas está vazio após trim')
+      }
+    } else {
+      // Debug: log apenas em desenvolvimento
+      if (import.meta.env.DEV && config.url && !config.url.includes('/auth/')) {
+        console.warn('[API Client] Requisição sem token:', {
+          url: config.url,
+          hasToken: !!token,
+        })
       }
     }
     return config
