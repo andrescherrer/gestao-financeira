@@ -52,18 +52,21 @@ export interface Account {
   account_id: string;
   user_id: string;
   name: string;
-  type: 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'CREDIT_CARD' | 'OTHER';
+  type: 'BANK' | 'WALLET' | 'INVESTMENT' | 'CREDIT_CARD';
   balance: string;
   currency: string;
+  context: 'PERSONAL' | 'BUSINESS';
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export interface CreateAccountRequest {
   name: string;
-  type: 'CHECKING' | 'SAVINGS' | 'INVESTMENT' | 'CREDIT_CARD' | 'OTHER';
-  initial_balance?: string;
-  currency?: string;
+  type: 'BANK' | 'WALLET' | 'INVESTMENT' | 'CREDIT_CARD';
+  initial_balance?: number;
+  currency: 'BRL' | 'USD' | 'EUR';
+  context: 'PERSONAL' | 'BUSINESS';
 }
 
 export interface ListAccountsResponse {

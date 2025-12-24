@@ -15,11 +15,10 @@ interface AccountCardProps {
  * Mapeia o tipo de conta para um ícone e label
  */
 const accountTypeConfig: Record<Account["type"], { icon: string; label: string }> = {
-  CHECKING: { icon: "💳", label: "Conta Corrente" },
-  SAVINGS: { icon: "💰", label: "Poupança" },
+  BANK: { icon: "🏦", label: "Banco" },
+  WALLET: { icon: "💳", label: "Carteira Digital" },
   INVESTMENT: { icon: "📈", label: "Investimento" },
   CREDIT_CARD: { icon: "💳", label: "Cartão de Crédito" },
-  OTHER: { icon: "🏦", label: "Outra" },
 };
 
 /**
