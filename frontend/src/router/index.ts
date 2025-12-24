@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,17 +7,72 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: () => import('@/views/HomeView.vue'),
+      meta: { requiresAuth: true },
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/LoginView.vue'),
+      meta: { requiresGuest: true },
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('@/views/RegisterView.vue'),
+      meta: { requiresGuest: true },
+    },
+    {
+      path: '/accounts',
+      name: 'accounts',
+      component: () => import('@/views/AccountsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/accounts/new',
+      name: 'new-account',
+      component: () => import('@/views/NewAccountView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/accounts/:id',
+      name: 'account-details',
+      component: () => import('@/views/AccountDetailsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/transactions',
+      name: 'transactions',
+      component: () => import('@/views/TransactionsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/transactions/new',
+      name: 'new-transaction',
+      component: () => import('@/views/NewTransactionView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/transactions/:id',
+      name: 'transaction-details',
+      component: () => import('@/views/TransactionDetailsView.vue'),
+      meta: { requiresAuth: true },
     },
   ],
+})
+
+// Navigation guard
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  authStore.init()
+
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next({ name: 'login', query: { redirect: to.fullPath } })
+  } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    next({ name: 'home' })
+  } else {
+    next()
+  }
 })
 
 export default router
