@@ -122,9 +122,21 @@ const pageTitle = computed(() => {
   return titles[route.name as string] || 'Gestão Financeira'
 })
 
-function handleLogout() {
-  authStore.logout()
-  router.push('/login')
+async function handleLogout() {
+  try {
+    // Limpar estado da store primeiro
+    authStore.logout()
+    // Aguardar um momento para garantir que o localStorage foi limpo
+    await new Promise(resolve => setTimeout(resolve, 100))
+    // Redirecionar para login
+    await router.push('/login')
+    // Forçar reload para garantir que tudo está limpo
+    window.location.reload()
+  } catch (error) {
+    console.error('Erro ao fazer logout:', error)
+    // Mesmo em caso de erro, tentar redirecionar
+    window.location.href = '/login'
+  }
 }
 
 function handleProfile() {

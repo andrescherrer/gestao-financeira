@@ -45,8 +45,13 @@ export const authService = {
   },
 
   removeToken(): void {
+    // Remover do localStorage
     localStorage.removeItem('auth_token')
+    // Remover cookie (múltiplas tentativas para garantir)
+    document.cookie = 'auth_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT'
     document.cookie = 'auth_token=; path=/; max-age=0'
+    // Limpar sessionStorage também (caso esteja sendo usado)
+    sessionStorage.removeItem('auth_token')
   },
 
   getToken(): string | null {

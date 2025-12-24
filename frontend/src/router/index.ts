@@ -71,17 +71,23 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   
-  // Inicializar apenas se necessário
-  if (!authStore.token) {
+  // Verificar autenticação baseado no token no localStorage e na store
+  const hasTokenInStorage = !!localStorage.getItem('auth_token')
+  const hasTokenInStore = !!authStore.token
+  
+  // Se não há token na store mas há no storage, inicializar
+  if (!hasTokenInStore && hasTokenInStorage) {
     authStore.init()
   }
+  
+  // Verificar autenticação (usar storage como fonte da verdade)
+  const isAuthenticated = hasTokenInStorage || hasTokenInStore
 
-  // Verificar autenticação baseado no token no localStorage
-  const hasToken = !!localStorage.getItem('auth_token')
-
-  if (to.meta.requiresAuth && !hasToken) {
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    // Limpar qualquer token residual
+    authStore.logout()
     next({ name: 'login', query: { redirect: to.fullPath } })
-  } else if (to.meta.requiresGuest && hasToken) {
+  } else if (to.meta.requiresGuest && isAuthenticated) {
     next({ name: 'home' })
   } else {
     next()

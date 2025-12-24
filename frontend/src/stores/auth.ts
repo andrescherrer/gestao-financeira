@@ -59,9 +59,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function logout() {
+    // Remover token primeiro
+    authService.removeToken()
+    // Limpar estado reativo
     token.value = null
     user.value = null
-    authService.removeToken()
   }
 
   return {
