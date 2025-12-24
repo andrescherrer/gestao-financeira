@@ -13,15 +13,24 @@ export const createAccountSchema = z.object({
     errorMap: () => ({ message: 'Tipo de conta é obrigatório' }),
   }),
   initial_balance: z
-    .string()
-    .optional()
-    .refine(
+    .preprocess(
       (val) => {
-        if (!val || val === '') return true
-        const num = parseFloat(val)
-        return !isNaN(num) && isFinite(num)
+        if (val === undefined || val === null || val === '') return undefined
+        if (typeof val === 'number') return val.toString()
+        if (typeof val === 'string' && val.trim() === '') return undefined
+        return val
       },
-      { message: 'Saldo inicial deve ser um número válido' }
+      z
+        .string()
+        .optional()
+        .refine(
+          (val) => {
+            if (!val || val === '') return true
+            const num = parseFloat(val)
+            return !isNaN(num) && isFinite(num)
+          },
+          { message: 'Saldo inicial deve ser um número válido' }
+        )
     ),
   currency: z.enum(['BRL', 'USD', 'EUR']).optional().default('BRL'),
   context: z.enum(['PERSONAL', 'BUSINESS'], {
