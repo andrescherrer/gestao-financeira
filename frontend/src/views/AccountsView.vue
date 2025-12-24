@@ -8,111 +8,119 @@
       <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-4xl font-bold mb-2">Contas</h1>
-          <p class="text-gray-600">
+          <p class="text-muted-foreground">
             Gerencie suas contas bancárias e financeiras
           </p>
         </div>
-        <router-link
-          to="/accounts/new"
-          class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
-        >
-          <i class="pi pi-plus"></i>
-          Nova Conta
-        </router-link>
+        <Button as-child>
+          <router-link to="/accounts/new">
+            <Plus class="h-4 w-4 mr-2" />
+            Nova Conta
+          </router-link>
+        </Button>
       </div>
 
       <!-- Loading State -->
       <div v-if="accountsStore.isLoading" class="flex items-center justify-center py-12">
         <div class="text-center">
-          <i class="pi pi-spinner pi-spin text-4xl text-blue-600 mb-4"></i>
-          <p class="text-gray-600">Carregando contas...</p>
+          <Loader2 class="mx-auto h-12 w-12 text-primary mb-4 animate-spin" />
+          <p class="text-muted-foreground">Carregando contas...</p>
         </div>
       </div>
 
       <!-- Error State -->
-      <div
+      <Card
         v-else-if="accountsStore.error"
-        class="rounded-md bg-red-50 border border-red-200 p-4 mb-6"
+        class="mb-6 border-destructive"
       >
-        <div class="flex items-center gap-2">
-          <i class="pi pi-exclamation-circle text-red-600"></i>
-          <p class="text-red-600">{{ accountsStore.error }}</p>
-        </div>
-        <button
-          @click="handleRetry"
-          class="mt-3 text-sm text-red-600 hover:text-red-700 underline"
-        >
-          Tentar novamente
-        </button>
-      </div>
+        <CardContent class="p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <AlertCircle class="h-4 w-4 text-destructive" />
+            <p class="text-destructive">{{ accountsStore.error }}</p>
+          </div>
+          <Button
+            variant="link"
+            @click="handleRetry"
+            class="text-destructive"
+          >
+            Tentar novamente
+          </Button>
+        </CardContent>
+      </Card>
 
       <!-- Empty State -->
-      <div
+      <Card
         v-else-if="accountsStore.accounts.length === 0"
-        class="rounded-lg border border-gray-200 bg-white p-12 text-center"
       >
-        <i class="pi pi-wallet text-6xl text-gray-400 mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-900 mb-2">
-          Nenhuma conta encontrada
-        </h3>
-        <p class="text-gray-600 mb-6">
-          Comece criando sua primeira conta financeira
-        </p>
-        <router-link
-          to="/accounts/new"
-          class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-        >
-          <i class="pi pi-plus"></i>
-          Criar Primeira Conta
-        </router-link>
-      </div>
+        <CardContent class="p-12 text-center">
+          <Wallet class="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+          <h3 class="text-xl font-semibold text-foreground mb-2">
+            Nenhuma conta encontrada
+          </h3>
+          <p class="text-muted-foreground mb-6">
+            Comece criando sua primeira conta financeira
+          </p>
+          <Button as-child>
+            <router-link to="/accounts/new">
+              <Plus class="h-4 w-4 mr-2" />
+              Criar Primeira Conta
+            </router-link>
+          </Button>
+        </CardContent>
+      </Card>
 
       <!-- Accounts List -->
       <div v-else class="space-y-4">
         <!-- Stats -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-sm transition-all hover:shadow-md">
-            <div class="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-blue-200 opacity-20"></div>
-            <div class="relative">
-              <div class="mb-2 flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500 text-white">
-                  <i class="pi pi-wallet"></i>
+          <Card class="group relative overflow-hidden">
+            <CardContent class="p-6">
+              <div class="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-blue-200 opacity-20"></div>
+              <div class="relative">
+                <div class="mb-2 flex items-center gap-3">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500 text-white">
+                    <Wallet class="h-5 w-5" />
+                  </div>
+                </div>
+                <div class="text-sm font-medium text-blue-700">Total de Contas</div>
+                <div class="text-3xl font-bold text-blue-900">
+                  {{ accountsStore.totalAccounts }}
                 </div>
               </div>
-              <div class="text-sm font-medium text-blue-700">Total de Contas</div>
-              <div class="text-3xl font-bold text-blue-900">
-                {{ accountsStore.totalAccounts }}
-              </div>
-            </div>
-          </div>
-          <div class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 p-6 shadow-sm transition-all hover:shadow-md">
-            <div class="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-purple-200 opacity-20"></div>
-            <div class="relative">
-              <div class="mb-2 flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500 text-white">
-                  <i class="pi pi-user"></i>
+            </CardContent>
+          </Card>
+          <Card class="group relative overflow-hidden">
+            <CardContent class="p-6">
+              <div class="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-purple-200 opacity-20"></div>
+              <div class="relative">
+                <div class="mb-2 flex items-center gap-3">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500 text-white">
+                    <User class="h-5 w-5" />
+                  </div>
+                </div>
+                <div class="text-sm font-medium text-purple-700">Contas Pessoais</div>
+                <div class="text-3xl font-bold text-purple-900">
+                  {{ accountsStore.personalAccounts.length }}
                 </div>
               </div>
-              <div class="text-sm font-medium text-purple-700">Contas Pessoais</div>
-              <div class="text-3xl font-bold text-purple-900">
-                {{ accountsStore.personalAccounts.length }}
-              </div>
-            </div>
-          </div>
-          <div class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 shadow-sm transition-all hover:shadow-md">
-            <div class="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-indigo-200 opacity-20"></div>
-            <div class="relative">
-              <div class="mb-2 flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500 text-white">
-                  <i class="pi pi-briefcase"></i>
+            </CardContent>
+          </Card>
+          <Card class="group relative overflow-hidden">
+            <CardContent class="p-6">
+              <div class="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-indigo-200 opacity-20"></div>
+              <div class="relative">
+                <div class="mb-2 flex items-center gap-3">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500 text-white">
+                    <Briefcase class="h-5 w-5" />
+                  </div>
+                </div>
+                <div class="text-sm font-medium text-indigo-700">Contas de Negócio</div>
+                <div class="text-3xl font-bold text-indigo-900">
+                  {{ accountsStore.businessAccounts.length }}
                 </div>
               </div>
-              <div class="text-sm font-medium text-indigo-700">Contas de Negócio</div>
-              <div class="text-3xl font-bold text-indigo-900">
-                {{ accountsStore.businessAccounts.length }}
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         <!-- Accounts Grid -->
@@ -134,6 +142,9 @@ import { useAccountsStore } from '@/stores/accounts'
 import Layout from '@/components/layout/Layout.vue'
 import AccountCard from '@/components/AccountCard.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Wallet, User, Briefcase, Plus, Loader2, AlertCircle } from 'lucide-vue-next'
 
 const accountsStore = useAccountsStore()
 
@@ -148,4 +159,3 @@ function handleRetry() {
   accountsStore.listAccounts()
 }
 </script>
-
