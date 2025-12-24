@@ -173,9 +173,9 @@ const emit = defineEmits<Emits>()
 const validationSchema = toTypedSchema(createAccountSchema)
 const error = ref<string | null>(null)
 
-function handleSubmit(values: CreateAccountFormData) {
+function handleSubmit(values: any) {
   error.value = null
-  emit('submit', values)
+  emit('submit', values as CreateAccountFormData)
 }
 
 // Expor função para definir erro externamente

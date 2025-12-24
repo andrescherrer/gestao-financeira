@@ -58,6 +58,7 @@ import { useAccountsStore } from '@/stores/accounts'
 import Layout from '@/components/layout/Layout.vue'
 import AccountForm from '@/components/AccountForm.vue'
 import type { CreateAccountFormData } from '@/validations/account'
+import type { CreateAccountRequest } from '@/api/types'
 
 const router = useRouter()
 const accountsStore = useAccountsStore()
@@ -70,7 +71,7 @@ async function handleSubmit(values: CreateAccountFormData) {
 
   try {
     // Preparar dados para API
-    const accountData = {
+    const accountData: CreateAccountRequest = {
       name: values.name,
       type: values.type,
       context: values.context,
