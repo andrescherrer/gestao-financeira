@@ -1,7 +1,5 @@
 import axios, { type AxiosInstance, type AxiosError } from 'axios'
 import { env } from '@/config/env'
-import router from '@/router'
-import { useAuthStore } from '@/stores/auth'
 
 /**
  * Cliente HTTP configurado
@@ -36,45 +34,8 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response) {
-      const status = error.response.status
-
-      // 401 Unauthorized - token inválido ou expirado
-      if (status === 401) {
-        // Ignorar 401 em rotas de autenticação (login/register)
-        const currentPath = window.location.pathname
-        if (currentPath === '/login' || currentPath === '/register') {
-          return Promise.reject(error)
-        }
-
-        // Verificar se realmente não há token antes de redirecionar
-        const token = localStorage.getItem('auth_token')
-        if (!token) {
-          // Não há token, redirecionar para login
-          const authStore = useAuthStore()
-          authStore.logout()
-          
-          // Usar setTimeout para evitar problemas de importação circular
-          setTimeout(() => {
-            if (router.currentRoute.value.path !== '/login') {
-              router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
-            }
-          }, 0)
-        } else {
-          // Há token mas foi rejeitado - pode ser token inválido ou expirado
-          // Limpar token e redirecionar
-          const authStore = useAuthStore()
-          authStore.logout()
-          
-          setTimeout(() => {
-            if (router.currentRoute.value.path !== '/login') {
-              router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
-            }
-          }, 0)
-        }
-      }
-    }
-
+    // Apenas rejeitar o erro - não fazer redirecionamento automático
+    // O redirecionamento será tratado pelos componentes que capturam o erro
     return Promise.reject(error)
   }
 )
