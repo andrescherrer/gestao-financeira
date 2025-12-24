@@ -1,131 +1,198 @@
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-    <div class="w-full max-w-md space-y-8 rounded-lg border bg-white p-8 shadow-lg">
-      <div class="text-center">
-        <h1 class="text-3xl font-bold">Criar Conta</h1>
-        <p class="mt-2 text-gray-600">
-          Preencha os dados para criar sua conta
-        </p>
-      </div>
-
-      <Form @submit="handleSubmit" :validation-schema="validationSchema" v-slot="{ errors }">
-        <div v-if="error" class="rounded-md bg-red-50 p-3 text-sm text-red-600">
-          {{ error }}
-        </div>
-
-        <div v-if="success" class="rounded-md bg-green-50 p-3 text-sm text-green-600">
-          Conta criada com sucesso! Redirecionando...
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label for="first_name" class="block text-sm font-medium text-gray-700">
-              Nome
-            </label>
-            <Field
-              id="first_name"
-              name="first_name"
-              type="text"
-              class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-blue-500"
-              :class="
-                errors.first_name
-                  ? 'border-red-300 focus:border-red-500'
-                  : 'border-gray-300 focus:border-blue-500'
-              "
-            />
-            <ErrorMessage name="first_name" class="mt-1 text-sm text-red-600" />
+  <div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
+    <div class="w-full max-w-md">
+      <!-- Card Principal -->
+      <Card class="p-8 shadow-2xl">
+        <!-- Logo e Título -->
+        <div class="mb-8 text-center">
+          <div class="mb-4 flex justify-center">
+            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg">
+              <Wallet class="h-8 w-8 text-white" />
+            </div>
           </div>
-
-          <div>
-            <label for="last_name" class="block text-sm font-medium text-gray-700">
-              Sobrenome
-            </label>
-            <Field
-              id="last_name"
-              name="last_name"
-              type="text"
-              class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-blue-500"
-              :class="
-                errors.last_name
-                  ? 'border-red-300 focus:border-red-500'
-                  : 'border-gray-300 focus:border-blue-500'
-              "
-            />
-            <ErrorMessage name="last_name" class="mt-1 text-sm text-red-600" />
-          </div>
-        </div>
-
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <Field
-            id="email"
-            name="email"
-            type="email"
-            class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-blue-500"
-            :class="
-              errors.email
-                ? 'border-red-300 focus:border-red-500'
-                : 'border-gray-300 focus:border-blue-500'
-            "
-          />
-          <ErrorMessage name="email" class="mt-1 text-sm text-red-600" />
-        </div>
-
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">
-            Senha
-          </label>
-          <Field
-            id="password"
-            name="password"
-            type="password"
-            class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-blue-500"
-            :class="
-              errors.password
-                ? 'border-red-300 focus:border-red-500'
-                : 'border-gray-300 focus:border-blue-500'
-            "
-          />
-          <ErrorMessage name="password" class="mt-1 text-sm text-red-600" />
-          <p class="mt-1 text-xs text-gray-500">
-            Mínimo 8 caracteres, com letra maiúscula, minúscula e número
+          <h1 class="text-3xl font-bold text-foreground">Criar Conta</h1>
+          <p class="mt-2 text-sm text-muted-foreground">
+            Já tem uma conta?
+            <router-link
+              to="/login"
+              class="font-semibold text-green-600 transition-colors hover:text-green-700"
+            >
+              Fazer login
+            </router-link>
           </p>
         </div>
 
-        <div>
-          <label for="confirmPassword" class="block text-sm font-medium text-gray-700">
-            Confirmar Senha
-          </label>
-          <Field
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-blue-500"
-            :class="
-              errors.confirmPassword
-                ? 'border-red-300 focus:border-red-500'
-                : 'border-gray-300 focus:border-blue-500'
-            "
-          />
-          <ErrorMessage name="confirmPassword" class="mt-1 text-sm text-red-600" />
-        </div>
+        <!-- Formulário -->
+        <Form @submit="handleSubmit" :validation-schema="validationSchema" v-slot="{ errors }">
+          <!-- Mensagem de Erro -->
+          <Card v-if="error" class="mb-6 border-destructive">
+            <CardContent class="p-4">
+              <div class="flex items-center gap-2">
+                <AlertCircle class="h-4 w-4 text-destructive" />
+                <p class="text-sm font-medium text-destructive">{{ error }}</p>
+              </div>
+            </CardContent>
+          </Card>
 
-        <button
-          type="submit"
-          :disabled="isLoading || success"
-          class="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {{ isLoading ? 'Criando...' : success ? 'Conta criada!' : 'Criar Conta' }}
-        </button>
-      </Form>
+          <!-- Mensagem de Sucesso -->
+          <Card v-if="success" class="mb-6 border-green-200 bg-green-50">
+            <CardContent class="p-4">
+              <div class="flex items-center gap-2">
+                <CheckCircle class="h-4 w-4 text-green-600" />
+                <p class="text-sm font-medium text-green-600">Conta criada com sucesso! Redirecionando...</p>
+              </div>
+            </CardContent>
+          </Card>
 
-      <div class="text-center text-sm">
-        <span class="text-gray-600">Já tem uma conta? </span>
-        <router-link to="/login" class="text-blue-600 hover:underline">
-          Fazer login
-        </router-link>
+          <!-- Nome e Sobrenome -->
+          <div class="mb-5 grid grid-cols-2 gap-4">
+            <div>
+              <Label for="first_name" class="mb-2">
+                Nome
+              </Label>
+              <Field
+                id="first_name"
+                name="first_name"
+                type="text"
+                as-child
+              >
+                <Input
+                  :class="errors.first_name ? 'border-destructive' : ''"
+                  placeholder="Seu nome"
+                />
+              </Field>
+              <ErrorMessage name="first_name" class="mt-1 text-sm text-destructive" />
+            </div>
+
+            <div>
+              <Label for="last_name" class="mb-2">
+                Sobrenome
+              </Label>
+              <Field
+                id="last_name"
+                name="last_name"
+                type="text"
+                as-child
+              >
+                <Input
+                  :class="errors.last_name ? 'border-destructive' : ''"
+                  placeholder="Seu sobrenome"
+                />
+              </Field>
+              <ErrorMessage name="last_name" class="mt-1 text-sm text-destructive" />
+            </div>
+          </div>
+
+          <!-- Campo Email -->
+          <div class="mb-5">
+            <Label for="email" class="mb-2">
+              Endereço de Email
+            </Label>
+            <div class="relative">
+              <Field
+                id="email"
+                name="email"
+                type="email"
+                as-child
+              >
+                <Input
+                  :class="errors.email ? 'border-destructive' : ''"
+                  placeholder="seu@email.com"
+                  class="pr-10"
+                />
+              </Field>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <Mail class="h-4 w-4 text-muted-foreground" />
+              </div>
+            </div>
+            <ErrorMessage name="email" class="mt-1 text-sm text-destructive" />
+          </div>
+
+          <!-- Campo Senha -->
+          <div class="mb-5">
+            <Label for="password" class="mb-2">
+              Senha
+            </Label>
+            <div class="relative">
+              <Field
+                id="password"
+                name="password"
+                :type="showPassword ? 'text' : 'password'"
+                as-child
+              >
+                <Input
+                  :class="errors.password ? 'border-destructive' : ''"
+                  placeholder="••••••••"
+                  class="pr-10"
+                />
+              </Field>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                class="absolute inset-y-0 right-0 h-full"
+                @click="showPassword = !showPassword"
+              >
+                <Eye v-if="!showPassword" class="h-4 w-4" />
+                <EyeOff v-else class="h-4 w-4" />
+              </Button>
+            </div>
+            <ErrorMessage name="password" class="mt-1 text-sm text-destructive" />
+            <p class="mt-1 text-xs text-muted-foreground">
+              Mínimo 8 caracteres, com letra maiúscula, minúscula e número
+            </p>
+          </div>
+
+          <!-- Campo Confirmar Senha -->
+          <div class="mb-6">
+            <Label for="confirmPassword" class="mb-2">
+              Confirmar Senha
+            </Label>
+            <div class="relative">
+              <Field
+                id="confirmPassword"
+                name="confirmPassword"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                as-child
+              >
+                <Input
+                  :class="errors.confirmPassword ? 'border-destructive' : ''"
+                  placeholder="••••••••"
+                  class="pr-10"
+                />
+              </Field>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                class="absolute inset-y-0 right-0 h-full"
+                @click="showConfirmPassword = !showConfirmPassword"
+              >
+                <Eye v-if="!showConfirmPassword" class="h-4 w-4" />
+                <EyeOff v-else class="h-4 w-4" />
+              </Button>
+            </div>
+            <ErrorMessage name="confirmPassword" class="mt-1 text-sm text-destructive" />
+          </div>
+
+          <!-- Botão de Registro -->
+          <Button
+            type="submit"
+            :disabled="isLoading || success"
+            class="w-full"
+            size="lg"
+          >
+            <UserPlus v-if="!isLoading && !success" class="h-5 w-5" />
+            <Loader2 v-else-if="isLoading" class="h-5 w-5 animate-spin" />
+            <CheckCircle v-else class="h-5 w-5" />
+            {{ isLoading ? 'Criando...' : success ? 'Conta criada!' : 'Criar Conta' }}
+          </Button>
+        </Form>
+      </Card>
+
+      <!-- Footer -->
+      <div class="mt-6 text-center text-sm text-muted-foreground">
+        <p>© 2025 Gestão Financeira. Todos os direitos reservados.</p>
       </div>
     </div>
   </div>
@@ -138,6 +205,11 @@ import { Form, Field, ErrorMessage } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useAuthStore } from '@/stores/auth'
 import { registerSchema } from '@/validations/auth'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { Wallet, Mail, Eye, EyeOff, UserPlus, Loader2, AlertCircle, CheckCircle } from 'lucide-vue-next'
 
 const validationSchema = toTypedSchema(registerSchema)
 
@@ -147,6 +219,8 @@ const authStore = useAuthStore()
 const error = ref<string | null>(null)
 const success = ref(false)
 const isLoading = computed(() => authStore.isLoading)
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 
 async function handleSubmit(values: any) {
   error.value = null
@@ -167,4 +241,3 @@ async function handleSubmit(values: any) {
   }
 }
 </script>
-
