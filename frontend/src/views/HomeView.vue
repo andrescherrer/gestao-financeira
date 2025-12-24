@@ -1,6 +1,9 @@
 <template>
   <Layout>
     <div class="space-y-6">
+      <!-- Breadcrumbs -->
+      <Breadcrumbs :items="[{ label: 'Dashboard' }]" />
+
       <!-- Header -->
       <div>
         <h1 class="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
@@ -238,6 +241,7 @@ import { computed, onMounted } from 'vue'
 import { useAccountsStore } from '@/stores/accounts'
 import { useTransactionsStore } from '@/stores/transactions'
 import Layout from '@/components/layout/Layout.vue'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
 
 const accountsStore = useAccountsStore()
 const transactionsStore = useTransactionsStore()

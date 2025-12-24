@@ -1,6 +1,9 @@
 <template>
   <Layout>
     <div>
+      <!-- Breadcrumbs -->
+      <Breadcrumbs :items="[{ label: 'Contas' }]" />
+
       <!-- Header -->
       <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -130,6 +133,7 @@ import { onMounted } from 'vue'
 import { useAccountsStore } from '@/stores/accounts'
 import Layout from '@/components/layout/Layout.vue'
 import AccountCard from '@/components/AccountCard.vue'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
 
 const accountsStore = useAccountsStore()
 

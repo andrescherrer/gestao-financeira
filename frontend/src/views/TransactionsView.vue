@@ -1,6 +1,9 @@
 <template>
   <Layout>
     <div>
+      <!-- Breadcrumbs -->
+      <Breadcrumbs :items="[{ label: 'Transações' }]" />
+
       <!-- Header -->
       <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -189,6 +192,7 @@ import { useTransactionsStore } from '@/stores/transactions'
 import { useAccountsStore } from '@/stores/accounts'
 import Layout from '@/components/layout/Layout.vue'
 import TransactionTable from '@/components/TransactionTable.vue'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
 
 const transactionsStore = useTransactionsStore()
 const accountsStore = useAccountsStore()
