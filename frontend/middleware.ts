@@ -29,9 +29,11 @@ export function middleware(request: NextRequest) {
   }
 
   // Se tem token e está tentando acessar rota pública (login/register)
-  if (token && isPublicRoute) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
+  // NÃO redirecionar automaticamente - deixar o componente ProtectedRoute decidir
+  // Isso evita loops de redirecionamento
+  // if (token && isPublicRoute) {
+  //   return NextResponse.redirect(new URL("/", request.url));
+  // }
 
   return NextResponse.next();
 }

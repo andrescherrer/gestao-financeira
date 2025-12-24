@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -34,6 +35,7 @@ export function LoginForm({
   showRegisterLink = true,
   className,
 }: LoginFormProps) {
+  const router = useRouter();
   const { login, isLoggingIn, loginError } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
@@ -61,13 +63,13 @@ export function LoginForm({
       // Chamar callback de sucesso se fornecido
       onSuccess?.();
 
-      // Redirecionar para a página original ou dashboard
-      // Usar setTimeout para garantir que o estado foi atualizado
-      setTimeout(() => {
-        const params = new URLSearchParams(window.location.search);
-        const redirect = params.get("redirect") || "/";
-        window.location.href = redirect;
-      }, 100);
+      // Redirecionar usando Next.js router (não window.location para evitar reload)
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect") || "/";
+      
+      // Usar router.push do Next.js para navegação client-side
+      router.push(redirect);
+      router.refresh(); // Forçar atualização do estado
     } catch (err: any) {
       // Tratar erros da API
       const errorMessage =
@@ -139,4 +141,3 @@ export function LoginForm({
     </form>
   );
 }
-

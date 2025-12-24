@@ -27,8 +27,9 @@ export const authService = {
   saveToken(token: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_token', token);
-      // Também salvar em cookie para o middleware
-      document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`; // 7 dias
+      // Salvar em cookie para o middleware (com configurações corretas)
+      const maxAge = 60 * 60 * 24 * 7; // 7 dias
+      document.cookie = `auth_token=${token}; path=/; max-age=${maxAge}; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
     }
   },
 
