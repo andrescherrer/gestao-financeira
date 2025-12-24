@@ -240,7 +240,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| FE-TX-001 | Criar store Pinia para transações (useTransactionsStore) | 🟣 | 🔴 | 2h | FE-007 | ⏳ |
+| FE-TX-001 | Criar store Pinia para transações (useTransactionsStore) | 🟣 | 🔴 | 2h | FE-007 | ✅ |
 | FE-TX-002 | Criar página de lista de transações (/transactions) | 🟣 | 🔴 | 4h | FE-TX-001 | 🚧 |
 | FE-TX-003 | Criar componente TransactionTable | 🟣 | 🔴 | 4h | FE-003 | ⏳ |
 | FE-TX-004 | Criar página de detalhes da transação (/transactions/:id) | 🟣 | 🔴 | 4h | FE-TX-001 | 🚧 |
