@@ -130,7 +130,8 @@ export const transactionService = {
       description: backendData.description,
       date: backendData.date,
       created_at: backendData.created_at,
-      updated_at: backendData.updated_at,
+      // Backend pode não retornar updated_at na criação, usar created_at como fallback
+      updated_at: backendData.updated_at || backendData.created_at,
     }
   },
 }

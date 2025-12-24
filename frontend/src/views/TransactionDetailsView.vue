@@ -256,7 +256,17 @@ function formatCurrency(value: number, currency: Transaction['currency']): strin
 }
 
 function formatDate(dateString: string): string {
+  if (!dateString) return 'Data inválida'
+  
+  // Tentar parsear a data
   const date = new Date(dateString)
+  
+  // Verificar se a data é válida
+  if (isNaN(date.getTime())) {
+    console.warn('[TransactionDetailsView] Data inválida:', dateString)
+    return 'Data inválida'
+  }
+  
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
     month: '2-digit',
@@ -265,7 +275,17 @@ function formatDate(dateString: string): string {
 }
 
 function formatDateTime(dateString: string): string {
+  if (!dateString) return 'Data inválida'
+  
+  // Tentar parsear a data
   const date = new Date(dateString)
+  
+  // Verificar se a data é válida
+  if (isNaN(date.getTime())) {
+    console.warn('[TransactionDetailsView] Data/hora inválida:', dateString)
+    return 'Data inválida'
+  }
+  
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
     month: '2-digit',

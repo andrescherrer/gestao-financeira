@@ -104,7 +104,17 @@ function formatCurrency(value: number): string {
 }
 
 function formatDate(dateString: string): string {
+  if (!dateString) return 'Data inválida'
+  
+  // Tentar parsear a data
   const date = new Date(dateString)
+  
+  // Verificar se a data é válida
+  if (isNaN(date.getTime())) {
+    console.warn('[TransactionTable] Data inválida:', dateString)
+    return 'Data inválida'
+  }
+  
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
     month: '2-digit',
