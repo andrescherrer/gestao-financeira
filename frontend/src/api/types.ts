@@ -54,8 +54,8 @@ export interface Account {
 export interface CreateAccountRequest {
   name: string
   type: 'BANK' | 'WALLET' | 'INVESTMENT' | 'CREDIT_CARD'
-  initial_balance?: string
-  currency?: 'BRL' | 'USD' | 'EUR'
+  initial_balance: number // Backend espera float64, não string
+  currency: 'BRL' | 'USD' | 'EUR' // Backend espera obrigatório
   context: 'PERSONAL' | 'BUSINESS'
 }
 

@@ -71,14 +71,15 @@ async function handleSubmit(values: CreateAccountFormData) {
 
   try {
     // Preparar dados para API
+    // Backend espera initial_balance como number (float64) e currency obrigatório
     const accountData: CreateAccountRequest = {
       name: values.name,
       type: values.type,
       context: values.context,
-      currency: values.currency || 'BRL',
+      currency: values.currency || 'BRL', // Sempre enviar currency (obrigatório)
       initial_balance: values.initial_balance
-        ? parseFloat(values.initial_balance).toFixed(2)
-        : undefined,
+        ? parseFloat(values.initial_balance) // Converter string para number
+        : 0.0, // Se não fornecido, usar 0.0 como float
     }
 
     const account = await accountsStore.createAccount(accountData)
