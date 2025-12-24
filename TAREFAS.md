@@ -19,7 +19,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 1.5: Transaction Context** (TX-001 a TX-015): ✅ Completo
 - **Sprint 1.6: Swagger** (DOC-001 a DOC-006): ✅ Completo
 - **Sprint 1.7: Setup Frontend** (FE-001 a FE-009): 🚧 Parcial (Vue 3 configurado, falta layout e UI library)
-- **Sprint 1.8: Módulo de Autenticação** (FE-AUTH-001 a FE-AUTH-010): 🚧 Parcial (estrutura completa, falta testes)
+- **Sprint 1.8: Módulo de Autenticação** (FE-AUTH-001 a FE-AUTH-010): ✅ Completo
 - **Sprint 1.9: Módulo de Contas** (FE-ACC-001 a FE-ACC-010): 🚧 Estrutura básica criada, implementação pendente
 - **Sprint 1.10: Módulo de Transações** (FE-TX-001 a FE-TX-010): 🚧 Estrutura básica criada, implementação pendente
 - **Demais sprints**: ⏳ Não iniciadas
@@ -32,7 +32,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
   - Transaction Context: ✅ 100%
   - Swagger: ✅ 100%
   - Frontend Setup: 🚧 70% (Vue 3 configurado, falta UI library e layout)
-  - Frontend Auth: 🚧 90% (estrutura completa, falta testes)
+  - Frontend Auth: ✅ 100% (completo e testado)
   - Frontend Accounts: 🚧 20% (rotas criadas, falta implementação)
   - Frontend Transactions: 🚧 20% (rotas criadas, falta implementação)
 
@@ -211,9 +211,9 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | FE-AUTH-007 | Integrar com API de autenticação (login) | 🟣 | 🔴 | 2h | FE-AUTH-001, DOC-006 | ✅ |
 | FE-AUTH-008 | Integrar com API de autenticação (registro) | 🟣 | 🔴 | 2h | FE-AUTH-002, DOC-006 | ✅ |
 | FE-AUTH-009 | Implementar tratamento de erros e loading states | 🟣 | 🟡 | 2h | FE-AUTH-007, FE-AUTH-008 | ✅ |
-| FE-AUTH-010 | Testar fluxo completo de autenticação | 🟤 | 🔴 | 2h | FE-AUTH-007, FE-AUTH-008 | ⏳ |
+| FE-AUTH-010 | Testar fluxo completo de autenticação | 🟤 | 🔴 | 2h | FE-AUTH-007, FE-AUTH-008 | ✅ |
 
-**Entregável Sprint 1.8:** Autenticação funcionando no frontend Vue 3 (estrutura completa, testes pendentes)
+**Entregável Sprint 1.8:** Autenticação funcionando no frontend Vue 3 (100% completo e testado)
 
 ---
 
