@@ -80,10 +80,10 @@ export interface Transaction {
 export interface CreateTransactionRequest {
   account_id: string
   type: 'INCOME' | 'EXPENSE'
-  amount: string
-  currency?: 'BRL' | 'USD' | 'EUR'
+  amount: number // Backend espera float64
+  currency: 'BRL' | 'USD' | 'EUR' // Backend exige obrigatório
   description: string
-  date: string
+  date: string // ISO 8601 format: YYYY-MM-DD
 }
 
 export interface ListTransactionsResponse {
