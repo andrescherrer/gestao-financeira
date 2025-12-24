@@ -30,6 +30,10 @@ export function useAuth() {
   const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
 
+  // Verificar se está autenticado (verifica token no localStorage)
+  // Isso é reativo porque é recalculado a cada render
+  const hasToken = typeof window !== 'undefined' && authService.isAuthenticated();
+
   // Query para verificar autenticação e obter dados do usuário
   const { data: authData, isLoading: isLoadingAuth } = useQuery<AuthState>({
     queryKey: AUTH_QUERY_KEY,
@@ -41,19 +45,18 @@ export function useAuth() {
 
       // Se tiver token, retornar dados do cache ou do estado local
       // Em uma implementação completa, faria uma requisição para validar o token
+      // Usar o user do estado ou do cache anterior
+      const cachedUser = queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY)?.user;
       return {
-        user: user || null,
+        user: user || cachedUser || null,
         isAuthenticated: true,
         isLoading: false,
       };
     },
+    enabled: true, // Sempre habilitada para verificar token
     staleTime: 5 * 60 * 1000, // 5 minutos
     retry: false,
   });
-
-  // Verificar se está autenticado (verifica token no localStorage)
-  // Isso é reativo porque é recalculado a cada render
-  const hasToken = typeof window !== 'undefined' && authService.isAuthenticated();
 
   // Mutation para login
   const loginMutation = useMutation({
@@ -139,16 +142,22 @@ export function useAuth() {
     [registerMutation]
   );
 
-  // Efeito para sincronizar user com authData
+  // Efeito para sincronizar user com authData e cache
   useEffect(() => {
     if (authData?.user) {
       setUser(authData.user);
     } else if (!hasToken) {
       setUser(null);
+    } else if (hasToken && !user) {
+      // Se tem token mas não tem user, tentar buscar do cache
+      const cachedAuth = queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY);
+      if (cachedAuth?.user) {
+        setUser(cachedAuth.user);
+      }
     }
-  }, [authData, hasToken]);
+  }, [authData, hasToken, user, queryClient]);
 
-  // Determinar se está autenticado: tem token OU tem user no cache
+  // Determinar se está autenticado: tem token OU tem user no cache/estado
   const hasUser = !!(user || authData?.user);
   const finalIsAuthenticated = hasToken || hasUser;
 
