@@ -68,39 +68,75 @@
       <div v-else class="space-y-4">
         <!-- Stats -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div class="rounded-lg border border-gray-200 bg-white p-4">
-            <div class="text-sm text-gray-600">Total de Transações</div>
-            <div class="text-2xl font-bold text-gray-900">
-              {{ transactionsStore.totalTransactions }}
+          <div class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 p-6 shadow-sm transition-all hover:shadow-md">
+            <div class="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-gray-200 opacity-20"></div>
+            <div class="relative">
+              <div class="mb-2 flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-500 text-white">
+                  <i class="pi pi-list"></i>
+                </div>
+              </div>
+              <div class="text-sm font-medium text-gray-700">Total de Transações</div>
+              <div class="text-3xl font-bold text-gray-900">
+                {{ transactionsStore.totalTransactions }}
+              </div>
             </div>
           </div>
-          <div class="rounded-lg border border-gray-200 bg-white p-4">
-            <div class="text-sm text-gray-600">Receitas</div>
-            <div class="text-2xl font-bold text-green-600">
-              {{ formatCurrency(transactionsStore.totalIncome) }}
-            </div>
-            <div class="text-xs text-gray-500 mt-1">
-              {{ transactionsStore.incomeTransactions.length }} transações
+          <div class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-sm transition-all hover:shadow-md">
+            <div class="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-green-200 opacity-20"></div>
+            <div class="relative">
+              <div class="mb-2 flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500 text-white">
+                  <i class="pi pi-arrow-down"></i>
+                </div>
+              </div>
+              <div class="text-sm font-medium text-green-700">Receitas</div>
+              <div class="text-3xl font-bold text-green-600">
+                {{ formatCurrency(transactionsStore.totalIncome) }}
+              </div>
+              <div class="text-xs text-green-600 mt-1 font-medium">
+                {{ transactionsStore.incomeTransactions.length }} transações
+              </div>
             </div>
           </div>
-          <div class="rounded-lg border border-gray-200 bg-white p-4">
-            <div class="text-sm text-gray-600">Despesas</div>
-            <div class="text-2xl font-bold text-red-600">
-              {{ formatCurrency(transactionsStore.totalExpense) }}
-            </div>
-            <div class="text-xs text-gray-500 mt-1">
-              {{ transactionsStore.expenseTransactions.length }} transações
+          <div class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-red-50 to-red-100 p-6 shadow-sm transition-all hover:shadow-md">
+            <div class="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-red-200 opacity-20"></div>
+            <div class="relative">
+              <div class="mb-2 flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500 text-white">
+                  <i class="pi pi-arrow-up"></i>
+                </div>
+              </div>
+              <div class="text-sm font-medium text-red-700">Despesas</div>
+              <div class="text-3xl font-bold text-red-600">
+                {{ formatCurrency(transactionsStore.totalExpense) }}
+              </div>
+              <div class="text-xs text-red-600 mt-1 font-medium">
+                {{ transactionsStore.expenseTransactions.length }} transações
+              </div>
             </div>
           </div>
-          <div class="rounded-lg border border-gray-200 bg-white p-4">
-            <div class="text-sm text-gray-600">Saldo</div>
-            <div
-              class="text-2xl font-bold"
-              :class="
-                transactionsStore.balance >= 0 ? 'text-green-600' : 'text-red-600'
-              "
-            >
-              {{ formatCurrency(transactionsStore.balance) }}
+          <div class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-sm transition-all hover:shadow-md border-2"
+            :class="transactionsStore.balance >= 0 ? 'border-green-200' : 'border-red-200'">
+            <div class="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full opacity-20"
+              :class="transactionsStore.balance >= 0 ? 'bg-green-200' : 'bg-red-200'"></div>
+            <div class="relative">
+              <div class="mb-2 flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg text-white"
+                  :class="transactionsStore.balance >= 0 ? 'bg-green-500' : 'bg-red-500'">
+                  <i class="pi pi-chart-line"></i>
+                </div>
+              </div>
+              <div class="text-sm font-medium"
+                :class="transactionsStore.balance >= 0 ? 'text-green-700' : 'text-red-700'">Saldo</div>
+              <div
+                class="text-3xl font-bold"
+                :class="
+                  transactionsStore.balance >= 0 ? 'text-green-600' : 'text-red-600'
+                "
+              >
+                {{ formatCurrency(transactionsStore.balance) }}
+              </div>
             </div>
           </div>
         </div>

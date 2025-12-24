@@ -1,11 +1,13 @@
 <template>
-  <header class="sticky top-0 z-50 border-b bg-white shadow-sm">
+  <header class="sticky top-0 z-50 border-b bg-gradient-to-r from-white to-gray-50 shadow-sm backdrop-blur-sm">
     <div class="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
       <!-- Logo e Título -->
       <div class="flex items-center gap-3">
-        <RouterLink to="/" class="flex items-center gap-2">
-          <i class="pi pi-wallet text-2xl text-blue-600"></i>
-          <span class="text-xl font-bold text-gray-900">Gestão Financeira</span>
+        <RouterLink to="/" class="flex items-center gap-2 transition-transform hover:scale-105">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md">
+            <i class="pi pi-wallet text-xl"></i>
+          </div>
+          <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Gestão Financeira</span>
         </RouterLink>
       </div>
 
@@ -36,11 +38,14 @@
 
       <!-- Menu do Usuário -->
       <div class="flex items-center gap-4">
-        <div v-if="authStore.user" class="hidden items-center gap-2 sm:flex">
-          <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600">
+        <div v-if="authStore.user" class="hidden items-center gap-3 sm:flex">
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-sm font-semibold text-white shadow-md">
             {{ userInitials }}
           </div>
-          <span class="text-sm font-medium text-gray-700">{{ userName }}</span>
+          <div class="flex flex-col">
+            <span class="text-sm font-semibold text-gray-900">{{ userName }}</span>
+            <span class="text-xs text-gray-500">{{ authStore.user.email }}</span>
+          </div>
         </div>
         <button
           @click="handleLogout"
