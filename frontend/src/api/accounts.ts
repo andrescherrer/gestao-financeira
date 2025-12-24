@@ -94,6 +94,11 @@ export const accountService = {
    * Cria uma nova conta
    */
   async create(data: CreateAccountRequest): Promise<Account> {
+    // Log em desenvolvimento para debug
+    if (import.meta.env.DEV) {
+      console.log('[AccountService] Criando conta com dados:', JSON.stringify(data, null, 2))
+    }
+
     const response = await apiClient.post<{
       message: string
       data: {

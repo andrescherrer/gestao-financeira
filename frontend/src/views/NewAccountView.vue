@@ -72,14 +72,26 @@ async function handleSubmit(values: CreateAccountFormData) {
   try {
     // Preparar dados para API
     // Backend espera initial_balance como number (float64) e currency obrigatório
+    let initialBalance = 0.0
+    if (values.initial_balance) {
+      const parsed = parseFloat(values.initial_balance)
+      if (isNaN(parsed) || !isFinite(parsed)) {
+        throw new Error('Saldo inicial deve ser um número válido')
+      }
+      initialBalance = parsed
+    }
+
     const accountData: CreateAccountRequest = {
-      name: values.name,
+      name: values.name.trim(), // Remover espaços em branco
       type: values.type,
       context: values.context,
       currency: values.currency || 'BRL', // Sempre enviar currency (obrigatório)
-      initial_balance: values.initial_balance
-        ? parseFloat(values.initial_balance) // Converter string para number
-        : 0.0, // Se não fornecido, usar 0.0 como float
+      initial_balance: initialBalance,
+    }
+
+    // Log em desenvolvimento para debug
+    if (import.meta.env.DEV) {
+      console.log('[NewAccountView] Dados sendo enviados:', accountData)
     }
 
     const account = await accountsStore.createAccount(accountData)
@@ -87,9 +99,19 @@ async function handleSubmit(values: CreateAccountFormData) {
     // Redirecionar para detalhes da conta criada
     router.push(`/accounts/${account.account_id}`)
   } catch (err: any) {
+    // Log detalhado do erro em desenvolvimento
+    if (import.meta.env.DEV) {
+      console.error('[NewAccountView] Erro ao criar conta:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+      })
+    }
+
     const errorMessage =
-      err.response?.data?.message ||
       err.response?.data?.error ||
+      err.response?.data?.message ||
       err.message ||
       'Erro ao criar conta. Tente novamente.'
     
