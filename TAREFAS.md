@@ -228,16 +228,16 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| FE-TX-001 | Criar hook useTransactions (TanStack Query) | 🟣 | 🔴 | 2h | FE-007 | ⏳ |
-| FE-TX-002 | Criar página de lista de transações (/transactions) | 🟣 | 🔴 | 4h | FE-006, FE-TX-001 | ⏳ |
-| FE-TX-003 | Criar componente TransactionTable | 🟣 | 🔴 | 4h | FE-003 | ⏳ |
-| FE-TX-004 | Criar página de detalhes da transação (/transactions/[id]) | 🟣 | 🔴 | 4h | FE-006, FE-TX-001 | ⏳ |
-| FE-TX-005 | Criar página de criação de transação (/transactions/new) | 🟣 | 🔴 | 4h | FE-006, FE-TX-001 | ⏳ |
-| FE-TX-006 | Criar formulário de transação (React Hook Form + Zod) | 🟣 | 🔴 | 6h | FE-003, FE-004 | ⏳ |
-| FE-TX-007 | Integrar com API de transações (listar) | 🟣 | 🔴 | 2h | FE-TX-002, DOC-006 | ⏳ |
-| FE-TX-008 | Integrar com API de transações (criar) | 🟣 | 🔴 | 2h | FE-TX-005, DOC-006 | ⏳ |
-| FE-TX-009 | Integrar com API de transações (detalhes) | 🟣 | 🔴 | 2h | FE-TX-004, DOC-006 | ⏳ |
-| FE-TX-010 | Implementar loading e error states | 🟣 | 🟡 | 2h | FE-TX-007, FE-TX-008 | ⏳ |
+| FE-TX-001 | Criar hook useTransactions (TanStack Query) | 🟣 | 🔴 | 2h | FE-007 | ✅ |
+| FE-TX-002 | Criar página de lista de transações (/transactions) | 🟣 | 🔴 | 4h | FE-006, FE-TX-001 | ✅ |
+| FE-TX-003 | Criar componente TransactionTable | 🟣 | 🔴 | 4h | FE-003 | ✅ |
+| FE-TX-004 | Criar página de detalhes da transação (/transactions/[id]) | 🟣 | 🔴 | 4h | FE-006, FE-TX-001 | ✅ |
+| FE-TX-005 | Criar página de criação de transação (/transactions/new) | 🟣 | 🔴 | 4h | FE-006, FE-TX-001 | ✅ |
+| FE-TX-006 | Criar formulário de transação (React Hook Form + Zod) | 🟣 | 🔴 | 6h | FE-003, FE-004 | ✅ |
+| FE-TX-007 | Integrar com API de transações (listar) | 🟣 | 🔴 | 2h | FE-TX-002, DOC-006 | ✅ |
+| FE-TX-008 | Integrar com API de transações (criar) | 🟣 | 🔴 | 2h | FE-TX-005, DOC-006 | ✅ |
+| FE-TX-009 | Integrar com API de transações (detalhes) | 🟣 | 🔴 | 2h | FE-TX-004, DOC-006 | ✅ |
+| FE-TX-010 | Implementar loading e error states | 🟣 | 🟡 | 2h | FE-TX-007, FE-TX-008 | ✅ |
 
 **Entregável Sprint 1.10:** Módulo de transações funcionando no frontend
 
