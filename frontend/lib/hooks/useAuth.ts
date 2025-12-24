@@ -150,7 +150,7 @@ export function useAuth() {
       setUser(authData.user);
     } else if (!hasToken) {
       setUser(null);
-    } else if (hasToken && !user) {
+    } else if (hasToken && !user && !authData?.user) {
       // Se tem token mas não tem user, tentar buscar do cache
       const cachedAuth = queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY);
       if (cachedAuth?.user) {
