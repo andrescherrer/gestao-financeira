@@ -1,52 +1,54 @@
 <template>
   <Layout>
     <div>
+      <!-- Breadcrumbs -->
+      <Breadcrumbs
+        :items="[
+          { label: 'Contas', to: '/accounts' },
+          { label: 'Nova Conta' },
+        ]"
+      />
+
       <!-- Header -->
       <div class="mb-6">
-        <button
-          @click="goBack"
-          class="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <i class="pi pi-arrow-left"></i>
-          <span>Voltar para contas</span>
-        </button>
         <h1 class="text-4xl font-bold mb-2">Nova Conta</h1>
-        <p class="text-gray-600">
+        <p class="text-muted-foreground">
           Preencha os dados para criar uma nova conta financeira
         </p>
       </div>
 
       <!-- Form -->
-      <div class="rounded-lg border border-gray-200 bg-white p-6">
-        <AccountForm
-          ref="formRef"
-          :isLoading="accountsStore.isLoading"
-          submitLabel="Criar Conta"
-          @submit="handleSubmit"
-        >
-          <template #actions="{ isLoading: formLoading }">
-            <div class="flex gap-3 pt-4">
-              <button
-                type="submit"
-                :disabled="formLoading"
-                class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
-              >
-                <i v-if="formLoading" class="pi pi-spinner pi-spin"></i>
-                <i v-else class="pi pi-check"></i>
-                {{ formLoading ? 'Criando...' : 'Criar Conta' }}
-              </button>
-              <button
-                type="button"
-                @click="goBack"
-                class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <i class="pi pi-times"></i>
-                Cancelar
-              </button>
-            </div>
-          </template>
-        </AccountForm>
-      </div>
+      <Card>
+        <CardContent class="p-6">
+          <AccountForm
+            ref="formRef"
+            :isLoading="accountsStore.isLoading"
+            submitLabel="Criar Conta"
+            @submit="handleSubmit"
+          >
+            <template #actions="{ isLoading: formLoading }">
+              <div class="flex gap-3 pt-4">
+                <Button
+                  type="submit"
+                  :disabled="formLoading"
+                >
+                  <Loader2 v-if="formLoading" class="h-4 w-4 animate-spin" />
+                  <Check v-else class="h-4 w-4" />
+                  {{ formLoading ? 'Criando...' : 'Criar Conta' }}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  @click="goBack"
+                >
+                  <X class="h-4 w-4" />
+                  Cancelar
+                </Button>
+              </div>
+            </template>
+          </AccountForm>
+        </CardContent>
+      </Card>
     </div>
   </Layout>
 </template>
@@ -57,6 +59,10 @@ import { useRouter } from 'vue-router'
 import { useAccountsStore } from '@/stores/accounts'
 import Layout from '@/components/layout/Layout.vue'
 import AccountForm from '@/components/AccountForm.vue'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Loader2, Check, X } from 'lucide-vue-next'
 import type { CreateAccountFormData } from '@/validations/account'
 import type { CreateAccountRequest } from '@/api/types'
 
@@ -70,8 +76,6 @@ async function handleSubmit(values: CreateAccountFormData) {
   }
 
   try {
-    // Preparar dados para API
-    // Backend espera initial_balance como number (float64) e currency obrigatório
     let initialBalance = 0.0
     if (values.initial_balance) {
       const parsed = parseFloat(values.initial_balance)
@@ -81,7 +85,6 @@ async function handleSubmit(values: CreateAccountFormData) {
       initialBalance = parsed
     }
 
-    // Validar nome (backend exige mínimo 3 caracteres)
     const trimmedName = values.name.trim()
     if (trimmedName.length < 3) {
       throw new Error('Nome da conta deve ter no mínimo 3 caracteres')
@@ -91,21 +94,17 @@ async function handleSubmit(values: CreateAccountFormData) {
       name: trimmedName,
       type: values.type,
       context: values.context,
-      currency: values.currency || 'BRL', // Sempre enviar currency (obrigatório)
-      initial_balance: initialBalance, // Sempre enviar como number (0.0 se não fornecido)
+      currency: values.currency || 'BRL',
+      initial_balance: initialBalance,
     }
 
-    // Log em desenvolvimento para debug
     if (import.meta.env.DEV) {
       console.log('[NewAccountView] Dados sendo enviados:', accountData)
     }
 
     const account = await accountsStore.createAccount(accountData)
-    
-    // Redirecionar para detalhes da conta criada
     router.push(`/accounts/${account.account_id}`)
   } catch (err: any) {
-    // Log detalhado do erro em desenvolvimento
     if (import.meta.env.DEV) {
       console.error('[NewAccountView] Erro ao criar conta:', {
         message: err.message,
@@ -131,4 +130,3 @@ function goBack() {
   router.push('/accounts')
 }
 </script>
-
