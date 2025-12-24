@@ -1,15 +1,14 @@
 <template>
-  <div class="flex min-h-screen flex-col">
-    <Header />
-    <div class="flex flex-1">
-      <Sidebar :is-open="sidebarOpen" />
-      <main class="flex-1 md:ml-64">
-        <div class="min-h-[calc(100vh-4rem)] p-4 sm:p-6 lg:p-8">
+  <div class="flex min-h-screen bg-gray-50">
+    <Sidebar :is-open="sidebarOpen" />
+    <div class="flex flex-1 flex-col md:ml-64">
+      <Header />
+      <main class="flex-1 overflow-y-auto">
+        <div class="p-6">
           <slot />
         </div>
       </main>
     </div>
-    <Footer />
   </div>
 </template>
 
@@ -17,7 +16,6 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import Header from './Header.vue'
 import Sidebar from './Sidebar.vue'
-import Footer from './Footer.vue'
 
 const sidebarOpen = ref(true)
 
@@ -38,4 +36,3 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
 </script>
-

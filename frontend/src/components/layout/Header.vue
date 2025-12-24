@@ -1,71 +1,87 @@
 <template>
-  <header class="sticky top-0 z-50 border-b bg-gradient-to-r from-white to-gray-50 shadow-sm backdrop-blur-sm">
-    <div class="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-      <!-- Logo e Título -->
-      <div class="flex items-center gap-3">
-        <RouterLink to="/" class="flex items-center gap-2 transition-transform hover:scale-105">
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md">
-            <i class="pi pi-wallet text-xl"></i>
-          </div>
-          <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Gestão Financeira</span>
-        </RouterLink>
+  <header class="sticky top-0 z-50 h-16 border-b border-gray-200 bg-white">
+    <div class="flex h-full items-center justify-between px-6">
+      <!-- Left: Breadcrumbs ou título da página -->
+      <div class="flex items-center gap-2 text-sm text-gray-600">
+        <span class="font-medium text-gray-900">{{ pageTitle }}</span>
       </div>
 
-      <!-- Navegação Desktop -->
-      <nav class="hidden items-center gap-6 md:flex">
-        <RouterLink
-          to="/"
-          class="text-sm font-medium text-gray-700 transition-colors hover:text-blue-600"
-          :class="{ 'text-blue-600': $route.name === 'home' }"
-        >
-          Dashboard
-        </RouterLink>
-        <RouterLink
-          to="/accounts"
-          class="text-sm font-medium text-gray-700 transition-colors hover:text-blue-600"
-          :class="{ 'text-blue-600': $route.name === 'accounts' || $route.name === 'new-account' || $route.name === 'account-details' }"
-        >
-          Contas
-        </RouterLink>
-        <RouterLink
-          to="/transactions"
-          class="text-sm font-medium text-gray-700 transition-colors hover:text-blue-600"
-          :class="{ 'text-blue-600': $route.name === 'transactions' || $route.name === 'new-transaction' || $route.name === 'transaction-details' }"
-        >
-          Transações
-        </RouterLink>
-      </nav>
-
-      <!-- Menu do Usuário -->
+      <!-- Right: Notificações e Usuário -->
       <div class="flex items-center gap-4">
-        <div v-if="authStore.user" class="hidden items-center gap-3 sm:flex">
-          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-sm font-semibold text-white shadow-md">
+        <!-- Ícone de Notificação -->
+        <button
+          class="relative flex h-10 w-10 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+          title="Notificações"
+        >
+          <i class="pi pi-bell text-lg"></i>
+          <span
+            v-if="hasNotifications"
+            class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500"
+          ></span>
+        </button>
+
+        <!-- Avatar do Usuário -->
+        <div v-if="authStore.user" class="flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-sm font-semibold text-white shadow-sm">
             {{ userInitials }}
           </div>
-          <div class="flex flex-col">
+          <div class="hidden flex-col sm:flex">
             <span class="text-sm font-semibold text-gray-900">{{ userName }}</span>
             <span class="text-xs text-gray-500">{{ authStore.user.email }}</span>
           </div>
+          <!-- Menu Dropdown do Usuário -->
+          <div class="relative" ref="userMenuRef">
+            <button
+              @click="showUserMenu = !showUserMenu"
+              class="flex items-center text-gray-600 hover:text-gray-900"
+            >
+              <i class="pi pi-chevron-down text-sm"></i>
+            </button>
+            <div
+              v-if="showUserMenu"
+              class="absolute right-0 mt-2 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
+            >
+              <button
+                @click="handleLogout"
+                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-red-600"
+              >
+                <i class="pi pi-sign-out"></i>
+                <span>Sair</span>
+              </button>
+            </div>
+          </div>
         </div>
-        <button
-          @click="handleLogout"
-          class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-red-600"
-        >
-          <i class="pi pi-sign-out"></i>
-          <span class="hidden sm:inline">Sair</span>
-        </button>
       </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
+
+const showUserMenu = ref(false)
+const hasNotifications = ref(false) // Pode ser conectado a um store de notificações
+const userMenuRef = ref<HTMLElement | null>(null)
+
+function handleClickOutside(event: MouseEvent) {
+  if (userMenuRef.value && !userMenuRef.value.contains(event.target as Node)) {
+    showUserMenu.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 
 const userName = computed(() => {
   if (!authStore.user) return 'Usuário'
@@ -87,9 +103,23 @@ const userInitials = computed(() => {
   return authStore.user.email?.[0]?.toUpperCase() || 'U'
 })
 
+const pageTitle = computed(() => {
+  const titles: Record<string, string> = {
+    home: 'Dashboard',
+    accounts: 'Contas',
+    'new-account': 'Nova Conta',
+    'account-details': 'Detalhes da Conta',
+    'edit-account': 'Editar Conta',
+    transactions: 'Transações',
+    'new-transaction': 'Nova Transação',
+    'transaction-details': 'Detalhes da Transação',
+  }
+  return titles[route.name as string] || 'Gestão Financeira'
+})
+
 function handleLogout() {
+  showUserMenu.value = false
   authStore.logout()
   router.push('/login')
 }
 </script>
-
