@@ -15,4 +15,13 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  css: {
+    preprocessorOptions: {
+      css: {
+        // Permitir que o Vite processe URLs relativas em imports CSS
+        additionalData: ''
+      }
+    }
+  },
+  assetsInclude: ['**/*.woff', '**/*.woff2', '**/*.ttf', '**/*.eot', '**/*.svg']
 })
