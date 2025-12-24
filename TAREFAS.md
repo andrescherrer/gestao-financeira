@@ -184,14 +184,19 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | FE-001 | Criar projeto Vue 3 com TypeScript | 🟣 | 🔴 | 2h | - | ✅ |
 | FE-002 | Configurar Tailwind CSS | 🟣 | 🔴 | 2h | FE-001 | ✅ |
 | FE-003 | Instalar e configurar biblioteca de componentes UI (PrimeVue) | 🟣 | 🔴 | 4h | FE-002 | ✅ |
-| FE-004 | Instalar dependências (Axios, Vue Router, Pinia) | 🟣 | 🔴 | 1h | FE-001 | ✅ |
+| FE-004 | Instalar dependências (Axios, Vue Router, Pinia) | 🟣 | 🔴 | 1h | FE-001 | ⚠️ |
 | FE-005 | Configurar estrutura de pastas (src/api, src/stores, src/views, src/router) | 🟣 | 🔴 | 2h | FE-001 | ✅ |
-| FE-006 | Criar layout base (Header, Sidebar, Footer) | 🟣 | 🔴 | 4h | FE-003 | ⏳ |
+| FE-006 | Criar layout base (Header, Sidebar, Footer) | 🟣 | 🔴 | 4h | FE-003 | ❌ |
 | FE-007 | Configurar cliente API (Axios) | 🟣 | 🔴 | 4h | FE-004 | ✅ |
 | FE-008 | Configurar variáveis de ambiente (.env) | 🟣 | 🔴 | 1h | FE-001 | ✅ |
 | FE-009 | Criar Dockerfile para frontend | 🟠 | 🟡 | 2h | FE-001 | ✅ |
 
 **Entregável Sprint 1.7:** Frontend Vue 3 configurado e rodando (estrutura básica completa)
+
+**Status:** ⚠️ **78% completo** - Ver `docs/VERIFICACAO_SPRINT_1.7.md` para detalhes
+- ✅ FE-001, FE-002, FE-003, FE-005, FE-007, FE-008, FE-009: Completas
+- ⚠️ FE-004: Parcial (falta biblioteca de validação de formulários)
+- ❌ FE-006: **PENDENTE** - Layout base (Header, Sidebar, Footer) não implementado
 
 ---
 
