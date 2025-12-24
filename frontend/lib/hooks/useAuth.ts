@@ -166,8 +166,10 @@ export function useAuth() {
   return {
     // Estado
     user: user || authData?.user || null,
+    // Se tem token, está autenticado (mesmo que user ainda não tenha sido carregado)
     isAuthenticated: finalIsAuthenticated,
-    isLoading: isLoadingAuth || loginMutation.isPending || registerMutation.isPending,
+    // Loading apenas durante a primeira verificação (sem token) ou durante mutations
+    isLoading: (isLoadingAuth && !hasToken) || loginMutation.isPending || registerMutation.isPending,
 
     // Ações
     login,
