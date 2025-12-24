@@ -4,7 +4,9 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ## 📊 Status Geral do Projeto
 
-**Última verificação:** 2025-01-27
+**Última verificação:** 2025-12-23
+
+**Nota:** Frontend migrado de Next.js/React para Vue 3 em 2025-12-23
 
 ### ✅ Concluído
 - **Setup Inicial** (SETUP-001 a SETUP-006): ✅ Completo
@@ -13,19 +15,26 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 1.3: Identity Context** (ID-001 a ID-013): ✅ Completo
 
 ### ⏳ Em Progresso / Pendente
-- **Sprint 1.4: Account Management** (AC-001 a AC-011): ⏳ Estrutura criada, implementação pendente
-- **Sprint 1.5: Transaction Context** (TX-001 a TX-015): ⏳ Estrutura criada, implementação pendente
-- **Sprint 1.6: Swagger** (DOC-001 a DOC-006): ⏳ Não iniciado
-- **Sprint 1.7: Setup Frontend** (FE-001 a FE-009): ⏳ Estrutura criada, implementação pendente
+- **Sprint 1.4: Account Management** (AC-001 a AC-011): ✅ Completo
+- **Sprint 1.5: Transaction Context** (TX-001 a TX-015): ✅ Completo
+- **Sprint 1.6: Swagger** (DOC-001 a DOC-006): ✅ Completo
+- **Sprint 1.7: Setup Frontend** (FE-001 a FE-009): 🚧 Parcial (Vue 3 configurado, falta layout e UI library)
+- **Sprint 1.8: Módulo de Autenticação** (FE-AUTH-001 a FE-AUTH-010): 🚧 Parcial (estrutura completa, falta testes)
+- **Sprint 1.9: Módulo de Contas** (FE-ACC-001 a FE-ACC-010): 🚧 Estrutura básica criada, implementação pendente
+- **Sprint 1.10: Módulo de Transações** (FE-TX-001 a FE-TX-010): 🚧 Estrutura básica criada, implementação pendente
 - **Demais sprints**: ⏳ Não iniciadas
 
 ### 📈 Progresso
-- **Fase 1 (Fundação e MVP)**: ~30% concluído
+- **Fase 1 (Fundação e MVP)**: ~60% concluído
   - Backend base: ✅ 100%
   - Identity Context: ✅ 100%
-  - Account Management: ⏳ 0%
-  - Transaction Context: ⏳ 0%
-  - Frontend: ⏳ 0%
+  - Account Management: ✅ 100%
+  - Transaction Context: ✅ 100%
+  - Swagger: ✅ 100%
+  - Frontend Setup: 🚧 70% (Vue 3 configurado, falta UI library e layout)
+  - Frontend Auth: 🚧 90% (estrutura completa, falta testes)
+  - Frontend Accounts: 🚧 20% (rotas criadas, falta implementação)
+  - Frontend Transactions: 🚧 20% (rotas criadas, falta implementação)
 
 ---
 
@@ -172,17 +181,17 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| FE-001 | Criar projeto Next.js 14 com TypeScript | 🟣 | 🔴 | 2h | - | ✅ |
-| FE-002 | Configurar Tailwind CSS | 🟣 | 🔴 | 2h | FE-001 | ✅ |
-| FE-003 | Instalar e configurar shadcn/ui | 🟣 | 🔴 | 4h | FE-002 | ✅ |
-| FE-004 | Instalar dependências (React Hook Form, Zod, Axios, TanStack Query) | 🟣 | 🔴 | 1h | FE-001 | ✅ |
-| FE-005 | Configurar estrutura de pastas (app, components, lib) | 🟣 | 🔴 | 2h | FE-001 | ✅ |
-| FE-006 | Criar layout base (Header, Sidebar, Footer) | 🟣 | 🔴 | 4h | FE-003 | ✅ |
+| FE-001 | Criar projeto Vue 3 com TypeScript | 🟣 | 🔴 | 2h | - | ✅ |
+| FE-002 | Configurar Tailwind CSS | 🟣 | 🔴 | 2h | FE-001 | ⏳ |
+| FE-003 | Instalar e configurar biblioteca de componentes UI | 🟣 | 🔴 | 4h | FE-002 | ⏳ |
+| FE-004 | Instalar dependências (Axios, Vue Router, Pinia) | 🟣 | 🔴 | 1h | FE-001 | ✅ |
+| FE-005 | Configurar estrutura de pastas (src/api, src/stores, src/views, src/router) | 🟣 | 🔴 | 2h | FE-001 | ✅ |
+| FE-006 | Criar layout base (Header, Sidebar, Footer) | 🟣 | 🔴 | 4h | FE-003 | ⏳ |
 | FE-007 | Configurar cliente API (Axios) | 🟣 | 🔴 | 4h | FE-004 | ✅ |
-| FE-008 | Configurar variáveis de ambiente (.env.local) | 🟣 | 🔴 | 1h | FE-001 | ✅ |
+| FE-008 | Configurar variáveis de ambiente (.env) | 🟣 | 🔴 | 1h | FE-001 | ✅ |
 | FE-009 | Criar Dockerfile para frontend | 🟠 | 🟡 | 2h | FE-001 | ✅ |
 
-**Entregável Sprint 1.7:** Frontend configurado e rodando
+**Entregável Sprint 1.7:** Frontend Vue 3 configurado e rodando (estrutura básica completa)
 
 ---
 
@@ -190,18 +199,18 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| FE-AUTH-001 | Criar página de Login (/login) | 🟣 | 🔴 | 4h | FE-006, FE-007 | ✅ |
-| FE-AUTH-002 | Criar página de Registro (/register) | 🟣 | 🔴 | 4h | FE-006, FE-007 | ✅ |
-| FE-AUTH-003 | Criar hook useAuth para gerenciar autenticação | 🟣 | 🔴 | 4h | FE-007 | ✅ |
-| FE-AUTH-004 | Implementar proteção de rotas (middleware) | 🟣 | 🔴 | 4h | FE-AUTH-003 | ✅ |
-| FE-AUTH-005 | Criar componente de formulário de login (React Hook Form + Zod) | 🟣 | 🔴 | 4h | FE-003, FE-004 | ✅ |
-| FE-AUTH-006 | Criar componente de formulário de registro | 🟣 | 🔴 | 4h | FE-003, FE-004 | ✅ |
+| FE-AUTH-001 | Criar página de Login (/login) | 🟣 | 🔴 | 4h | FE-007 | ✅ |
+| FE-AUTH-002 | Criar página de Registro (/register) | 🟣 | 🔴 | 4h | FE-007 | ✅ |
+| FE-AUTH-003 | Criar store Pinia para autenticação (useAuthStore) | 🟣 | 🔴 | 4h | FE-007 | ✅ |
+| FE-AUTH-004 | Implementar proteção de rotas (navigation guards) | 🟣 | 🔴 | 4h | FE-AUTH-003 | ✅ |
+| FE-AUTH-005 | Criar formulário de login (Vue Composition API) | 🟣 | 🔴 | 4h | FE-AUTH-001 | ✅ |
+| FE-AUTH-006 | Criar formulário de registro | 🟣 | 🔴 | 4h | FE-AUTH-002 | ✅ |
 | FE-AUTH-007 | Integrar com API de autenticação (login) | 🟣 | 🔴 | 2h | FE-AUTH-001, DOC-006 | ✅ |
 | FE-AUTH-008 | Integrar com API de autenticação (registro) | 🟣 | 🔴 | 2h | FE-AUTH-002, DOC-006 | ✅ |
 | FE-AUTH-009 | Implementar tratamento de erros e loading states | 🟣 | 🟡 | 2h | FE-AUTH-007, FE-AUTH-008 | ✅ |
-| FE-AUTH-010 | Testar fluxo completo de autenticação | 🟤 | 🔴 | 2h | FE-AUTH-007, FE-AUTH-008 | ✅ |
+| FE-AUTH-010 | Testar fluxo completo de autenticação | 🟤 | 🔴 | 2h | FE-AUTH-007, FE-AUTH-008 | ⏳ |
 
-**Entregável Sprint 1.8:** Autenticação funcionando no frontend
+**Entregável Sprint 1.8:** Autenticação funcionando no frontend Vue 3 (estrutura completa, testes pendentes)
 
 ---
 
@@ -209,18 +218,18 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| FE-ACC-001 | Criar hook useAccounts (TanStack Query) | 🟣 | 🔴 | 2h | FE-007 | ✅ |
-| FE-ACC-002 | Criar página de lista de contas (/accounts) | 🟣 | 🔴 | 4h | FE-006, FE-ACC-001 | ✅ |
-| FE-ACC-003 | Criar componente AccountCard | 🟣 | 🔴 | 2h | FE-003 | ✅ |
-| FE-ACC-004 | Criar página de detalhes da conta (/accounts/[id]) | 🟣 | 🔴 | 4h | FE-006, FE-ACC-001 | ✅ |
-| FE-ACC-005 | Criar página de criação de conta (/accounts/new) | 🟣 | 🔴 | 4h | FE-006, FE-ACC-001 | ✅ |
-| FE-ACC-006 | Criar formulário de conta (React Hook Form + Zod) | 🟣 | 🔴 | 4h | FE-003, FE-004 | ✅ |
-| FE-ACC-007 | Integrar com API de contas (listar) | 🟣 | 🔴 | 2h | FE-ACC-002, DOC-006 | ✅ |
-| FE-ACC-008 | Integrar com API de contas (criar) | 🟣 | 🔴 | 2h | FE-ACC-005, DOC-006 | ✅ |
-| FE-ACC-009 | Integrar com API de contas (detalhes) | 🟣 | 🔴 | 2h | FE-ACC-004, DOC-006 | ✅ |
-| FE-ACC-010 | Implementar loading e error states | 🟣 | 🟡 | 2h | FE-ACC-007, FE-ACC-008 | ✅ |
+| FE-ACC-001 | Criar store Pinia para contas (useAccountsStore) | 🟣 | 🔴 | 2h | FE-007 | ⏳ |
+| FE-ACC-002 | Criar página de lista de contas (/accounts) | 🟣 | 🔴 | 4h | FE-ACC-001 | 🚧 |
+| FE-ACC-003 | Criar componente AccountCard | 🟣 | 🔴 | 2h | FE-003 | ⏳ |
+| FE-ACC-004 | Criar página de detalhes da conta (/accounts/:id) | 🟣 | 🔴 | 4h | FE-ACC-001 | 🚧 |
+| FE-ACC-005 | Criar página de criação de conta (/accounts/new) | 🟣 | 🔴 | 4h | FE-ACC-001 | 🚧 |
+| FE-ACC-006 | Criar formulário de conta (Vue Composition API) | 🟣 | 🔴 | 4h | FE-ACC-005 | ⏳ |
+| FE-ACC-007 | Integrar com API de contas (listar) | 🟣 | 🔴 | 2h | FE-ACC-002, DOC-006 | ⏳ |
+| FE-ACC-008 | Integrar com API de contas (criar) | 🟣 | 🔴 | 2h | FE-ACC-005, DOC-006 | ⏳ |
+| FE-ACC-009 | Integrar com API de contas (detalhes) | 🟣 | 🔴 | 2h | FE-ACC-004, DOC-006 | ⏳ |
+| FE-ACC-010 | Implementar loading e error states | 🟣 | 🟡 | 2h | FE-ACC-007, FE-ACC-008 | ⏳ |
 
-**Entregável Sprint 1.9:** Módulo de contas funcionando no frontend
+**Entregável Sprint 1.9:** Módulo de contas funcionando no frontend (estrutura básica criada, implementação pendente)
 
 ---
 
@@ -228,18 +237,18 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| FE-TX-001 | Criar hook useTransactions (TanStack Query) | 🟣 | 🔴 | 2h | FE-007 | ✅ |
-| FE-TX-002 | Criar página de lista de transações (/transactions) | 🟣 | 🔴 | 4h | FE-006, FE-TX-001 | ✅ |
-| FE-TX-003 | Criar componente TransactionTable | 🟣 | 🔴 | 4h | FE-003 | ✅ |
-| FE-TX-004 | Criar página de detalhes da transação (/transactions/[id]) | 🟣 | 🔴 | 4h | FE-006, FE-TX-001 | ✅ |
-| FE-TX-005 | Criar página de criação de transação (/transactions/new) | 🟣 | 🔴 | 4h | FE-006, FE-TX-001 | ✅ |
-| FE-TX-006 | Criar formulário de transação (React Hook Form + Zod) | 🟣 | 🔴 | 6h | FE-003, FE-004 | ✅ |
-| FE-TX-007 | Integrar com API de transações (listar) | 🟣 | 🔴 | 2h | FE-TX-002, DOC-006 | ✅ |
-| FE-TX-008 | Integrar com API de transações (criar) | 🟣 | 🔴 | 2h | FE-TX-005, DOC-006 | ✅ |
-| FE-TX-009 | Integrar com API de transações (detalhes) | 🟣 | 🔴 | 2h | FE-TX-004, DOC-006 | ✅ |
-| FE-TX-010 | Implementar loading e error states | 🟣 | 🟡 | 2h | FE-TX-007, FE-TX-008 | ✅ |
+| FE-TX-001 | Criar store Pinia para transações (useTransactionsStore) | 🟣 | 🔴 | 2h | FE-007 | ⏳ |
+| FE-TX-002 | Criar página de lista de transações (/transactions) | 🟣 | 🔴 | 4h | FE-TX-001 | 🚧 |
+| FE-TX-003 | Criar componente TransactionTable | 🟣 | 🔴 | 4h | FE-003 | ⏳ |
+| FE-TX-004 | Criar página de detalhes da transação (/transactions/:id) | 🟣 | 🔴 | 4h | FE-TX-001 | 🚧 |
+| FE-TX-005 | Criar página de criação de transação (/transactions/new) | 🟣 | 🔴 | 4h | FE-TX-001 | 🚧 |
+| FE-TX-006 | Criar formulário de transação (Vue Composition API) | 🟣 | 🔴 | 6h | FE-TX-005 | ⏳ |
+| FE-TX-007 | Integrar com API de transações (listar) | 🟣 | 🔴 | 2h | FE-TX-002, DOC-006 | ⏳ |
+| FE-TX-008 | Integrar com API de transações (criar) | 🟣 | 🔴 | 2h | FE-TX-005, DOC-006 | ⏳ |
+| FE-TX-009 | Integrar com API de transações (detalhes) | 🟣 | 🔴 | 2h | FE-TX-004, DOC-006 | ⏳ |
+| FE-TX-010 | Implementar loading e error states | 🟣 | 🟡 | 2h | FE-TX-007, FE-TX-008 | ⏳ |
 
-**Entregável Sprint 1.10:** Módulo de transações funcionando no frontend
+**Entregável Sprint 1.10:** Módulo de transações funcionando no frontend (estrutura básica criada, implementação pendente)
 
 ---
 
