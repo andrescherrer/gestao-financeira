@@ -30,9 +30,11 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading.value = true
     try {
       const response = await authService.login(credentials)
-      // Salvar token primeiro
+      // Salvar token no localStorage PRIMEIRO
       authService.saveToken(response.token)
-      // Depois atualizar o estado
+      // Aguardar um momento para garantir que foi salvo
+      await new Promise(resolve => setTimeout(resolve, 10))
+      // Depois atualizar o estado reativo
       token.value = response.token
       user.value = response.user
       return response

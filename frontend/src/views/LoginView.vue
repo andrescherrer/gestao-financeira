@@ -90,11 +90,13 @@ const isLoading = computed(() => authStore.isLoading)
 async function handleSubmit(values: any) {
   error.value = null
   try {
-    await authStore.login(values)
-    // Garantir que o token foi salvo e o estado foi atualizado
-    authStore.init()
-    // Aguardar um tick para garantir que tudo está sincronizado
-    await new Promise(resolve => setTimeout(resolve, 50))
+    const response = await authStore.login(values)
+    // Verificar se o token foi salvo
+    const savedToken = localStorage.getItem('auth_token')
+    if (!savedToken) {
+      throw new Error('Token não foi salvo corretamente')
+    }
+    // Redirecionar após login bem-sucedido
     const redirect = (route.query.redirect as string) || '/'
     router.push(redirect)
   } catch (err: any) {
