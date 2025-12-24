@@ -183,7 +183,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 |----|--------|------|------------|---------|--------------|--------|
 | FE-001 | Criar projeto Vue 3 com TypeScript | 🟣 | 🔴 | 2h | - | ✅ |
 | FE-002 | Configurar Tailwind CSS | 🟣 | 🔴 | 2h | FE-001 | ✅ |
-| FE-003 | Instalar e configurar biblioteca de componentes UI | 🟣 | 🔴 | 4h | FE-002 | ⏳ |
+| FE-003 | Instalar e configurar biblioteca de componentes UI (PrimeVue) | 🟣 | 🔴 | 4h | FE-002 | ✅ |
 | FE-004 | Instalar dependências (Axios, Vue Router, Pinia) | 🟣 | 🔴 | 1h | FE-001 | ✅ |
 | FE-005 | Configurar estrutura de pastas (src/api, src/stores, src/views, src/router) | 🟣 | 🔴 | 2h | FE-001 | ✅ |
 | FE-006 | Criar layout base (Header, Sidebar, Footer) | 🟣 | 🔴 | 4h | FE-003 | ⏳ |
