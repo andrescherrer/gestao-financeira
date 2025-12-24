@@ -76,7 +76,7 @@ const userInitials = computed(() => {
   if (firstName && lastName) {
     return `${firstName[0]}${lastName[0]}`.toUpperCase()
   }
-  if (firstName) {
+  if (firstName && firstName[0]) {
     return firstName[0].toUpperCase()
   }
   return authStore.user.email?.[0]?.toUpperCase() || 'U'
