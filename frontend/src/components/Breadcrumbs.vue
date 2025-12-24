@@ -29,15 +29,3 @@ defineProps<{
   items: BreadcrumbItem[]
 }>()
 </script>
-
-<script setup lang="ts">
-interface BreadcrumbItem {
-  label: string
-  to?: string
-}
-
-defineProps<{
-  items: BreadcrumbItem[]
-}>()
-</script>
-
