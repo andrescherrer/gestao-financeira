@@ -54,10 +54,16 @@
                 id="first_name"
                 name="first_name"
                 type="text"
-                as-child
+                v-slot="{ field, meta }"
               >
                 <Input
-                  :class="errors.first_name ? 'border-destructive' : ''"
+                  :id="field.id"
+                  :name="field.name"
+                  :value="field.value"
+                  :onInput="field.onInput"
+                  :onChange="field.onChange"
+                  :onBlur="field.onBlur"
+                  :class="errors.first_name || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
                   placeholder="Seu nome"
                 />
               </Field>
@@ -72,10 +78,16 @@
                 id="last_name"
                 name="last_name"
                 type="text"
-                as-child
+                v-slot="{ field, meta }"
               >
                 <Input
-                  :class="errors.last_name ? 'border-destructive' : ''"
+                  :id="field.id"
+                  :name="field.name"
+                  :value="field.value"
+                  :onInput="field.onInput"
+                  :onChange="field.onChange"
+                  :onBlur="field.onBlur"
+                  :class="errors.last_name || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
                   placeholder="Seu sobrenome"
                 />
               </Field>
@@ -93,10 +105,16 @@
                 id="email"
                 name="email"
                 type="email"
-                as-child
+                v-slot="{ field, meta }"
               >
                 <Input
-                  :class="errors.email ? 'border-destructive' : ''"
+                  :id="field.id"
+                  :name="field.name"
+                  :value="field.value"
+                  :onInput="field.onInput"
+                  :onChange="field.onChange"
+                  :onBlur="field.onBlur"
+                  :class="errors.email || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
                   placeholder="seu@email.com"
                   class="pr-10"
                 />
@@ -118,10 +136,17 @@
                 id="password"
                 name="password"
                 :type="showPassword ? 'text' : 'password'"
-                as-child
+                v-slot="{ field, meta }"
               >
                 <Input
-                  :class="errors.password ? 'border-destructive' : ''"
+                  :id="field.id"
+                  :name="field.name"
+                  :type="showPassword ? 'text' : 'password'"
+                  :value="field.value"
+                  :onInput="field.onInput"
+                  :onChange="field.onChange"
+                  :onBlur="field.onBlur"
+                  :class="errors.password || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
                   placeholder="••••••••"
                   class="pr-10"
                 />
@@ -153,10 +178,17 @@
                 id="confirmPassword"
                 name="confirmPassword"
                 :type="showConfirmPassword ? 'text' : 'password'"
-                as-child
+                v-slot="{ field, meta }"
               >
                 <Input
-                  :class="errors.confirmPassword ? 'border-destructive' : ''"
+                  :id="field.id"
+                  :name="field.name"
+                  :type="showConfirmPassword ? 'text' : 'password'"
+                  :value="field.value"
+                  :onInput="field.onInput"
+                  :onChange="field.onChange"
+                  :onBlur="field.onBlur"
+                  :class="errors.confirmPassword || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
                   placeholder="••••••••"
                   class="pr-10"
                 />
