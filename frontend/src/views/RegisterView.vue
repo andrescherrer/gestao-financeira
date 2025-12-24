@@ -57,7 +57,7 @@
                 v-slot="{ field, meta }"
               >
                 <Input
-                  :id="field.id"
+                  id="first_name"
                   :name="field.name"
                   :value="field.value"
                   @input="field.onInput"
@@ -81,7 +81,7 @@
                 v-slot="{ field, meta }"
               >
                 <Input
-                  :id="field.id"
+                  id="last_name"
                   :name="field.name"
                   :value="field.value"
                   @input="field.onInput"
@@ -108,7 +108,7 @@
                 v-slot="{ field, meta }"
               >
                 <Input
-                  :id="field.id"
+                  id="email"
                   :name="field.name"
                   :value="field.value"
                   @input="field.onInput"
@@ -139,7 +139,7 @@
                 v-slot="{ field, meta }"
               >
                 <Input
-                  :id="field.id"
+                  id="password"
                   :name="field.name"
                   :type="showPassword ? 'text' : 'password'"
                   :value="field.value"
@@ -181,7 +181,7 @@
                 v-slot="{ field, meta }"
               >
                 <Input
-                  :id="field.id"
+                  id="confirmPassword"
                   :name="field.name"
                   :type="showConfirmPassword ? 'text' : 'password'"
                   :value="field.value"
