@@ -7,7 +7,7 @@ export const createAccountSchema = z.object({
   name: z
     .string()
     .min(1, 'Nome da conta é obrigatório')
-    .min(2, 'Nome deve ter no mínimo 2 caracteres')
+    .min(3, 'Nome deve ter no mínimo 3 caracteres') // Backend exige mínimo 3
     .max(100, 'Nome deve ter no máximo 100 caracteres'),
   type: z.enum(['BANK', 'WALLET', 'INVESTMENT', 'CREDIT_CARD'], {
     errorMap: () => ({ message: 'Tipo de conta é obrigatório' }),
