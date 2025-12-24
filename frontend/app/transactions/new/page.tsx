@@ -1,13 +1,15 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Sidebar } from "@/components/layout";
 import { ProtectedRoute } from "@/components/auth";
 import { TransactionForm } from "@/components/transactions";
 import { useTransactions } from "@/lib/hooks/useTransactions";
 import type { CreateTransactionRequest } from "@/lib/api/types";
+import { LoadingSpinner } from "@/components/auth";
 
-export default function NewTransactionPage() {
+function NewTransactionForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const accountId = searchParams.get("account_id"); // Permite pré-selecionar conta via query param
@@ -25,33 +27,50 @@ export default function NewTransactionPage() {
   };
 
   return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-4xl font-bold mb-2">Nova Transação</h1>
+        <p className="text-muted-foreground">
+          Preencha os dados para criar uma nova transação
+        </p>
+      </div>
+
+      <TransactionForm
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        isLoading={isCreating}
+        error={
+          createError
+            ? (createError as any)?.response?.data?.error ||
+              (createError as any)?.message ||
+              "Erro ao criar transação"
+            : null
+        }
+        defaultAccountId={accountId || undefined}
+      />
+    </div>
+  );
+}
+
+export default function NewTransactionPage() {
+  return (
     <ProtectedRoute>
       <div className="flex">
         <Sidebar />
         <div className="ml-64 flex-1 p-8">
           <div className="container max-w-2xl">
-            <div className="space-y-6">
-              <div>
-                <h1 className="text-4xl font-bold mb-2">Nova Transação</h1>
-                <p className="text-muted-foreground">
-                  Preencha os dados para criar uma nova transação
-                </p>
-              </div>
-
-              <TransactionForm
-                onSubmit={handleSubmit}
-                onCancel={handleCancel}
-                isLoading={isCreating}
-                error={
-                  createError
-                    ? (createError as any)?.response?.data?.error ||
-                      (createError as any)?.message ||
-                      "Erro ao criar transação"
-                    : null
-                }
-                defaultAccountId={accountId || undefined}
-              />
-            </div>
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <LoadingSpinner className="mx-auto mb-4" />
+                    <p className="text-muted-foreground">Carregando...</p>
+                  </div>
+                </div>
+              }
+            >
+              <NewTransactionForm />
+            </Suspense>
           </div>
         </div>
       </div>
