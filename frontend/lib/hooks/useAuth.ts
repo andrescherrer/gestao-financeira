@@ -30,9 +30,6 @@ export function useAuth() {
   const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
 
-  // Verificar se está autenticado (verifica token no localStorage)
-  const isAuthenticated = authService.isAuthenticated();
-
   // Query para verificar autenticação e obter dados do usuário
   const { data: authData, isLoading: isLoadingAuth } = useQuery<AuthState>({
     queryKey: AUTH_QUERY_KEY,
@@ -42,19 +39,21 @@ export function useAuth() {
         return { user: null, isAuthenticated: false, isLoading: false };
       }
 
-      // Se tiver token, tentar obter dados do usuário
-      // Por enquanto, apenas verifica se o token existe
+      // Se tiver token, retornar dados do cache ou do estado local
       // Em uma implementação completa, faria uma requisição para validar o token
       return {
-        user: user,
+        user: user || null,
         isAuthenticated: true,
         isLoading: false,
       };
     },
-    enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000, // 5 minutos
     retry: false,
   });
+
+  // Verificar se está autenticado (verifica token no localStorage)
+  // Isso é reativo porque é recalculado a cada render
+  const hasToken = typeof window !== 'undefined' && authService.isAuthenticated();
 
   // Mutation para login
   const loginMutation = useMutation({
@@ -144,15 +143,19 @@ export function useAuth() {
   useEffect(() => {
     if (authData?.user) {
       setUser(authData.user);
-    } else if (!isAuthenticated) {
+    } else if (!hasToken) {
       setUser(null);
     }
-  }, [authData, isAuthenticated]);
+  }, [authData, hasToken]);
+
+  // Determinar se está autenticado: tem token OU tem user no cache
+  const hasUser = !!(user || authData?.user);
+  const finalIsAuthenticated = hasToken || hasUser;
 
   return {
     // Estado
     user: user || authData?.user || null,
-    isAuthenticated: isAuthenticated && !!user,
+    isAuthenticated: finalIsAuthenticated,
     isLoading: isLoadingAuth || loginMutation.isPending || registerMutation.isPending,
 
     // Ações
