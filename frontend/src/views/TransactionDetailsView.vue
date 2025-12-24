@@ -1,17 +1,13 @@
 <template>
   <Layout>
     <div>
-      <!-- Header com botão voltar -->
-      <div class="mb-6">
-        <button
-          @click="goBack"
-          class="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <i class="pi pi-arrow-left"></i>
-          <span>Voltar para transações</span>
-        </button>
-        <h1 class="text-4xl font-bold mb-2">Detalhes da Transação</h1>
-      </div>
+      <!-- Breadcrumbs -->
+      <Breadcrumbs
+        :items="[
+          { label: 'Transações', to: '/transactions' },
+          { label: transactionsStore.currentTransaction?.description || 'Detalhes' },
+        ]"
+      />
 
       <!-- Loading State -->
       <div v-if="transactionsStore.isLoading" class="flex items-center justify-center py-12">
@@ -24,7 +20,7 @@
       <!-- Error State -->
       <div
         v-else-if="transactionsStore.error"
-        class="rounded-md bg-red-50 border border-red-200 p-4 mb-6"
+        class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4"
       >
         <div class="flex items-center gap-2">
           <i class="pi pi-exclamation-circle text-red-600"></i>
@@ -33,13 +29,13 @@
         <div class="mt-4 flex gap-3">
           <button
             @click="handleRetry"
-            class="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700 transition-colors"
+            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
           >
             Tentar novamente
           </button>
           <button
             @click="goBack"
-            class="rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
           >
             Voltar
           </button>
@@ -48,32 +44,45 @@
 
       <!-- Transaction Details -->
       <div v-else-if="transactionsStore.currentTransaction" class="space-y-6">
+        <!-- Header -->
+        <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">
+              {{ transactionsStore.currentTransaction.description }}
+            </h1>
+            <p class="text-gray-600">
+              {{ getTransactionTypeLabel(transactionsStore.currentTransaction.type) }}
+            </p>
+          </div>
+          <span
+            class="rounded-full px-3 py-1 text-sm font-semibold"
+            :class="
+              transactionsStore.currentTransaction.type === 'INCOME'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
+            "
+          >
+            {{ transactionsStore.currentTransaction.type === 'INCOME' ? 'Receita' : 'Despesa' }}
+          </span>
+        </div>
+
         <!-- Transaction Card -->
-        <div class="rounded-lg border border-gray-200 bg-white p-6">
-          <div class="mb-6 flex items-start justify-between">
-            <div>
-              <h2 class="text-2xl font-bold text-gray-900 mb-2">
-                {{ transactionsStore.currentTransaction.description }}
-              </h2>
-              <p class="text-gray-600">
-                {{ getTransactionTypeLabel(transactionsStore.currentTransaction.type) }}
-              </p>
-            </div>
-            <span
-              class="rounded-full px-3 py-1 text-sm font-medium"
+        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <!-- Amount -->
+          <div class="mb-6 rounded-lg bg-gradient-to-br p-6"
+            :class="
+              transactionsStore.currentTransaction.type === 'INCOME'
+                ? 'from-green-50 to-green-100'
+                : 'from-red-50 to-red-100'
+            ">
+            <div class="text-sm font-medium mb-2"
               :class="
                 transactionsStore.currentTransaction.type === 'INCOME'
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-700'
-              "
-            >
-              {{ transactionsStore.currentTransaction.type === 'INCOME' ? 'Receita' : 'Despesa' }}
-            </span>
-          </div>
-
-          <!-- Amount -->
-          <div class="mb-6 rounded-lg bg-gray-50 p-6">
-            <div class="text-sm text-gray-600 mb-2">Valor</div>
+                  ? 'text-green-700'
+                  : 'text-red-700'
+              ">
+              Valor
+            </div>
             <div
               class="text-4xl font-bold"
               :class="
@@ -91,72 +100,75 @@
 
           <!-- Transaction Information Grid -->
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Tipo</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Tipo
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ getTransactionTypeLabel(transactionsStore.currentTransaction.type) }}
               </div>
             </div>
 
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Conta</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Conta
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ getAccountName(transactionsStore.currentTransaction.account_id) }}
               </div>
             </div>
 
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Data</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Data
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ formatDate(transactionsStore.currentTransaction.date) }}
               </div>
             </div>
 
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Moeda</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Moeda
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ transactionsStore.currentTransaction.currency }}
               </div>
             </div>
 
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Data de Criação</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Data de Criação
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ formatDateTime(transactionsStore.currentTransaction.created_at) }}
               </div>
             </div>
 
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Última Atualização</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Última Atualização
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ formatDateTime(transactionsStore.currentTransaction.updated_at) }}
               </div>
             </div>
           </div>
 
           <!-- Description -->
-          <div class="mt-6 pt-6 border-t border-gray-200">
-            <div class="text-sm text-gray-600 mb-2">Descrição</div>
-            <div class="text-lg text-gray-900">
+          <div class="mt-6 rounded-lg border border-gray-100 bg-gray-50 p-4">
+            <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
+              Descrição
+            </div>
+            <div class="text-lg font-medium text-gray-900">
               {{ transactionsStore.currentTransaction.description }}
             </div>
           </div>
         </div>
-
-        <!-- Actions -->
-        <div class="flex gap-3">
-          <button
-            @click="goBack"
-            class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            <i class="pi pi-arrow-left"></i>
-            Voltar
-          </button>
-        </div>
       </div>
 
       <!-- Not Found State -->
-      <div v-else class="rounded-lg border border-gray-200 bg-white p-12 text-center">
+      <div v-else class="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
         <i class="pi pi-exclamation-circle text-6xl text-gray-400 mb-4"></i>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">
           Transação não encontrada
@@ -166,7 +178,7 @@
         </p>
         <button
           @click="goBack"
-          class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+          class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           <i class="pi pi-arrow-left"></i>
           Voltar para transações
@@ -182,6 +194,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useTransactionsStore } from '@/stores/transactions'
 import { useAccountsStore } from '@/stores/accounts'
 import Layout from '@/components/layout/Layout.vue'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import type { Transaction } from '@/api/types'
 
 const route = useRoute()

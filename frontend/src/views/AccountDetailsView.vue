@@ -1,17 +1,13 @@
 <template>
   <Layout>
     <div>
-      <!-- Header com botão voltar -->
-      <div class="mb-6">
-        <button
-          @click="goBack"
-          class="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <i class="pi pi-arrow-left"></i>
-          <span>Voltar para contas</span>
-        </button>
-        <h1 class="text-4xl font-bold mb-2">Detalhes da Conta</h1>
-      </div>
+      <!-- Breadcrumbs -->
+      <Breadcrumbs
+        :items="[
+          { label: 'Contas', to: '/accounts' },
+          { label: accountsStore.currentAccount?.name || 'Detalhes' },
+        ]"
+      />
 
       <!-- Loading State -->
       <div v-if="accountsStore.isLoading" class="flex items-center justify-center py-12">
@@ -24,7 +20,7 @@
       <!-- Error State -->
       <div
         v-else-if="accountsStore.error"
-        class="rounded-md bg-red-50 border border-red-200 p-4 mb-6"
+        class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4"
       >
         <div class="flex items-center gap-2">
           <i class="pi pi-exclamation-circle text-red-600"></i>
@@ -33,13 +29,13 @@
         <div class="mt-4 flex gap-3">
           <button
             @click="handleRetry"
-            class="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700 transition-colors"
+            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
           >
             Tentar novamente
           </button>
           <button
             @click="goBack"
-            class="rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
           >
             Voltar
           </button>
@@ -48,19 +44,19 @@
 
       <!-- Account Details -->
       <div v-else-if="accountsStore.currentAccount" class="space-y-6">
-        <!-- Account Card -->
-        <div class="rounded-lg border border-gray-200 bg-white p-6">
-          <div class="mb-6 flex items-start justify-between">
-            <div>
-              <h2 class="text-2xl font-bold text-gray-900 mb-2">
-                {{ accountsStore.currentAccount.name }}
-              </h2>
-              <p class="text-gray-600">
-                {{ getAccountTypeLabel(accountsStore.currentAccount.type) }}
-              </p>
-            </div>
+        <!-- Header -->
+        <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">
+              {{ accountsStore.currentAccount.name }}
+            </h1>
+            <p class="text-gray-600">
+              {{ getAccountTypeLabel(accountsStore.currentAccount.type) }}
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
             <span
-              class="rounded-full px-3 py-1 text-sm font-medium"
+              class="rounded-full px-3 py-1 text-sm font-semibold"
               :class="
                 accountsStore.currentAccount.is_active
                   ? 'bg-green-100 text-green-700'
@@ -69,11 +65,21 @@
             >
               {{ accountsStore.currentAccount.is_active ? 'Ativa' : 'Inativa' }}
             </span>
+            <router-link
+              :to="`/accounts/${accountsStore.currentAccount.account_id}/edit`"
+              class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            >
+              <i class="pi pi-pencil"></i>
+              Editar
+            </router-link>
           </div>
+        </div>
 
+        <!-- Account Card -->
+        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <!-- Balance -->
-          <div class="mb-6 rounded-lg bg-gray-50 p-6">
-            <div class="text-sm text-gray-600 mb-2">Saldo Atual</div>
+          <div class="mb-6 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+            <div class="text-sm font-medium text-gray-600 mb-2">Saldo Atual</div>
             <div
               class="text-4xl font-bold"
               :class="getBalanceColor(accountsStore.currentAccount.balance)"
@@ -84,71 +90,65 @@
 
           <!-- Account Information Grid -->
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Tipo de Conta</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Tipo de Conta
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ getAccountTypeLabel(accountsStore.currentAccount.type) }}
               </div>
             </div>
 
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Contexto</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Contexto
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ getContextLabel(accountsStore.currentAccount.context) }}
               </div>
             </div>
 
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Moeda</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Moeda
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ accountsStore.currentAccount.currency }}
               </div>
             </div>
 
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Status</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Status
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ accountsStore.currentAccount.is_active ? 'Ativa' : 'Inativa' }}
               </div>
             </div>
 
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Data de Criação</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Data de Criação
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ formatDate(accountsStore.currentAccount.created_at) }}
               </div>
             </div>
 
-            <div>
-              <div class="text-sm text-gray-600 mb-1">Última Atualização</div>
-              <div class="text-lg font-medium text-gray-900">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                Última Atualização
+              </div>
+              <div class="text-lg font-semibold text-gray-900">
                 {{ formatDate(accountsStore.currentAccount.updated_at) }}
               </div>
             </div>
           </div>
         </div>
-
-        <!-- Actions -->
-        <div class="flex gap-3">
-          <router-link
-            :to="`/accounts/${accountsStore.currentAccount.account_id}/edit`"
-            class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
-          >
-            <i class="pi pi-pencil"></i>
-            Editar Conta
-          </router-link>
-          <button
-            @click="goBack"
-            class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            <i class="pi pi-arrow-left"></i>
-            Voltar
-          </button>
-        </div>
       </div>
 
       <!-- Not Found State -->
-      <div v-else class="rounded-lg border border-gray-200 bg-white p-12 text-center">
+      <div v-else class="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
         <i class="pi pi-exclamation-circle text-6xl text-gray-400 mb-4"></i>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">
           Conta não encontrada
@@ -158,7 +158,7 @@
         </p>
         <button
           @click="goBack"
-          class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+          class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           <i class="pi pi-arrow-left"></i>
           Voltar para contas
@@ -173,6 +173,7 @@ import { onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAccountsStore } from '@/stores/accounts'
 import Layout from '@/components/layout/Layout.vue'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import type { Account } from '@/api/types'
 
 const route = useRoute()
@@ -265,4 +266,3 @@ function formatDate(dateString: string): string {
   }).format(date)
 }
 </script>
-
