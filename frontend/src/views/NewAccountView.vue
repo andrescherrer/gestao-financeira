@@ -81,12 +81,18 @@ async function handleSubmit(values: CreateAccountFormData) {
       initialBalance = parsed
     }
 
+    // Validar nome (backend exige mínimo 3 caracteres)
+    const trimmedName = values.name.trim()
+    if (trimmedName.length < 3) {
+      throw new Error('Nome da conta deve ter no mínimo 3 caracteres')
+    }
+
     const accountData: CreateAccountRequest = {
-      name: values.name.trim(), // Remover espaços em branco
+      name: trimmedName,
       type: values.type,
       context: values.context,
       currency: values.currency || 'BRL', // Sempre enviar currency (obrigatório)
-      initial_balance: initialBalance,
+      initial_balance: initialBalance, // Sempre enviar como number (0.0 se não fornecido)
     }
 
     // Log em desenvolvimento para debug
