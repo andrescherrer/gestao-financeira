@@ -61,7 +61,7 @@ export interface CreateAccountRequest {
 
 export interface ListAccountsResponse {
   accounts: Account[]
-  total: number
+  count: number
 }
 
 export interface Transaction {
