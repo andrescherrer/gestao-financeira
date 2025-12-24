@@ -43,18 +43,20 @@ export function useAuth() {
         return { user: null, isAuthenticated: false, isLoading: false };
       }
 
-      // Se tiver token, retornar dados do cache ou do estado local
+      // Se tiver token, buscar dados do cache primeiro, depois do estado local
       // Em uma implementação completa, faria uma requisição para validar o token
-      // Usar o user do estado ou do cache anterior
-      const cachedUser = queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY)?.user;
+      const cachedAuth = queryClient.getQueryData<AuthState>(AUTH_QUERY_KEY);
+      const cachedUser = cachedAuth?.user;
+      
       return {
-        user: user || cachedUser || null,
+        user: cachedUser || user || null,
         isAuthenticated: true,
         isLoading: false,
       };
     },
     enabled: true, // Sempre habilitada para verificar token
     staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos (mantém cache por mais tempo)
     retry: false,
   });
 
