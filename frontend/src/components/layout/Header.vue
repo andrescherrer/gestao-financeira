@@ -1,24 +1,26 @@
 <template>
-  <header class="sticky top-0 z-50 h-16 border-b border-gray-200 bg-white">
+  <header class="sticky top-0 z-50 h-16 border-b border-border bg-background">
     <div class="flex h-full items-center justify-between px-6">
       <!-- Left: Breadcrumbs ou título da página -->
-      <div class="flex items-center gap-2 text-sm text-gray-600">
-        <span class="font-medium text-gray-900">{{ pageTitle }}</span>
+      <div class="flex items-center gap-2 text-sm text-muted-foreground">
+        <span class="font-medium text-foreground">{{ pageTitle }}</span>
       </div>
 
       <!-- Right: Notificações e Usuário -->
       <div class="flex items-center gap-4">
         <!-- Ícone de Notificação -->
-        <button
-          class="relative flex h-10 w-10 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+        <Button
+          variant="ghost"
+          size="icon"
+          class="relative"
           title="Notificações"
         >
-          <i class="pi pi-bell text-lg"></i>
+          <Bell class="h-5 w-5" />
           <span
             v-if="hasNotifications"
-            class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500"
+            class="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive"
           ></span>
-        </button>
+        </Button>
 
         <!-- Avatar do Usuário -->
         <div v-if="authStore.user" class="flex items-center gap-3">
@@ -26,28 +28,30 @@
             {{ userInitials }}
           </div>
           <div class="hidden flex-col sm:flex">
-            <span class="text-sm font-semibold text-gray-900">{{ userName }}</span>
-            <span class="text-xs text-gray-500">{{ authStore.user.email }}</span>
+            <span class="text-sm font-semibold text-foreground">{{ userName }}</span>
+            <span class="text-xs text-muted-foreground">{{ authStore.user.email }}</span>
           </div>
           <!-- Menu Dropdown do Usuário -->
           <div class="relative" ref="userMenuRef">
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               @click="showUserMenu = !showUserMenu"
-              class="flex items-center text-gray-600 hover:text-gray-900"
             >
-              <i class="pi pi-chevron-down text-sm"></i>
-            </button>
+              <ChevronDown class="h-4 w-4" />
+            </Button>
             <div
               v-if="showUserMenu"
-              class="absolute right-0 mt-2 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
+              class="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-popover p-1 shadow-lg"
             >
-              <button
+              <Button
+                variant="ghost"
+                class="flex w-full items-center gap-2 justify-start"
                 @click="handleLogout"
-                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-red-600"
               >
-                <i class="pi pi-sign-out"></i>
+                <LogOut class="h-4 w-4" />
                 <span>Sair</span>
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -60,13 +64,15 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { Button } from '@/components/ui/button'
+import { Bell, ChevronDown, LogOut } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
 const showUserMenu = ref(false)
-const hasNotifications = ref(false) // Pode ser conectado a um store de notificações
+const hasNotifications = ref(false)
 const userMenuRef = ref<HTMLElement | null>(null)
 
 function handleClickOutside(event: MouseEvent) {

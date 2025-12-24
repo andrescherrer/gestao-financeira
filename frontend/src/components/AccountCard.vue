@@ -1,6 +1,6 @@
 <template>
-  <div
-    class="group relative cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-blue-300 hover:shadow-lg"
+  <Card
+    class="group relative cursor-pointer overflow-hidden transition-all hover:border-primary hover:shadow-lg"
     @click="handleClick"
   >
     <!-- Background gradient effect -->
@@ -9,67 +9,58 @@
       :class="getAccountGradient(account.type)"
     ></div>
 
-    <div class="relative">
+    <CardContent class="relative p-6">
       <div class="mb-4 flex items-start justify-between">
         <div class="flex items-center gap-3">
           <div
             class="flex h-12 w-12 items-center justify-center rounded-lg"
             :class="getAccountIconBg(account.type)"
           >
-            <i
-              class="pi text-xl text-white"
-              :class="getAccountIcon(account.type)"
-            ></i>
+            <component :is="getAccountIcon(account.type)" class="h-6 w-6 text-white" />
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900">
+            <h3 class="text-lg font-semibold text-foreground">
               {{ account.name }}
             </h3>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-muted-foreground">
               {{ getAccountTypeLabel(account.type) }}
             </p>
           </div>
         </div>
-        <span
-          class="rounded-full px-3 py-1 text-xs font-semibold"
-          :class="
-            account.is_active
-              ? 'bg-green-100 text-green-700'
-              : 'bg-gray-100 text-gray-700'
-          "
+        <Badge
+          :variant="account.is_active ? 'default' : 'secondary'"
         >
           {{ account.is_active ? 'Ativa' : 'Inativa' }}
-        </span>
+        </Badge>
       </div>
 
-      <div class="mb-4 rounded-lg bg-gray-50 p-4">
-        <div class="text-xs font-medium uppercase tracking-wide text-gray-500 mb-1">Saldo</div>
+      <div class="mb-4 rounded-lg bg-muted p-4">
+        <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">Saldo</div>
         <div class="text-3xl font-bold" :class="getBalanceColor(account.balance)">
           {{ formatCurrency(account.balance, account.currency) }}
         </div>
       </div>
 
       <div class="flex items-center justify-between">
-        <span
-          class="rounded-full px-3 py-1 text-xs font-medium"
-          :class="
-            account.context === 'PERSONAL'
-              ? 'bg-purple-100 text-purple-700'
-              : 'bg-indigo-100 text-indigo-700'
-          "
+        <Badge
+          :variant="account.context === 'PERSONAL' ? 'secondary' : 'outline'"
+          class="bg-purple-100 text-purple-700"
         >
           {{ getContextLabel(account.context) }}
-        </span>
-        <i
-          class="pi pi-chevron-right text-gray-400 transition-all group-hover:translate-x-1 group-hover:text-blue-600"
-        ></i>
+        </Badge>
+        <ChevronRight
+          class="h-5 w-5 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary"
+        />
       </div>
-    </div>
-  </div>
+    </CardContent>
+  </Card>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Building2, Wallet, TrendingUp, CreditCard, ChevronRight } from 'lucide-vue-next'
 import type { Account } from '@/api/types'
 
 interface Props {
@@ -110,17 +101,17 @@ function getBalanceColor(balance: string): string {
   const value = parseFloat(balance)
   if (value > 0) return 'text-green-600'
   if (value < 0) return 'text-red-600'
-  return 'text-gray-900'
+  return 'text-foreground'
 }
 
-function getAccountIcon(type: Account['type']): string {
-  const icons: Record<Account['type'], string> = {
-    BANK: 'pi-building',
-    WALLET: 'pi-wallet',
-    INVESTMENT: 'pi-chart-line',
-    CREDIT_CARD: 'pi-credit-card',
+function getAccountIcon(type: Account['type']) {
+  const icons: Record<Account['type'], any> = {
+    BANK: Building2,
+    WALLET: Wallet,
+    INVESTMENT: TrendingUp,
+    CREDIT_CARD: CreditCard,
   }
-  return icons[type] || 'pi-wallet'
+  return icons[type] || Wallet
 }
 
 function getAccountIconBg(type: Account['type']): string {
@@ -143,4 +134,3 @@ function getAccountGradient(type: Account['type']): string {
   return gradients[type] || 'bg-gradient-to-br from-gray-500 to-gray-600'
 }
 </script>
-
