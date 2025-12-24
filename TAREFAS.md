@@ -225,7 +225,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | FE-ACC-002 | Criar página de lista de contas (/accounts) | 🟣 | 🔴 | 4h | FE-ACC-001 | ✅ |
 | FE-ACC-003 | Criar componente AccountCard | 🟣 | 🔴 | 2h | FE-003 | ✅ |
 | FE-ACC-004 | Criar página de detalhes da conta (/accounts/:id) | 🟣 | 🔴 | 4h | FE-ACC-001 | ✅ |
-| FE-ACC-005 | Criar página de criação de conta (/accounts/new) | 🟣 | 🔴 | 4h | FE-ACC-001 | 🚧 |
+| FE-ACC-005 | Criar página de criação de conta (/accounts/new) | 🟣 | 🔴 | 4h | FE-ACC-001 | ✅ |
 | FE-ACC-006 | Criar formulário de conta (Vue Composition API) | 🟣 | 🔴 | 4h | FE-ACC-005 | ⏳ |
 | FE-ACC-007 | Integrar com API de contas (listar) | 🟣 | 🔴 | 2h | FE-ACC-002, DOC-006 | ⏳ |
 | FE-ACC-008 | Integrar com API de contas (criar) | 🟣 | 🔴 | 2h | FE-ACC-005, DOC-006 | ⏳ |
