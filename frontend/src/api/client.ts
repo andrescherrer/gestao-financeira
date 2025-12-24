@@ -41,6 +41,17 @@ apiClient.interceptors.request.use(
         })
       }
     }
+
+    // Log do body em desenvolvimento para POST/PUT/PATCH
+    if (import.meta.env.DEV && config.data && (config.method === 'post' || config.method === 'put' || config.method === 'patch')) {
+      console.log('[API Client] Request body:', {
+        url: config.url,
+        method: config.method?.toUpperCase(),
+        data: config.data,
+        dataString: JSON.stringify(config.data, null, 2),
+      })
+    }
+
     return config
   },
   (error: AxiosError) => {
