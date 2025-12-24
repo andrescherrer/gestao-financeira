@@ -1,7 +1,6 @@
+/* PrimeVue Icons - deve vir antes das diretivas @tailwind */
+@import 'primeicons/primeicons.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* PrimeVue Styles */
-@import 'primevue/resources/themes/aura-light-green/theme.css';
-@import 'primeicons/primeicons.css';
