@@ -8,7 +8,7 @@
         </p>
       </div>
 
-      <form @submit.prevent="handleSubmit" class="space-y-4">
+      <Form @submit="handleSubmit" :validation-schema="validationSchema" v-slot="{ errors }">
         <div v-if="error" class="rounded-md bg-red-50 p-3 text-sm text-red-600">
           {{ error }}
         </div>
@@ -17,29 +17,38 @@
           <label for="email" class="block text-sm font-medium text-gray-700">
             Email
           </label>
-          <input
+          <Field
             id="email"
-            v-model="form.email"
+            name="email"
             type="email"
-            required
-            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+            class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-blue-500"
+            :class="
+              errors.email
+                ? 'border-red-300 focus:border-red-500'
+                : 'border-gray-300 focus:border-blue-500'
+            "
             placeholder="seu@email.com"
           />
+          <ErrorMessage name="email" class="mt-1 text-sm text-red-600" />
         </div>
 
         <div>
           <label for="password" class="block text-sm font-medium text-gray-700">
             Senha
           </label>
-          <input
+          <Field
             id="password"
-            v-model="form.password"
+            name="password"
             type="password"
-            required
-            minlength="8"
-            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+            class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-blue-500"
+            :class="
+              errors.password
+                ? 'border-red-300 focus:border-red-500'
+                : 'border-gray-300 focus:border-blue-500'
+            "
             placeholder="••••••••"
           />
+          <ErrorMessage name="password" class="mt-1 text-sm text-red-600" />
         </div>
 
         <button
@@ -49,7 +58,7 @@
         >
           {{ isLoading ? 'Entrando...' : 'Entrar' }}
         </button>
-      </form>
+      </Form>
 
       <div class="text-center text-sm">
         <span class="text-gray-600">Não tem uma conta? </span>
@@ -64,24 +73,24 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { Form, Field, ErrorMessage } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
 import { useAuthStore } from '@/stores/auth'
+import { loginSchema } from '@/validations/auth'
+
+const validationSchema = toTypedSchema(loginSchema)
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-const form = ref({
-  email: '',
-  password: '',
-})
-
 const error = ref<string | null>(null)
 const isLoading = computed(() => authStore.isLoading)
 
-async function handleSubmit() {
+async function handleSubmit(values: any) {
   error.value = null
   try {
-    await authStore.login(form.value)
+    await authStore.login(values)
     const redirect = (route.query.redirect as string) || '/'
     router.push(redirect)
   } catch (err: any) {
