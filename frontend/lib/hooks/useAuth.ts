@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { authService } from "@/lib/api/auth";
 import type { LoginRequest, RegisterRequest, LoginResponse } from "@/lib/api/types";
 
