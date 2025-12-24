@@ -12,158 +12,165 @@
       <!-- Loading State -->
       <div v-if="accountsStore.isLoading" class="flex items-center justify-center py-12">
         <div class="text-center">
-          <i class="pi pi-spinner pi-spin text-4xl text-blue-600 mb-4"></i>
-          <p class="text-gray-600">Carregando detalhes da conta...</p>
+          <Loader2 class="mx-auto h-12 w-12 text-primary mb-4 animate-spin" />
+          <p class="text-muted-foreground">Carregando detalhes da conta...</p>
         </div>
       </div>
 
       <!-- Error State -->
-      <div
+      <Card
         v-else-if="accountsStore.error"
-        class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4"
+        class="mb-6 border-destructive"
       >
-        <div class="flex items-center gap-2">
-          <i class="pi pi-exclamation-circle text-red-600"></i>
-          <p class="text-red-600">{{ accountsStore.error }}</p>
-        </div>
-        <div class="mt-4 flex gap-3">
-          <button
-            @click="handleRetry"
-            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
-          >
-            Tentar novamente
-          </button>
-          <button
-            @click="goBack"
-            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-          >
-            Voltar
-          </button>
-        </div>
-      </div>
+        <CardContent class="p-4">
+          <div class="flex items-center gap-2 mb-4">
+            <AlertCircle class="h-4 w-4 text-destructive" />
+            <p class="text-destructive">{{ accountsStore.error }}</p>
+          </div>
+          <div class="flex gap-3">
+            <Button
+              @click="handleRetry"
+              variant="destructive"
+            >
+              Tentar novamente
+            </Button>
+            <Button
+              variant="outline"
+              @click="goBack"
+            >
+              Voltar
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <!-- Account Details -->
       <div v-else-if="accountsStore.currentAccount" class="space-y-6">
         <!-- Header -->
         <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">
+            <h1 class="text-4xl font-bold text-foreground mb-2">
               {{ accountsStore.currentAccount.name }}
             </h1>
-            <p class="text-gray-600">
+            <p class="text-muted-foreground">
               {{ getAccountTypeLabel(accountsStore.currentAccount.type) }}
             </p>
           </div>
           <div class="flex items-center gap-3">
-            <span
-              class="rounded-full px-3 py-1 text-sm font-semibold"
-              :class="
-                accountsStore.currentAccount.is_active
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-100 text-gray-700'
-              "
+            <Badge
+              :variant="accountsStore.currentAccount.is_active ? 'default' : 'secondary'"
             >
               {{ accountsStore.currentAccount.is_active ? 'Ativa' : 'Inativa' }}
-            </span>
-            <router-link
-              :to="`/accounts/${accountsStore.currentAccount.account_id}/edit`"
-              class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            </Badge>
+            <Button
+              as-child
+              variant="default"
             >
-              <i class="pi pi-pencil"></i>
-              Editar
-            </router-link>
+              <router-link
+                :to="`/accounts/${accountsStore.currentAccount.account_id}/edit`"
+              >
+                <Pencil class="h-4 w-4 mr-2" />
+                Editar
+              </router-link>
+            </Button>
           </div>
         </div>
 
         <!-- Account Card -->
-        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <!-- Balance -->
-          <div class="mb-6 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-            <div class="text-sm font-medium text-gray-600 mb-2">Saldo Atual</div>
-            <div
-              class="text-4xl font-bold"
-              :class="getBalanceColor(accountsStore.currentAccount.balance)"
-            >
-              {{ formatCurrency(accountsStore.currentAccount.balance, accountsStore.currentAccount.currency) }}
-            </div>
-          </div>
-
-          <!-- Account Information Grid -->
-          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
-              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                Tipo de Conta
-              </div>
-              <div class="text-lg font-semibold text-gray-900">
-                {{ getAccountTypeLabel(accountsStore.currentAccount.type) }}
+        <Card>
+          <CardContent class="p-6">
+            <!-- Balance -->
+            <div class="mb-6 rounded-lg bg-gradient-to-br from-muted to-muted/50 p-6">
+              <div class="text-sm font-medium text-muted-foreground mb-2">Saldo Atual</div>
+              <div
+                class="text-4xl font-bold"
+                :class="getBalanceColor(accountsStore.currentAccount.balance)"
+              >
+                {{ formatCurrency(accountsStore.currentAccount.balance, accountsStore.currentAccount.currency) }}
               </div>
             </div>
 
-            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
-              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                Contexto
+            <!-- Account Information Grid -->
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div class="rounded-lg border border-border bg-muted/50 p-4">
+                <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                  Tipo de Conta
+                </div>
+                <div class="text-lg font-semibold text-foreground">
+                  {{ getAccountTypeLabel(accountsStore.currentAccount.type) }}
+                </div>
               </div>
-              <div class="text-lg font-semibold text-gray-900">
-                {{ getContextLabel(accountsStore.currentAccount.context) }}
-              </div>
-            </div>
 
-            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
-              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                Moeda
+              <div class="rounded-lg border border-border bg-muted/50 p-4">
+                <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                  Contexto
+                </div>
+                <div class="text-lg font-semibold text-foreground">
+                  {{ getContextLabel(accountsStore.currentAccount.context) }}
+                </div>
               </div>
-              <div class="text-lg font-semibold text-gray-900">
-                {{ accountsStore.currentAccount.currency }}
-              </div>
-            </div>
 
-            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
-              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                Status
+              <div class="rounded-lg border border-border bg-muted/50 p-4">
+                <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                  Moeda
+                </div>
+                <div class="text-lg font-semibold text-foreground">
+                  {{ accountsStore.currentAccount.currency }}
+                </div>
               </div>
-              <div class="text-lg font-semibold text-gray-900">
-                {{ accountsStore.currentAccount.is_active ? 'Ativa' : 'Inativa' }}
-              </div>
-            </div>
 
-            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
-              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                Data de Criação
+              <div class="rounded-lg border border-border bg-muted/50 p-4">
+                <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                  Status
+                </div>
+                <div class="text-lg font-semibold text-foreground">
+                  {{ accountsStore.currentAccount.is_active ? 'Ativa' : 'Inativa' }}
+                </div>
               </div>
-              <div class="text-lg font-semibold text-gray-900">
-                {{ formatDate(accountsStore.currentAccount.created_at) }}
-              </div>
-            </div>
 
-            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
-              <div class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                Última Atualização
+              <div class="rounded-lg border border-border bg-muted/50 p-4">
+                <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                  Data de Criação
+                </div>
+                <div class="text-lg font-semibold text-foreground">
+                  {{ formatDate(accountsStore.currentAccount.created_at) }}
+                </div>
               </div>
-              <div class="text-lg font-semibold text-gray-900">
-                {{ formatDate(accountsStore.currentAccount.updated_at) }}
+
+              <div class="rounded-lg border border-border bg-muted/50 p-4">
+                <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                  Última Atualização
+                </div>
+                <div class="text-lg font-semibold text-foreground">
+                  {{ formatDate(accountsStore.currentAccount.updated_at) }}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       <!-- Not Found State -->
-      <div v-else class="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
-        <i class="pi pi-exclamation-circle text-6xl text-gray-400 mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-900 mb-2">
-          Conta não encontrada
-        </h3>
-        <p class="text-gray-600 mb-6">
-          A conta que você está procurando não existe ou foi removida.
-        </p>
-        <button
-          @click="goBack"
-          class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-        >
-          <i class="pi pi-arrow-left"></i>
-          Voltar para contas
-        </button>
-      </div>
+      <Card v-else>
+        <CardContent class="p-12 text-center">
+          <AlertCircle class="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+          <h3 class="text-xl font-semibold text-foreground mb-2">
+            Conta não encontrada
+          </h3>
+          <p class="text-muted-foreground mb-6">
+            A conta que você está procurando não existe ou foi removida.
+          </p>
+          <Button
+            @click="goBack"
+            as-child
+          >
+            <router-link to="/accounts">
+              <ArrowLeft class="h-4 w-4 mr-2" />
+              Voltar para contas
+            </router-link>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   </Layout>
 </template>
@@ -174,6 +181,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAccountsStore } from '@/stores/accounts'
 import Layout from '@/components/layout/Layout.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Loader2, AlertCircle, Pencil, ArrowLeft } from 'lucide-vue-next'
 import type { Account } from '@/api/types'
 
 const route = useRoute()
@@ -198,16 +209,13 @@ watch(
 async function loadAccount() {
   if (!accountId) return
 
-  // Verifica se a conta já está na lista
   const existingAccount = accountsStore.accounts.find(
     (acc) => acc.account_id === accountId
   )
 
   if (existingAccount && !accountsStore.currentAccount) {
-    // Se já está na lista, usa ela
     accountsStore.currentAccount = existingAccount
   } else {
-    // Caso contrário, busca do servidor
     try {
       await accountsStore.getAccount(accountId)
     } catch (error) {
@@ -252,7 +260,7 @@ function getBalanceColor(balance: string): string {
   const value = parseFloat(balance)
   if (value > 0) return 'text-green-600'
   if (value < 0) return 'text-red-600'
-  return 'text-gray-900'
+  return 'text-foreground'
 }
 
 function formatDate(dateString: string): string {
