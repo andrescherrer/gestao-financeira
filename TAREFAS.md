@@ -209,16 +209,16 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| FE-ACC-001 | Criar hook useAccounts (TanStack Query) | 🟣 | 🔴 | 2h | FE-007 | ⏳ |
-| FE-ACC-002 | Criar página de lista de contas (/accounts) | 🟣 | 🔴 | 4h | FE-006, FE-ACC-001 | ⏳ |
-| FE-ACC-003 | Criar componente AccountCard | 🟣 | 🔴 | 2h | FE-003 | ⏳ |
-| FE-ACC-004 | Criar página de detalhes da conta (/accounts/[id]) | 🟣 | 🔴 | 4h | FE-006, FE-ACC-001 | ⏳ |
-| FE-ACC-005 | Criar página de criação de conta (/accounts/new) | 🟣 | 🔴 | 4h | FE-006, FE-ACC-001 | ⏳ |
-| FE-ACC-006 | Criar formulário de conta (React Hook Form + Zod) | 🟣 | 🔴 | 4h | FE-003, FE-004 | ⏳ |
-| FE-ACC-007 | Integrar com API de contas (listar) | 🟣 | 🔴 | 2h | FE-ACC-002, DOC-006 | ⏳ |
-| FE-ACC-008 | Integrar com API de contas (criar) | 🟣 | 🔴 | 2h | FE-ACC-005, DOC-006 | ⏳ |
-| FE-ACC-009 | Integrar com API de contas (detalhes) | 🟣 | 🔴 | 2h | FE-ACC-004, DOC-006 | ⏳ |
-| FE-ACC-010 | Implementar loading e error states | 🟣 | 🟡 | 2h | FE-ACC-007, FE-ACC-008 | ⏳ |
+| FE-ACC-001 | Criar hook useAccounts (TanStack Query) | 🟣 | 🔴 | 2h | FE-007 | ✅ |
+| FE-ACC-002 | Criar página de lista de contas (/accounts) | 🟣 | 🔴 | 4h | FE-006, FE-ACC-001 | ✅ |
+| FE-ACC-003 | Criar componente AccountCard | 🟣 | 🔴 | 2h | FE-003 | ✅ |
+| FE-ACC-004 | Criar página de detalhes da conta (/accounts/[id]) | 🟣 | 🔴 | 4h | FE-006, FE-ACC-001 | ✅ |
+| FE-ACC-005 | Criar página de criação de conta (/accounts/new) | 🟣 | 🔴 | 4h | FE-006, FE-ACC-001 | ✅ |
+| FE-ACC-006 | Criar formulário de conta (React Hook Form + Zod) | 🟣 | 🔴 | 4h | FE-003, FE-004 | ✅ |
+| FE-ACC-007 | Integrar com API de contas (listar) | 🟣 | 🔴 | 2h | FE-ACC-002, DOC-006 | ✅ |
+| FE-ACC-008 | Integrar com API de contas (criar) | 🟣 | 🔴 | 2h | FE-ACC-005, DOC-006 | ✅ |
+| FE-ACC-009 | Integrar com API de contas (detalhes) | 🟣 | 🔴 | 2h | FE-ACC-004, DOC-006 | ✅ |
+| FE-ACC-010 | Implementar loading e error states | 🟣 | 🟡 | 2h | FE-ACC-007, FE-ACC-008 | ✅ |
 
 **Entregável Sprint 1.9:** Módulo de contas funcionando no frontend
 
