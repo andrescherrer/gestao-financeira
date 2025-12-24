@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { ErrorDisplay } from "@/components/auth/ErrorDisplay";
 import type { RegisterRequest } from "@/lib/api/types";
 
 const registerSchema = z

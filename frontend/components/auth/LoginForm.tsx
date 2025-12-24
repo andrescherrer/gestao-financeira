@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { ErrorDisplay } from "@/components/auth/ErrorDisplay";
 import type { LoginRequest } from "@/lib/api/types";
 
 const loginSchema = z.object({
@@ -81,14 +82,15 @@ export function LoginForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={className}>
-      {(error || loginError) && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive mb-4">
-          {error ||
-            (loginError as any)?.response?.data?.error ||
-            (loginError as any)?.message ||
-            "Erro ao fazer login"}
-        </div>
-      )}
+      <ErrorDisplay
+        error={
+          error ||
+          (loginError as any)?.response?.data?.error ||
+          (loginError as any)?.message ||
+          undefined
+        }
+        className="mb-4"
+      />
 
       <div className="space-y-4">
         <div className="space-y-2">
