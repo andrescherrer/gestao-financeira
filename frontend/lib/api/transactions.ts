@@ -15,26 +15,29 @@ export const transactionsService = {
    */
   async list(accountId?: string): Promise<ListTransactionsResponse> {
     const params = accountId ? { account_id: accountId } : {};
-    const response = await apiClient.get<ListTransactionsResponse>('/transactions', {
+    const response = await apiClient.get<{ message: string; data: ListTransactionsResponse }>('/transactions', {
       params,
     });
-    return response.data;
+    // O backend retorna { message: "...", data: { transactions: [...], count: ... } }
+    return response.data.data;
   },
 
   /**
    * Obtém uma transação específica por ID
    */
   async getById(transactionId: string): Promise<Transaction> {
-    const response = await apiClient.get<Transaction>(`/transactions/${transactionId}`);
-    return response.data;
+    const response = await apiClient.get<{ message: string; data: Transaction }>(`/transactions/${transactionId}`);
+    // O backend retorna { message: "...", data: {...} }
+    return response.data.data;
   },
 
   /**
    * Cria uma nova transação
    */
   async create(transactionData: CreateTransactionRequest): Promise<Transaction> {
-    const response = await apiClient.post<Transaction>('/transactions', transactionData);
-    return response.data;
+    const response = await apiClient.post<{ message: string; data: Transaction }>('/transactions', transactionData);
+    // O backend retorna { message: "...", data: {...} }
+    return response.data.data;
   },
 
   /**
@@ -44,11 +47,12 @@ export const transactionsService = {
     transactionId: string,
     transactionData: UpdateTransactionRequest
   ): Promise<Transaction> {
-    const response = await apiClient.put<Transaction>(
+    const response = await apiClient.put<{ message: string; data: Transaction }>(
       `/transactions/${transactionId}`,
       transactionData
     );
-    return response.data;
+    // O backend retorna { message: "...", data: {...} }
+    return response.data.data;
   },
 
   /**

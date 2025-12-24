@@ -79,7 +79,7 @@ export interface Transaction {
   transaction_id: string;
   account_id: string;
   user_id: string;
-  type: 'INCOME' | 'EXPENSE' | 'TRANSFER';
+  type: 'INCOME' | 'EXPENSE';
   amount: string;
   currency: string;
   description: string;
@@ -90,7 +90,7 @@ export interface Transaction {
 
 export interface CreateTransactionRequest {
   account_id: string;
-  type: 'INCOME' | 'EXPENSE' | 'TRANSFER';
+  type: 'INCOME' | 'EXPENSE';
   amount: string;
   currency?: string;
   description: string;
@@ -98,7 +98,7 @@ export interface CreateTransactionRequest {
 }
 
 export interface UpdateTransactionRequest {
-  type?: 'INCOME' | 'EXPENSE' | 'TRANSFER';
+  type?: 'INCOME' | 'EXPENSE';
   amount?: string;
   currency?: string;
   description?: string;
@@ -107,6 +107,6 @@ export interface UpdateTransactionRequest {
 
 export interface ListTransactionsResponse {
   transactions: Transaction[];
-  total: number;
+  count: number;
 }
 
