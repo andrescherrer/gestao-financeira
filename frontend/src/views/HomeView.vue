@@ -293,26 +293,42 @@ const recentTransactions = computed(() => {
 })
 
 onMounted(async () => {
-  // Verificar autenticação antes de carregar dados
+  // Validar token antes de carregar dados
+  const hasToken = authStore.token || localStorage.getItem('auth_token')
+  if (hasToken) {
+    const isValid = await authStore.validateToken()
+    if (!isValid) {
+      // Token inválido, redirecionar para login
+      authStore.logout()
+      router.push({ name: 'login', query: { redirect: '/' } })
+      return
+    }
+  }
+  
+  // Se não estiver autenticado, redirecionar para login
   if (!authStore.isAuthenticated) {
-    // Se não está autenticado, redirecionar para login
+    authStore.logout()
     router.push({ name: 'login', query: { redirect: '/' } })
     return
   }
-  
-  // Validar token novamente para garantir
-  const isValid = await authStore.validateToken()
-  if (!isValid) {
-    router.push({ name: 'login', query: { redirect: '/' } })
-    return
-  }
-  
-  // Carregar dados apenas se autenticado
-  if (accountsStore.accounts.length === 0) {
-    await accountsStore.listAccounts()
-  }
-  if (transactionsStore.transactions.length === 0) {
-    await transactionsStore.listTransactions()
+
+  // Carregar dados apenas se autenticado e validado
+  try {
+    if (accountsStore.accounts.length === 0) {
+      await accountsStore.listAccounts()
+    }
+    if (transactionsStore.transactions.length === 0) {
+      await transactionsStore.listTransactions()
+    }
+  } catch (error: any) {
+    // Se houver erro 401 ou 403, token pode ter sido invalidado
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      authStore.logout()
+      router.push({ name: 'login', query: { redirect: '/' } })
+      return
+    }
+    // Outros erros podem ser ignorados ou tratados conforme necessário
+    console.error('Erro ao carregar dados do dashboard:', error)
   }
 })
 
