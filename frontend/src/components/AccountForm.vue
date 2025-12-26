@@ -24,10 +24,16 @@
           id="name"
           name="name"
           type="text"
-          as-child
+          v-slot="{ field, meta }"
         >
           <Input
-            :class="errors.name ? 'border-destructive' : ''"
+            id="name"
+            :name="field.name"
+            :value="field.value"
+            @input="field.onInput"
+            @change="field.onChange"
+            @blur="field.onBlur"
+            :class="errors.name || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
             placeholder="Ex: Conta Corrente Banco do Brasil"
           />
         </Field>
@@ -103,10 +109,18 @@
           name="initial_balance"
           type="number"
           step="0.01"
-          as-child
+          v-slot="{ field, meta }"
         >
           <Input
-            :class="errors.initial_balance ? 'border-destructive' : ''"
+            id="initial_balance"
+            :name="field.name"
+            type="number"
+            step="0.01"
+            :value="field.value"
+            @input="field.onInput"
+            @change="field.onChange"
+            @blur="field.onBlur"
+            :class="errors.initial_balance || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
             placeholder="0.00"
           />
         </Field>
