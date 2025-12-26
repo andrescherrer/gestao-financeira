@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	identityevents "gestao-financeira/backend/internal/identity/domain/events"
 	"gestao-financeira/backend/internal/identity/domain/valueobjects"
 	"gestao-financeira/backend/internal/shared/domain/events"
 )
@@ -53,11 +54,11 @@ func NewUser(
 		events:       []events.DomainEvent{},
 	}
 
-	// Add domain event
-	user.addEvent(events.NewBaseDomainEvent(
-		"UserRegistered",
+	// Add domain event with user details
+	user.addEvent(identityevents.NewUserRegistered(
 		user.id.Value(),
-		"User",
+		user.email.Value(),
+		user.name.FullName(),
 	))
 
 	return user, nil

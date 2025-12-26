@@ -17,6 +17,7 @@ import (
 	"gestao-financeira/backend/internal/identity/presentation/handlers"
 	"gestao-financeira/backend/internal/identity/presentation/routes"
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
+	sharedhandlers "gestao-financeira/backend/internal/shared/infrastructure/handlers"
 	transactionusecases "gestao-financeira/backend/internal/transaction/application/usecases"
 	transactionpersistence "gestao-financeira/backend/internal/transaction/infrastructure/persistence"
 	transactionhandlers "gestao-financeira/backend/internal/transaction/presentation/handlers"
@@ -72,6 +73,22 @@ func main() {
 
 	// Initialize Event Bus
 	eventBus := eventbus.NewEventBus()
+
+	// Initialize event logger handler for observability
+	eventLoggerHandler := sharedhandlers.NewEventLoggerHandler()
+
+	// Subscribe logger to all domain events
+	// Note: In a production system, you might want to use a wildcard subscription
+	// For now, we'll subscribe to common event types
+	eventBus.Subscribe("UserRegistered", eventLoggerHandler.Handle)
+	eventBus.Subscribe("AccountCreated", eventLoggerHandler.Handle)
+	eventBus.Subscribe("AccountBalanceUpdated", eventLoggerHandler.Handle)
+	eventBus.Subscribe("AccountNameChanged", eventLoggerHandler.Handle)
+	eventBus.Subscribe("AccountDeactivated", eventLoggerHandler.Handle)
+	eventBus.Subscribe("AccountActivated", eventLoggerHandler.Handle)
+	eventBus.Subscribe("TransactionCreated", eventLoggerHandler.Handle)
+	eventBus.Subscribe("TransactionUpdated", eventLoggerHandler.Handle)
+	eventBus.Subscribe("TransactionDeleted", eventLoggerHandler.Handle)
 
 	// Initialize repositories
 	userRepository := persistence.NewGormUserRepository(db)

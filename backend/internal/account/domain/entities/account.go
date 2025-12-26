@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	accountevents "gestao-financeira/backend/internal/account/domain/events"
 	"gestao-financeira/backend/internal/account/domain/valueobjects"
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
 	"gestao-financeira/backend/internal/shared/domain/events"
@@ -67,11 +68,14 @@ func NewAccount(
 		events:      []events.DomainEvent{},
 	}
 
-	// Add domain event
-	account.addEvent(events.NewBaseDomainEvent(
-		"AccountCreated",
+	// Add domain event with account details
+	account.addEvent(accountevents.NewAccountCreated(
 		account.id.Value(),
-		"Account",
+		account.userID.Value(),
+		account.name.Value(),
+		account.accountType.Value(),
+		account.balance.Currency().Code(),
+		account.context.Value(),
 	))
 
 	return account, nil
