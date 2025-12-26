@@ -38,13 +38,23 @@
             <AlertCircle class="h-4 w-4 text-destructive" />
             <p class="text-destructive">{{ accountsStore.error }}</p>
           </div>
-          <Button
-            variant="link"
-            @click="handleRetry"
-            class="text-destructive"
-          >
-            Tentar novamente
-          </Button>
+          <div class="flex gap-2">
+            <Button
+              variant="link"
+              @click="handleRetry"
+              class="text-destructive"
+            >
+              Tentar novamente
+            </Button>
+            <Button
+              v-if="isAuthError"
+              variant="outline"
+              @click="handleLogin"
+              class="text-destructive border-destructive"
+            >
+              Fazer login novamente
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -137,8 +147,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAccountsStore } from '@/stores/accounts'
+import { useAuthStore } from '@/stores/auth'
 import Layout from '@/components/layout/Layout.vue'
 import AccountCard from '@/components/AccountCard.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
@@ -146,9 +158,25 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Wallet, User, Briefcase, Plus, Loader2, AlertCircle } from 'lucide-vue-next'
 
+const router = useRouter()
 const accountsStore = useAccountsStore()
+const authStore = useAuthStore()
+
+const isAuthError = computed(() => {
+  const error = accountsStore.error?.toLowerCase() || ''
+  return error.includes('token') || 
+         error.includes('autenticação') || 
+         error.includes('unauthorized') ||
+         error.includes('invalid') ||
+         error.includes('expired')
+})
 
 onMounted(async () => {
+  // Garantir que o token está inicializado
+  if (!authStore.token) {
+    authStore.init()
+  }
+  
   if (accountsStore.accounts.length === 0) {
     await accountsStore.listAccounts()
   }
@@ -157,5 +185,10 @@ onMounted(async () => {
 function handleRetry() {
   accountsStore.clearError()
   accountsStore.listAccounts()
+}
+
+function handleLogin() {
+  authStore.logout()
+  router.push({ name: 'login', query: { redirect: '/accounts' } })
 }
 </script>

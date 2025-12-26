@@ -62,9 +62,35 @@ apiClient.interceptors.request.use(
 // Interceptor para tratar respostas e erros
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    // Apenas rejeitar o erro - não fazer redirecionamento automático
-    // O redirecionamento será tratado pelos componentes que capturam o erro
+  async (error: AxiosError) => {
+    // Tratar erro 401 (não autorizado) - token inválido ou expirado
+    if (error.response?.status === 401) {
+      // Importar dinamicamente para evitar dependência circular
+      const { authService } = await import('./auth')
+      const { useAuthStore } = await import('@/stores/auth')
+      
+      // Remover token inválido
+      authService.removeToken()
+      
+      // Limpar estado de autenticação
+      const authStore = useAuthStore()
+      authStore.logout()
+      
+      // Redirecionar para login apenas se não estiver já na página de login/register
+      if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname
+        if (!currentPath.includes('/login') && !currentPath.includes('/register')) {
+          // Usar window.location para garantir redirecionamento
+          // O router guard vai tratar a navegação depois
+          const redirectUrl = `/login?redirect=${encodeURIComponent(currentPath)}`
+          // Usar setTimeout para garantir que o logout foi processado
+          setTimeout(() => {
+            window.location.href = redirectUrl
+          }, 100)
+        }
+      }
+    }
+    
     return Promise.reject(error)
   }
 )
