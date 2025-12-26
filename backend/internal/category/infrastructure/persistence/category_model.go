@@ -12,6 +12,7 @@ type CategoryModel struct {
 	ID          string         `gorm:"type:uuid;primary_key"`
 	UserID      string         `gorm:"type:uuid;index;not null"`
 	Name        string         `gorm:"type:varchar(100);not null"`
+	Slug        string         `gorm:"type:varchar(100);not null;uniqueIndex:idx_user_slug"`
 	Description string         `gorm:"type:text"`
 	IsActive    bool           `gorm:"default:true;not null"`
 	CreatedAt   time.Time      `gorm:"not null"`

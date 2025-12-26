@@ -26,6 +26,7 @@ export const categoryService = {
           category_id: string
           user_id: string
           name: string
+          slug: string
           description: string
           is_active: boolean
           created_at: string
@@ -52,6 +53,7 @@ export const categoryService = {
         category_id: cat.category_id,
         user_id: cat.user_id,
         name: cat.name,
+        slug: cat.slug,
         description: cat.description,
         is_active: cat.is_active,
         created_at: cat.created_at,
@@ -71,6 +73,7 @@ export const categoryService = {
         category_id: string
         user_id: string
         name: string
+        slug: string
         description: string
         is_active: boolean
         created_at: string
@@ -88,6 +91,7 @@ export const categoryService = {
       category_id: backendData.category_id,
       user_id: backendData.user_id,
       name: backendData.name,
+      slug: backendData.slug,
       description: backendData.description,
       is_active: backendData.is_active,
       created_at: backendData.created_at,
@@ -109,6 +113,7 @@ export const categoryService = {
         category_id: string
         user_id: string
         name: string
+        slug: string
         description: string
         is_active: boolean
         created_at: string
@@ -125,6 +130,7 @@ export const categoryService = {
       category_id: backendData.category_id,
       user_id: backendData.user_id,
       name: backendData.name,
+      slug: backendData.slug,
       description: backendData.description,
       is_active: backendData.is_active,
       created_at: backendData.created_at,
@@ -146,6 +152,7 @@ export const categoryService = {
         category_id: string
         user_id: string
         name: string
+        slug: string
         description: string
         is_active: boolean
         updated_at: string
@@ -162,6 +169,7 @@ export const categoryService = {
       category_id: backendData.category_id,
       user_id: backendData.user_id,
       name: backendData.name,
+      slug: backendData.slug,
       description: backendData.description,
       is_active: backendData.is_active,
       created_at: '', // Backend não retorna created_at na atualização

@@ -87,6 +87,7 @@ func (uc *UpdateCategoryUseCase) Execute(input dtos.UpdateCategoryInput) (*dtos.
 		CategoryID:  category.ID().Value(),
 		UserID:      category.UserID().Value(),
 		Name:        category.Name().Value(),
+		Slug:        category.Slug().Value(),
 		Description: category.Description(),
 		IsActive:    category.IsActive(),
 		UpdatedAt:   category.UpdatedAt().Format("2006-01-02T15:04:05Z07:00"),

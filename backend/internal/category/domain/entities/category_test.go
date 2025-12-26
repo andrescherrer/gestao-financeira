@@ -195,10 +195,12 @@ func TestCategoryFromPersistence(t *testing.T) {
 	createdAt := time.Now()
 	updatedAt := time.Now()
 
+	categorySlug := valueobjects.GenerateSlugFromName(categoryName.Value())
 	category, err := CategoryFromPersistence(
 		categoryID,
 		userID,
 		categoryName,
+		categorySlug,
 		description,
 		createdAt,
 		updatedAt,

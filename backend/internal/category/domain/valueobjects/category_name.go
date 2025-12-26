@@ -35,7 +35,8 @@ func NewCategoryName(name string) (CategoryName, error) {
 		return CategoryName{}, fmt.Errorf("category name is too long (max %d characters)", MaxCategoryNameLength)
 	}
 
-	// Check for valid characters (letters, numbers, spaces, hyphens, apostrophes)
+	// Check for valid characters (letters including accented, numbers, spaces, hyphens, apostrophes)
+	// Allow all unicode letters (including accented characters like ã, ç, etc.)
 	for _, char := range name {
 		if !unicode.IsLetter(char) && !unicode.IsNumber(char) && char != ' ' && char != '-' && char != '\'' {
 			return CategoryName{}, errors.New("category name contains invalid characters")

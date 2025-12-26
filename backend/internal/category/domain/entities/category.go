@@ -14,6 +14,7 @@ type Category struct {
 	id          valueobjects.CategoryID
 	userID      identityvalueobjects.UserID
 	name        valueobjects.CategoryName
+	slug        valueobjects.CategorySlug
 	description string
 	createdAt   time.Time
 	updatedAt   time.Time
@@ -42,12 +43,16 @@ func NewCategory(
 		return nil, errors.New("category description is too long (max 500 characters)")
 	}
 
+	// Generate slug from name
+	slug := valueobjects.GenerateSlugFromName(name.Value())
+
 	now := time.Now()
 
 	category := &Category{
 		id:          valueobjects.GenerateCategoryID(),
 		userID:      userID,
 		name:        name,
+		slug:        slug,
 		description: description,
 		createdAt:   now,
 		updatedAt:   now,
@@ -71,6 +76,7 @@ func CategoryFromPersistence(
 	id valueobjects.CategoryID,
 	userID identityvalueobjects.UserID,
 	name valueobjects.CategoryName,
+	slug valueobjects.CategorySlug,
 	description string,
 	createdAt time.Time,
 	updatedAt time.Time,
@@ -92,6 +98,7 @@ func CategoryFromPersistence(
 		id:          id,
 		userID:      userID,
 		name:        name,
+		slug:        slug,
 		description: description,
 		createdAt:   createdAt,
 		updatedAt:   updatedAt,
@@ -113,6 +120,11 @@ func (c *Category) UserID() identityvalueobjects.UserID {
 // Name returns the category name.
 func (c *Category) Name() valueobjects.CategoryName {
 	return c.name
+}
+
+// Slug returns the category slug.
+func (c *Category) Slug() valueobjects.CategorySlug {
+	return c.slug
 }
 
 // Description returns the category description.
@@ -146,6 +158,8 @@ func (c *Category) UpdateName(name valueobjects.CategoryName) error {
 	}
 
 	c.name = name
+	// Regenerate slug when name is updated
+	c.slug = valueobjects.GenerateSlugFromName(name.Value())
 	c.updatedAt = time.Now()
 
 	c.addEvent(events.NewBaseDomainEvent(

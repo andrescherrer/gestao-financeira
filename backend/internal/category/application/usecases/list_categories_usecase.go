@@ -57,6 +57,7 @@ func (uc *ListCategoriesUseCase) Execute(input dtos.ListCategoriesInput) (*dtos.
 			CategoryID:  category.ID().Value(),
 			UserID:      category.UserID().Value(),
 			Name:        category.Name().Value(),
+			Slug:        category.Slug().Value(),
 			Description: category.Description(),
 			IsActive:    category.IsActive(),
 			CreatedAt:   category.CreatedAt().Format("2006-01-02T15:04:05Z07:00"),

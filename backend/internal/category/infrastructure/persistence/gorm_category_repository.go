@@ -144,10 +144,23 @@ func (r *GormCategoryRepository) toDomain(model *CategoryModel) (*entities.Categ
 		return nil, fmt.Errorf("invalid category name: %w", err)
 	}
 
+	// If slug is empty in database, generate it from name (for backward compatibility)
+	var categorySlug valueobjects.CategorySlug
+	if model.Slug == "" {
+		categorySlug = valueobjects.GenerateSlugFromName(model.Name)
+	} else {
+		categorySlug, err = valueobjects.NewCategorySlug(model.Slug)
+		if err != nil {
+			// If slug is invalid, generate a new one
+			categorySlug = valueobjects.GenerateSlugFromName(model.Name)
+		}
+	}
+
 	return entities.CategoryFromPersistence(
 		categoryID,
 		userID,
 		categoryName,
+		categorySlug,
 		model.Description,
 		model.CreatedAt,
 		model.UpdatedAt,
@@ -161,6 +174,7 @@ func (r *GormCategoryRepository) toModel(category *entities.Category) *CategoryM
 		ID:          category.ID().Value(),
 		UserID:      category.UserID().Value(),
 		Name:        category.Name().Value(),
+		Slug:        category.Slug().Value(),
 		Description: category.Description(),
 		IsActive:    category.IsActive(),
 		CreatedAt:   category.CreatedAt(),
