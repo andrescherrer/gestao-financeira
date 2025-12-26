@@ -18,23 +18,26 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 1.4: Account Management** (AC-001 a AC-011): ✅ Completo
 - **Sprint 1.5: Transaction Context** (TX-001 a TX-015): ✅ Completo
 - **Sprint 1.6: Swagger** (DOC-001 a DOC-006): ✅ Completo
-- **Sprint 1.7: Setup Frontend** (FE-001 a FE-009): 🚧 Parcial (Vue 3 configurado, falta layout e UI library)
+- **Sprint 1.7: Setup Frontend** (FE-001 a FE-009): ✅ Completo
 - **Sprint 1.8: Módulo de Autenticação** (FE-AUTH-001 a FE-AUTH-010): ✅ Completo
 - **Sprint 1.9: Módulo de Contas** (FE-ACC-001 a FE-ACC-010): ✅ Completo
-- **Sprint 1.10: Módulo de Transações** (FE-TX-001 a FE-TX-010): 🚧 Estrutura básica criada, implementação pendente
+- **Sprint 1.10: Módulo de Transações** (FE-TX-001 a FE-TX-010): ✅ Completo
+- **Sprint 2.1: Integração Transaction ↔ Account** (INT-001 a INT-006, FE-INT-001): ✅ Completo
 - **Demais sprints**: ⏳ Não iniciadas
 
 ### 📈 Progresso
-- **Fase 1 (Fundação e MVP)**: ~60% concluído
+- **Fase 1 (Fundação e MVP)**: ~85% concluído
   - Backend base: ✅ 100%
   - Identity Context: ✅ 100%
   - Account Management: ✅ 100%
   - Transaction Context: ✅ 100%
   - Swagger: ✅ 100%
-  - Frontend Setup: 🚧 70% (Vue 3 configurado, falta UI library e layout)
+  - Frontend Setup: ✅ 100%
   - Frontend Auth: ✅ 100% (completo e testado)
-  - Frontend Accounts: 🚧 20% (rotas criadas, falta implementação)
-  - Frontend Transactions: 🚧 20% (rotas criadas, falta implementação)
+  - Frontend Accounts: ✅ 100% (completo e testado)
+  - Frontend Transactions: ✅ 100% (completo e testado)
+- **Fase 2 (Core Domain e Integrações)**: ~15% concluído
+  - Integração Transaction ↔ Account: ✅ 100% (completo e testado)
 
 ---
 
@@ -261,15 +264,15 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| INT-001 | Implementar atualização de saldo ao criar transação | 🔵 | 🔴 | 6h | TX-008, AC-003 | ⏳ |
-| INT-002 | Implementar atualização de saldo ao atualizar transação | 🔵 | 🔴 | 6h | TX-011, AC-003 | ⏳ |
-| INT-003 | Implementar atualização de saldo ao deletar transação | 🔵 | 🔴 | 4h | TX-012, AC-003 | ⏳ |
-| INT-004 | Criar domain event TransactionCreated | 🔵 | 🔴 | 2h | SK-004, TX-004 | ⏳ |
-| INT-005 | Criar handler para atualizar saldo via event bus | 🔵 | 🔴 | 4h | INT-004, SK-005 | ⏳ |
-| INT-006 | Testes de integração Transaction ↔ Account | 🟤 | 🔴 | 4h | INT-001, INT-002, INT-003 | ⏳ |
-| FE-INT-001 | Atualizar saldo em tempo real no frontend | 🟣 | 🟡 | 4h | FE-ACC-002, FE-TX-008 | ⏳ |
+| INT-001 | Implementar atualização de saldo ao criar transação | 🔵 | 🔴 | 6h | TX-008, AC-003 | ✅ |
+| INT-002 | Implementar atualização de saldo ao atualizar transação | 🔵 | 🔴 | 6h | TX-011, AC-003 | ✅ |
+| INT-003 | Implementar atualização de saldo ao deletar transação | 🔵 | 🔴 | 4h | TX-012, AC-003 | ✅ |
+| INT-004 | Criar domain event TransactionCreated | 🔵 | 🔴 | 2h | SK-004, TX-004 | ✅ |
+| INT-005 | Criar handler para atualizar saldo via event bus | 🔵 | 🔴 | 4h | INT-004, SK-005 | ✅ |
+| INT-006 | Testes de integração Transaction ↔ Account | 🟤 | 🔴 | 4h | INT-001, INT-002, INT-003 | ✅ |
+| FE-INT-001 | Atualizar saldo em tempo real no frontend | 🟣 | 🟡 | 4h | FE-ACC-002, FE-TX-008 | ✅ |
 
-**Entregável Sprint 2.1:** Transações atualizam saldo das contas automaticamente
+**Entregável Sprint 2.1:** ✅ Transações atualizam saldo das contas automaticamente - Completo
 
 ---
 
