@@ -100,19 +100,18 @@ router.beforeEach(async (to, from, next) => {
   
   // Se há token e estamos acessando rota protegida, validar token
   if (to.meta.requiresAuth && (hasTokenInStorage || hasTokenInStore)) {
-    // Se ainda não foi validado, validar agora
-    if (!authStore.isValidated) {
-      const isValid = await authStore.validateToken()
-      if (!isValid) {
-        // Token inválido, redirecionar para login
-        next({ name: 'login', query: { redirect: to.fullPath } })
-        return
-      }
+    // Sempre validar token antes de permitir acesso (mesmo se já foi validado antes)
+    // Isso garante que se o banco foi zerado, o token será invalidado
+    const isValid = await authStore.validateToken()
+    if (!isValid) {
+      // Token inválido, redirecionar para login
+      next({ name: 'login', query: { redirect: to.fullPath } })
+      return
     }
   }
   
-  // Verificar autenticação (usar storage como fonte da verdade)
-  const isAuthenticated = hasTokenInStorage || hasTokenInStore
+  // Verificar autenticação usando a computed property que considera validação
+  const isAuthenticated = authStore.isAuthenticated
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     // Limpar qualquer token residual

@@ -10,8 +10,12 @@ export const useAuthStore = defineStore('auth', () => {
   const isValidated = ref(false)
 
   const isAuthenticated = computed(() => {
-    // Sempre verificar o localStorage como fonte da verdade
-    return !!token.value || !!authService.getToken()
+    // Só considerar autenticado se:
+    // 1. Há token
+    // 2. Token foi validado (isValidated = true)
+    // 3. Token ainda está presente (não foi removido após validação)
+    const hasToken = !!token.value || !!authService.getToken()
+    return hasToken && isValidated.value && !!token.value
   })
 
   const isLoading = ref(false)
@@ -21,10 +25,13 @@ export const useAuthStore = defineStore('auth', () => {
     const storedToken = authService.getToken()
     if (storedToken) {
       token.value = storedToken
+      // Resetar validação ao inicializar - será validado novamente
+      isValidated.value = false
     } else {
       // Garantir que o estado está limpo se não há token
       token.value = null
       user.value = null
+      isValidated.value = false
     }
   }
 
@@ -90,11 +97,14 @@ export const useAuthStore = defineStore('auth', () => {
       // Depois atualizar o estado reativo
       token.value = response.token
       user.value = response.user
+      // Marcar como validado após login bem-sucedido
+      isValidated.value = true
       return response
     } catch (error) {
       // Limpar token em caso de erro
       token.value = null
       user.value = null
+      isValidated.value = false
       authService.removeToken()
       throw error
     } finally {

@@ -17,16 +17,27 @@ onMounted(async () => {
   // Inicializar token do localStorage
   authStore.init()
   
-  // Se há token, validar com o backend
-  if (authStore.token || authService.getToken()) {
+  // Sempre validar token se houver, mesmo em rotas públicas
+  // Isso garante que o estado de autenticação está correto
+  const hasToken = authStore.token || authService.getToken()
+  if (hasToken) {
     const isValid = await authStore.validateToken()
     
     // Se o token é inválido e estamos em uma rota protegida, redirecionar para login
     if (!isValid) {
       const currentPath = window.location.pathname
       if (currentPath !== '/login' && currentPath !== '/register') {
-        await router.push({ name: 'login', query: { redirect: currentPath } })
+        // Usar window.location para garantir redirecionamento completo
+        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
+        return
       }
+    }
+  } else {
+    // Se não há token, garantir que isValidated está false
+    // Isso evita problemas se o usuário tentar acessar rotas protegidas
+    if (authStore.isValidated && !hasToken) {
+      // Resetar validação se não há token
+      authStore.logout()
     }
   }
 })

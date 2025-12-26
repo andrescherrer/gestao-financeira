@@ -23,7 +23,7 @@
         </Button>
 
         <!-- Avatar do Usuário com Dropdown Menu -->
-        <DropdownMenu v-if="authStore.user || authStore.token">
+        <DropdownMenu v-if="authStore.isAuthenticated && !authStore.isValidating">
           <DropdownMenuTrigger as-child>
             <Button
               variant="ghost"
