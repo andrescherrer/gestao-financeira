@@ -25,6 +25,16 @@ export const useAuthStore = defineStore('auth', () => {
     const storedToken = authService.getToken()
     if (storedToken) {
       token.value = storedToken
+      // Tentar carregar dados do usuário do localStorage
+      const storedUser = localStorage.getItem('auth_user')
+      if (storedUser) {
+        try {
+          user.value = JSON.parse(storedUser)
+        } catch (error) {
+          console.error('Erro ao carregar dados do usuário do localStorage:', error)
+          user.value = null
+        }
+      }
       // Resetar validação ao inicializar - será validado novamente
       isValidated.value = false
     } else {
@@ -32,6 +42,8 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = null
       user.value = null
       isValidated.value = false
+      // Limpar dados do usuário do localStorage também
+      localStorage.removeItem('auth_user')
     }
   }
 
@@ -104,6 +116,8 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await authService.login(credentials)
       // Salvar token no localStorage PRIMEIRO
       authService.saveToken(response.token)
+      // Salvar dados do usuário no localStorage
+      localStorage.setItem('auth_user', JSON.stringify(response.user))
       // Aguardar um momento para garantir que foi salvo
       await new Promise(resolve => setTimeout(resolve, 10))
       // Depois atualizar o estado reativo
@@ -118,6 +132,7 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = null
       isValidated.value = false
       authService.removeToken()
+      localStorage.removeItem('auth_user')
       throw error
     } finally {
       isLoading.value = false
@@ -136,6 +151,8 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     // Remover token primeiro
     authService.removeToken()
+    // Remover dados do usuário do localStorage
+    localStorage.removeItem('auth_user')
     // Limpar estado reativo
     token.value = null
     user.value = null
