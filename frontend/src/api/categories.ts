@@ -39,6 +39,14 @@ export const categoryService = {
     
     // Mapear resposta do backend
     const backendData = response.data.data
+    if (!backendData || !backendData.categories) {
+      // Se não há dados, retornar array vazio
+      return {
+        categories: [],
+        count: 0,
+      }
+    }
+    
     return {
       categories: backendData.categories.map((cat) => ({
         category_id: cat.category_id,
@@ -49,7 +57,7 @@ export const categoryService = {
         created_at: cat.created_at,
         updated_at: cat.updated_at,
       })),
-      count: backendData.count,
+      count: backendData.count || 0,
     }
   },
 
@@ -72,6 +80,10 @@ export const categoryService = {
     
     // Mapear resposta do backend
     const backendData = response.data.data
+    if (!backendData) {
+      throw new Error('Resposta do servidor inválida: dados não encontrados')
+    }
+    
     return {
       category_id: backendData.category_id,
       user_id: backendData.user_id,
@@ -105,6 +117,10 @@ export const categoryService = {
     
     // Mapear resposta do backend
     const backendData = response.data.data
+    if (!backendData) {
+      throw new Error('Resposta do servidor inválida: dados não encontrados')
+    }
+    
     return {
       category_id: backendData.category_id,
       user_id: backendData.user_id,
@@ -138,6 +154,10 @@ export const categoryService = {
     
     // Mapear resposta do backend
     const backendData = response.data.data
+    if (!backendData) {
+      throw new Error('Resposta do servidor inválida: dados não encontrados')
+    }
+    
     return {
       category_id: backendData.category_id,
       user_id: backendData.user_id,

@@ -32,8 +32,12 @@ export const useCategoriesStore = defineStore('categories', () => {
       }
       
       const response = await categoryService.list(isActive)
-      categories.value = response.categories || []
-      return { categories: response.categories, count: response.count }
+      // Garantir que categories é sempre um array
+      categories.value = Array.isArray(response.categories) ? response.categories : []
+      return { 
+        categories: Array.isArray(response.categories) ? response.categories : [], 
+        count: response.count || 0 
+      }
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || 
                            err.response?.data?.message ||
