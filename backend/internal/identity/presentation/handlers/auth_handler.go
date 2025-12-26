@@ -45,7 +45,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	if err := c.BodyParser(&input); err != nil {
 		log.Warn().Err(err).Msg("Failed to parse request body")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
+			"error": "Corpo da requisição inválido",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
@@ -53,28 +53,28 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	// Validate input (basic validation - can be enhanced with a validator)
 	if input.Email == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Email is required",
+			"error": "Email é obrigatório",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
 
 	if input.Password == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Password is required",
+			"error": "Senha é obrigatória",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
 
 	if input.FirstName == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "First name is required",
+			"error": "Nome é obrigatório",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
 
 	if input.LastName == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Last name is required",
+			"error": "Sobrenome é obrigatório",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
@@ -87,7 +87,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 
 	// Return success response
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "User registered successfully",
+		"message": "Usuário registrado com sucesso",
 		"data":    output,
 	})
 }
@@ -100,7 +100,7 @@ func (h *AuthHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
 	if strings.Contains(errMsg, "already exists") {
 		log.Warn().Err(err).Msg("User registration failed: email already exists")
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-			"error": "User with this email already exists",
+			"error": "Já existe um usuário com este email",
 			"code":  fiber.StatusConflict,
 		})
 	}
@@ -108,7 +108,7 @@ func (h *AuthHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
 	if strings.Contains(errMsg, "invalid email") {
 		log.Warn().Err(err).Msg("User registration failed: invalid email")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid email format",
+			"error": "Formato de email inválido",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
@@ -116,7 +116,7 @@ func (h *AuthHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
 	if strings.Contains(errMsg, "invalid password") {
 		log.Warn().Err(err).Msg("User registration failed: invalid password")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Password must be at least 8 characters long",
+			"error": "A senha deve ter no mínimo 8 caracteres",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
@@ -124,7 +124,7 @@ func (h *AuthHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
 	if strings.Contains(errMsg, "invalid name") {
 		log.Warn().Err(err).Msg("User registration failed: invalid name")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid name format",
+			"error": "Formato de nome inválido",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
@@ -132,7 +132,7 @@ func (h *AuthHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
 	// Generic error handling
 	log.Error().Err(err).Msg("User registration failed: unexpected error")
 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "An unexpected error occurred",
+		"error": "Ocorreu um erro inesperado",
 		"code":  fiber.StatusInternalServerError,
 	})
 }
@@ -157,7 +157,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(&input); err != nil {
 		log.Warn().Err(err).Msg("Failed to parse request body")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
+			"error": "Corpo da requisição inválido",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
@@ -165,14 +165,14 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	// Validate input
 	if input.Email == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Email is required",
+			"error": "Email é obrigatório",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
 
 	if input.Password == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Password is required",
+			"error": "Senha é obrigatória",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
@@ -185,7 +185,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 
 	// Return success response
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Login successful",
+		"message": "Login realizado com sucesso",
 		"data":    output,
 	})
 }
@@ -198,7 +198,7 @@ func (h *AuthHandler) handleLoginError(c *fiber.Ctx, err error) error {
 	if strings.Contains(errMsg, "invalid email or password") {
 		log.Warn().Err(err).Msg("Login failed: invalid credentials")
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Invalid email or password",
+			"error": "Email ou senha inválidos",
 			"code":  fiber.StatusUnauthorized,
 		})
 	}
@@ -206,7 +206,7 @@ func (h *AuthHandler) handleLoginError(c *fiber.Ctx, err error) error {
 	if strings.Contains(errMsg, "inactive") {
 		log.Warn().Err(err).Msg("Login failed: user account is inactive")
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"error": "User account is inactive",
+			"error": "Conta de usuário está inativa",
 			"code":  fiber.StatusForbidden,
 		})
 	}
@@ -214,7 +214,7 @@ func (h *AuthHandler) handleLoginError(c *fiber.Ctx, err error) error {
 	if strings.Contains(errMsg, "invalid email") {
 		log.Warn().Err(err).Msg("Login failed: invalid email format")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid email format",
+			"error": "Formato de email inválido",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
@@ -222,7 +222,7 @@ func (h *AuthHandler) handleLoginError(c *fiber.Ctx, err error) error {
 	// Generic error handling
 	log.Error().Err(err).Msg("Login failed: unexpected error")
 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "An unexpected error occurred",
+		"error": "Ocorreu um erro inesperado",
 		"code":  fiber.StatusInternalServerError,
 	})
 }

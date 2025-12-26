@@ -104,11 +104,12 @@ async function handleSubmit(values: CreateCategoryFormData | UpdateCategoryFormD
       })
     }
 
-    const errorMessage =
-      err.response?.data?.error ||
-      err.response?.data?.message ||
-      err.message ||
-      'Erro ao criar categoria. Tente novamente.'
+    const { translateError } = await import('@/utils/errorTranslations')
+    const rawError = err.response?.data?.error ||
+                     err.response?.data?.message ||
+                     err.message ||
+                     'Erro ao criar categoria. Tente novamente.'
+    const errorMessage = translateError(rawError)
     
     // Mostrar toast de erro
     const { toast } = await import('@/components/ui/toast')

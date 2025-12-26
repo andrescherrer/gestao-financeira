@@ -42,16 +42,17 @@ export const useAccountsStore = defineStore('accounts', () => {
       accounts.value = response.accounts || []
       return { accounts: response.accounts, count: response.count }
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || 
-                           err.response?.data?.message ||
-                           err.message ||
-                           'Erro ao listar contas'
-      error.value = errorMessage
+      const { translateError } = await import('@/utils/errorTranslations')
+      const rawError = err.response?.data?.error || 
+                       err.response?.data?.message ||
+                       err.message ||
+                       'Erro ao listar contas'
+      error.value = translateError(rawError)
       
       // Log detalhado do erro em desenvolvimento
       if (import.meta.env.DEV) {
         console.error('[Accounts Store] Erro ao listar contas:', {
-          message: errorMessage,
+          message: error.value,
           status: err.response?.status,
           statusText: err.response?.statusText,
           data: err.response?.data,
@@ -84,10 +85,12 @@ export const useAccountsStore = defineStore('accounts', () => {
 
       return account
     } catch (err: any) {
-      error.value =
-        err.response?.data?.message ||
-        err.message ||
-        'Erro ao obter detalhes da conta'
+      const { translateError } = await import('@/utils/errorTranslations')
+      const rawError = err.response?.data?.error ||
+                       err.response?.data?.message ||
+                       err.message ||
+                       'Erro ao obter detalhes da conta'
+      error.value = translateError(rawError)
       throw err
     } finally {
       isLoading.value = false
@@ -105,10 +108,12 @@ export const useAccountsStore = defineStore('accounts', () => {
       accounts.value.push(account)
       return account
     } catch (err: any) {
-      error.value =
-        err.response?.data?.message ||
-        err.message ||
-        'Erro ao criar conta'
+      const { translateError } = await import('@/utils/errorTranslations')
+      const rawError = err.response?.data?.error ||
+                       err.response?.data?.message ||
+                       err.message ||
+                       'Erro ao criar conta'
+      error.value = translateError(rawError)
       throw err
     } finally {
       isLoading.value = false

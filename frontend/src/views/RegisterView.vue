@@ -265,11 +265,12 @@ async function handleSubmit(values: any) {
       router.push('/login')
     }, 2000)
   } catch (err: any) {
-    error.value =
-      err.response?.data?.error ||
-      err.response?.data?.message ||
-      err.message ||
-      'Erro ao criar conta. Tente novamente.'
+    const { translateError } = await import('@/utils/errorTranslations')
+    const rawError = err.response?.data?.error ||
+                     err.response?.data?.message ||
+                     err.message ||
+                     'Erro ao criar conta. Tente novamente.'
+    error.value = translateError(rawError)
   }
 }
 </script>

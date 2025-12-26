@@ -163,11 +163,12 @@ async function handleSubmit(values: CreateAccountFormData) {
     // TODO: Implementar atualização de conta quando o backend suportar
     router.push(`/accounts/${accountId}`)
   } catch (err: any) {
-    const errorMessage =
-      err.response?.data?.message ||
-      err.response?.data?.error ||
-      err.message ||
-      'Erro ao atualizar conta. Tente novamente.'
+    const { translateError } = await import('@/utils/errorTranslations')
+    const rawError = err.response?.data?.error ||
+                     err.response?.data?.message ||
+                     err.message ||
+                     'Erro ao atualizar conta. Tente novamente.'
+    const errorMessage = translateError(rawError)
     
     if (formRef.value) {
       formRef.value.setError(errorMessage)

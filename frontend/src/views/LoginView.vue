@@ -156,6 +156,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Wallet, Mail, Eye, EyeOff, User, Loader2, AlertCircle } from 'lucide-vue-next'
+import { translateError } from '@/utils/errorTranslations'
 
 const validationSchema = toTypedSchema(loginSchema)
 
@@ -179,11 +180,12 @@ async function handleSubmit(values: any) {
     const redirect = (route.query.redirect as string) || '/'
     router.push(redirect)
   } catch (err: any) {
-    error.value =
+    const rawError =
       err.response?.data?.error ||
       err.response?.data?.message ||
       err.message ||
       'Erro ao fazer login. Verifique suas credenciais.'
+    error.value = translateError(rawError)
   }
 }
 </script>

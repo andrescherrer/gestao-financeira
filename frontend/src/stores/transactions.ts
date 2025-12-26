@@ -43,11 +43,12 @@ export const useTransactionsStore = defineStore('transactions', () => {
       transactions.value = response.transactions || []
       return { transactions: response.transactions, count: response.count }
     } catch (err: any) {
-      error.value =
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        err.message ||
-        'Erro ao listar transações'
+      const { translateError } = await import('@/utils/errorTranslations')
+      const rawError = err.response?.data?.error ||
+                       err.response?.data?.message ||
+                       err.message ||
+                       'Erro ao listar transações'
+      error.value = translateError(rawError)
       throw err
     } finally {
       isLoading.value = false
@@ -74,11 +75,12 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
       return transaction
     } catch (err: any) {
-      error.value =
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        err.message ||
-        'Erro ao obter detalhes da transação'
+      const { translateError } = await import('@/utils/errorTranslations')
+      const rawError = err.response?.data?.error ||
+                       err.response?.data?.message ||
+                       err.message ||
+                       'Erro ao obter detalhes da transação'
+      error.value = translateError(rawError)
       throw err
     } finally {
       isLoading.value = false
@@ -96,11 +98,12 @@ export const useTransactionsStore = defineStore('transactions', () => {
       transactions.value.push(transaction)
       return transaction
     } catch (err: any) {
-      error.value =
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        err.message ||
-        'Erro ao criar transação'
+      const { translateError } = await import('@/utils/errorTranslations')
+      const rawError = err.response?.data?.error ||
+                       err.response?.data?.message ||
+                       err.message ||
+                       'Erro ao criar transação'
+      error.value = translateError(rawError)
       throw err
     } finally {
       isLoading.value = false

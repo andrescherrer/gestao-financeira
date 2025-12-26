@@ -39,15 +39,16 @@ export const useCategoriesStore = defineStore('categories', () => {
         count: response.count || 0 
       }
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || 
-                           err.response?.data?.message ||
-                           err.message ||
-                           'Erro ao listar categorias'
-      error.value = errorMessage
+      const { translateError } = await import('@/utils/errorTranslations')
+      const rawError = err.response?.data?.error || 
+                       err.response?.data?.message ||
+                       err.message ||
+                       'Erro ao listar categorias'
+      error.value = translateError(rawError)
       
       if (import.meta.env.DEV) {
         console.error('[Categories Store] Erro ao listar categorias:', {
-          message: errorMessage,
+          message: error.value,
           status: err.response?.status,
           statusText: err.response?.statusText,
           data: err.response?.data,
@@ -80,10 +81,12 @@ export const useCategoriesStore = defineStore('categories', () => {
 
       return category
     } catch (err: any) {
-      error.value =
-        err.response?.data?.message ||
-        err.message ||
-        'Erro ao obter detalhes da categoria'
+      const { translateError } = await import('@/utils/errorTranslations')
+      const rawError = err.response?.data?.error ||
+                       err.response?.data?.message ||
+                       err.message ||
+                       'Erro ao obter detalhes da categoria'
+      error.value = translateError(rawError)
       throw err
     } finally {
       isLoading.value = false
@@ -101,10 +104,12 @@ export const useCategoriesStore = defineStore('categories', () => {
       categories.value.push(category)
       return category
     } catch (err: any) {
-      error.value =
-        err.response?.data?.message ||
-        err.message ||
-        'Erro ao criar categoria'
+      const { translateError } = await import('@/utils/errorTranslations')
+      const rawError = err.response?.data?.error ||
+                       err.response?.data?.message ||
+                       err.message ||
+                       'Erro ao criar categoria'
+      error.value = translateError(rawError)
       throw err
     } finally {
       isLoading.value = false
@@ -135,10 +140,12 @@ export const useCategoriesStore = defineStore('categories', () => {
       
       return updatedCategory
     } catch (err: any) {
-      error.value =
-        err.response?.data?.message ||
-        err.message ||
-        'Erro ao atualizar categoria'
+      const { translateError } = await import('@/utils/errorTranslations')
+      const rawError = err.response?.data?.error ||
+                       err.response?.data?.message ||
+                       err.message ||
+                       'Erro ao atualizar categoria'
+      error.value = translateError(rawError)
       throw err
     } finally {
       isLoading.value = false
@@ -164,10 +171,12 @@ export const useCategoriesStore = defineStore('categories', () => {
         currentCategory.value = null
       }
     } catch (err: any) {
-      error.value =
-        err.response?.data?.message ||
-        err.message ||
-        'Erro ao deletar categoria'
+      const { translateError } = await import('@/utils/errorTranslations')
+      const rawError = err.response?.data?.error ||
+                       err.response?.data?.message ||
+                       err.message ||
+                       'Erro ao deletar categoria'
+      error.value = translateError(rawError)
       throw err
     } finally {
       isLoading.value = false
