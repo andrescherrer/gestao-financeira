@@ -4,7 +4,7 @@
     @update:model-value="handleChange"
     :disabled="isLoading || disabled"
   >
-    <SelectTrigger :class="errorClass" @blur="$emit('blur')">
+    <SelectTrigger :class="errorClass" @blur="(e) => $emit('blur', e)">
       <SelectValue :placeholder="placeholder" />
     </SelectTrigger>
     <SelectContent>
@@ -58,7 +58,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
-  'blur': []
+  'blur': [event: Event]
 }>()
 
 const categoriesStore = useCategoriesStore()
