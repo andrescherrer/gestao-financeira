@@ -120,6 +120,11 @@ async function handleSubmit(values: CreateTransactionFormData) {
     }
 
     const transaction = await transactionsStore.createTransaction(transactionData)
+    
+    // Atualizar saldo da conta em tempo real
+    // O backend já atualizou o saldo via event handler, mas precisamos atualizar no frontend
+    await accountsStore.refreshAccount(transaction.account_id)
+    
     router.push(`/transactions/${transaction.transaction_id}`)
   } catch (err: any) {
     if (import.meta.env.DEV) {

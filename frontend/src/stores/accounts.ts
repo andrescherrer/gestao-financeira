@@ -116,6 +116,37 @@ export const useAccountsStore = defineStore('accounts', () => {
   }
 
   /**
+   * Atualiza uma conta específica (útil após operações de transação)
+   */
+  async function refreshAccount(accountId: string) {
+    try {
+      const account = await accountService.get(accountId)
+      
+      // Atualiza a conta na lista se já existir
+      const index = accounts.value.findIndex(
+        (acc) => acc.account_id === accountId
+      )
+      if (index !== -1) {
+        accounts.value[index] = account
+      }
+      
+      // Atualiza currentAccount se for a mesma
+      if (currentAccount.value?.account_id === accountId) {
+        currentAccount.value = account
+      }
+      
+      return account
+    } catch (err: any) {
+      // Log erro mas não falha silenciosamente
+      if (import.meta.env.DEV) {
+        console.warn('[Accounts Store] Erro ao atualizar conta:', err)
+      }
+      // Não propagar erro para não quebrar o fluxo principal
+      return null
+    }
+  }
+
+  /**
    * Limpa o estado
    */
   function clearError() {
@@ -141,6 +172,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     listAccounts,
     getAccount,
     createAccount,
+    refreshAccount,
     clearError,
     clearCurrentAccount,
   }
