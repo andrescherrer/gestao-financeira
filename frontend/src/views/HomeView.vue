@@ -270,14 +270,18 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAccountsStore } from '@/stores/accounts'
 import { useTransactionsStore } from '@/stores/transactions'
+import { useAuthStore } from '@/stores/auth'
 import Layout from '@/components/layout/Layout.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Wallet, User, Briefcase, List, ArrowDown, ArrowUp, TrendingUp, Plus, ChevronRight } from 'lucide-vue-next'
 
+const router = useRouter()
+const authStore = useAuthStore()
 const accountsStore = useAccountsStore()
 const transactionsStore = useTransactionsStore()
 
@@ -289,6 +293,21 @@ const recentTransactions = computed(() => {
 })
 
 onMounted(async () => {
+  // Verificar autenticação antes de carregar dados
+  if (!authStore.isAuthenticated) {
+    // Se não está autenticado, redirecionar para login
+    router.push({ name: 'login', query: { redirect: '/' } })
+    return
+  }
+  
+  // Validar token novamente para garantir
+  const isValid = await authStore.validateToken()
+  if (!isValid) {
+    router.push({ name: 'login', query: { redirect: '/' } })
+    return
+  }
+  
+  // Carregar dados apenas se autenticado
   if (accountsStore.accounts.length === 0) {
     await accountsStore.listAccounts()
   }
