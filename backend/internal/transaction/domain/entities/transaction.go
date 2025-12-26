@@ -8,6 +8,7 @@ import (
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
 	"gestao-financeira/backend/internal/shared/domain/events"
 	sharedvalueobjects "gestao-financeira/backend/internal/shared/domain/valueobjects"
+	transactionevents "gestao-financeira/backend/internal/transaction/domain/events"
 	transactionvalueobjects "gestao-financeira/backend/internal/transaction/domain/valueobjects"
 )
 
@@ -79,11 +80,12 @@ func NewTransaction(
 		events:          []events.DomainEvent{},
 	}
 
-	// Add domain event
-	transaction.addEvent(events.NewBaseDomainEvent(
-		"TransactionCreated",
+	// Add domain event with transaction details
+	transaction.addEvent(transactionevents.NewTransactionCreated(
 		transaction.id.Value(),
-		"Transaction",
+		transaction.accountID.Value(),
+		transaction.transactionType.Value(),
+		transaction.amount,
 	))
 
 	return transaction, nil

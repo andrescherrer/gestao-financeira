@@ -11,6 +11,10 @@ import (
 	accountpersistence "gestao-financeira/backend/internal/account/infrastructure/persistence"
 	accounthandlers "gestao-financeira/backend/internal/account/presentation/handlers"
 	accountroutes "gestao-financeira/backend/internal/account/presentation/routes"
+	categoryusecases "gestao-financeira/backend/internal/category/application/usecases"
+	categorypersistence "gestao-financeira/backend/internal/category/infrastructure/persistence"
+	categoryhandlers "gestao-financeira/backend/internal/category/presentation/handlers"
+	categoryroutes "gestao-financeira/backend/internal/category/presentation/routes"
 	"gestao-financeira/backend/internal/identity/application/usecases"
 	"gestao-financeira/backend/internal/identity/infrastructure/persistence"
 	"gestao-financeira/backend/internal/identity/infrastructure/services"
@@ -94,6 +98,7 @@ func main() {
 	userRepository := persistence.NewGormUserRepository(db)
 	accountRepository := accountpersistence.NewGormAccountRepository(db)
 	transactionRepository := transactionpersistence.NewGormTransactionRepository(db)
+	categoryRepository := categorypersistence.NewGormCategoryRepository(db)
 
 	// Initialize services
 	jwtService := services.NewJWTService()
@@ -122,6 +127,13 @@ func main() {
 	updateTransactionUseCase := transactionusecases.NewUpdateTransactionUseCase(transactionRepository, eventBus)
 	deleteTransactionUseCase := transactionusecases.NewDeleteTransactionUseCase(transactionRepository, eventBus)
 
+	// Initialize category use cases
+	createCategoryUseCase := categoryusecases.NewCreateCategoryUseCase(categoryRepository, eventBus)
+	listCategoriesUseCase := categoryusecases.NewListCategoriesUseCase(categoryRepository)
+	getCategoryUseCase := categoryusecases.NewGetCategoryUseCase(categoryRepository)
+	updateCategoryUseCase := categoryusecases.NewUpdateCategoryUseCase(categoryRepository, eventBus)
+	deleteCategoryUseCase := categoryusecases.NewDeleteCategoryUseCase(categoryRepository)
+
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUserUseCase, loginUseCase)
 	accountHandler := accounthandlers.NewAccountHandler(createAccountUseCase, listAccountsUseCase, getAccountUseCase)
@@ -131,6 +143,13 @@ func main() {
 		getTransactionUseCase,
 		updateTransactionUseCase,
 		deleteTransactionUseCase,
+	)
+	categoryHandler := categoryhandlers.NewCategoryHandler(
+		createCategoryUseCase,
+		listCategoriesUseCase,
+		getCategoryUseCase,
+		updateCategoryUseCase,
+		deleteCategoryUseCase,
 	)
 
 	// Create Fiber app
@@ -200,6 +219,9 @@ func main() {
 
 		// Setup transaction routes (protected)
 		transactionroutes.SetupTransactionRoutes(api, transactionHandler, jwtService)
+
+		// Setup category routes (protected)
+		categoryroutes.SetupCategoryRoutes(api, categoryHandler, jwtService)
 	}
 
 	// Get port from environment or use default

@@ -24,6 +24,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 1.10: Módulo de Transações** (FE-TX-001 a FE-TX-010): ✅ Completo
 - **Sprint 2.1: Integração Transaction ↔ Account** (INT-001 a INT-006, FE-INT-001): ✅ Completo
 - **Sprint 2.2: Event Bus e Domain Events** (EVT-001 a EVT-005): ✅ Completo
+- **Sprint 2.3: Category Context - Backend** (CAT-001 a CAT-010): ✅ Completo
 - **Demais sprints**: ⏳ Não iniciadas
 
 ### 📈 Progresso
@@ -37,9 +38,10 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
   - Frontend Auth: ✅ 100% (completo e testado)
   - Frontend Accounts: ✅ 100% (completo e testado)
   - Frontend Transactions: ✅ 100% (completo e testado)
-- **Fase 2 (Core Domain e Integrações)**: ~30% concluído
+- **Fase 2 (Core Domain e Integrações)**: ~40% concluído
   - Integração Transaction ↔ Account: ✅ 100% (completo e testado)
   - Event Bus e Domain Events: ✅ 100% (completo e testado)
+  - Category Context - Backend: ✅ 100% (completo e testado)
 
 ---
 
@@ -296,16 +298,16 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| CAT-001 | Criar value object CategoryID | 🔵 | 🔴 | 1h | BE-001 | ⏳ |
-| CAT-002 | Criar entidade Category (agregado raiz) | 🔵 | 🔴 | 4h | CAT-001 | ⏳ |
-| CAT-003 | Criar interface CategoryRepository | 🔵 | 🔴 | 1h | CAT-002 | ⏳ |
-| CAT-004 | Implementar GormCategoryRepository | 🔵 | 🔴 | 6h | CAT-003, BE-004 | ⏳ |
-| CAT-005 | Criar migration para tabela categories | 🔵 | 🔴 | 2h | CAT-004 | ⏳ |
-| CAT-006 | Implementar use cases de Category (CRUD) | 🔵 | 🔴 | 6h | CAT-002, CAT-003 | ⏳ |
-| CAT-007 | Criar CategoryHandler (CRUD completo) | 🔵 | 🔴 | 4h | CAT-006 | ⏳ |
-| CAT-008 | Configurar rotas de categories (/api/v1/categories/*) | 🔵 | 🔴 | 2h | CAT-007, ID-011 | ⏳ |
-| CAT-009 | Adicionar anotações Swagger para Category | 🔵 | 🟡 | 2h | CAT-007, DOC-001 | ⏳ |
-| CAT-010 | Testes unitários para Category Context | 🟤 | 🟡 | 6h | CAT-002, CAT-006 | ⏳ |
+| CAT-001 | Criar value object CategoryID | 🔵 | 🔴 | 1h | BE-001 | ✅ |
+| CAT-002 | Criar entidade Category (agregado raiz) | 🔵 | 🔴 | 4h | CAT-001 | ✅ |
+| CAT-003 | Criar interface CategoryRepository | 🔵 | 🔴 | 1h | CAT-002 | ✅ |
+| CAT-004 | Implementar GormCategoryRepository | 🔵 | 🔴 | 6h | CAT-003, BE-004 | ✅ |
+| CAT-005 | Criar migration para tabela categories | 🔵 | 🔴 | 2h | CAT-004 | ✅ |
+| CAT-006 | Implementar use cases de Category (CRUD) | 🔵 | 🔴 | 6h | CAT-002, CAT-003 | ✅ |
+| CAT-007 | Criar CategoryHandler (CRUD completo) | 🔵 | 🔴 | 4h | CAT-006 | ✅ |
+| CAT-008 | Configurar rotas de categories (/api/v1/categories/*) | 🔵 | 🔴 | 2h | CAT-007, ID-011 | ✅ |
+| CAT-009 | Adicionar anotações Swagger para Category | 🔵 | 🟡 | 2h | CAT-007, DOC-001 | ✅ |
+| CAT-010 | Testes unitários para Category Context | 🟤 | 🟡 | 6h | CAT-002, CAT-006 | ✅ |
 
 **Entregável Sprint 2.3:** API de categorias funcionando
 

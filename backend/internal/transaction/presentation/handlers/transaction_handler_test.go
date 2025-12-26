@@ -150,7 +150,7 @@ func TestTransactionHandler_Create(t *testing.T) {
 	listUseCase := usecases.NewListTransactionsUseCase(mockRepo)
 	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
 	updateUseCase := usecases.NewUpdateTransactionUseCase(mockRepo, eventBus)
-	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo)
+	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
 	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase)
 
 	app.Post("/transactions", func(c *fiber.Ctx) error {
@@ -232,7 +232,7 @@ func TestTransactionHandler_List(t *testing.T) {
 	createUseCase := usecases.NewCreateTransactionUseCase(mockRepo, eventbus.NewEventBus())
 	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
 	updateUseCase := usecases.NewUpdateTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo)
+	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
 	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase)
 
 	app.Get("/transactions", func(c *fiber.Ctx) error {
@@ -300,7 +300,7 @@ func TestTransactionHandler_Get(t *testing.T) {
 	createUseCase := usecases.NewCreateTransactionUseCase(mockRepo, eventbus.NewEventBus())
 	listUseCase := usecases.NewListTransactionsUseCase(mockRepo)
 	updateUseCase := usecases.NewUpdateTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo)
+	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
 	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase)
 
 	app.Get("/transactions/:id", func(c *fiber.Ctx) error {
@@ -371,7 +371,7 @@ func TestTransactionHandler_Update(t *testing.T) {
 	createUseCase := usecases.NewCreateTransactionUseCase(mockRepo, eventbus.NewEventBus())
 	listUseCase := usecases.NewListTransactionsUseCase(mockRepo)
 	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
-	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo)
+	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
 	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase)
 
 	app.Put("/transactions/:id", func(c *fiber.Ctx) error {
@@ -447,7 +447,7 @@ func TestTransactionHandler_Delete(t *testing.T) {
 
 	app := fiber.New()
 	mockRepo := newMockTransactionRepositoryForHandler()
-	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo)
+	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
 	createUseCase := usecases.NewCreateTransactionUseCase(mockRepo, eventbus.NewEventBus())
 	listUseCase := usecases.NewListTransactionsUseCase(mockRepo)
 	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
