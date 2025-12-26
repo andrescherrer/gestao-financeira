@@ -87,9 +87,19 @@ export const useAuthStore = defineStore('auth', () => {
       }
       
       token.value = storedToken
+      // Garantir que os dados do usuário estão carregados
+      // Se não estão na store, tentar carregar do localStorage
+      if (!user.value) {
+        const storedUser = localStorage.getItem('auth_user')
+        if (storedUser) {
+          try {
+            user.value = JSON.parse(storedUser)
+          } catch (error) {
+            console.error('Erro ao carregar dados do usuário do localStorage:', error)
+          }
+        }
+      }
       isValidated.value = true
-      // Nota: não temos endpoint /me, então não podemos carregar user aqui
-      // Mas o token é válido, então mantemos o estado
       return true
     } catch (error: any) {
       // Se retornou 401 ou 403, o token é inválido ou expirado
