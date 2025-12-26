@@ -8,6 +8,7 @@ import (
 	sharedvalueobjects "gestao-financeira/backend/internal/shared/domain/valueobjects"
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
 	"gestao-financeira/backend/internal/transaction/application/dtos"
+	transactionevents "gestao-financeira/backend/internal/transaction/domain/events"
 	"gestao-financeira/backend/internal/transaction/domain/repositories"
 	transactionvalueobjects "gestao-financeira/backend/internal/transaction/domain/valueobjects"
 )
@@ -49,6 +50,10 @@ func (uc *UpdateTransactionUseCase) Execute(input dtos.UpdateTransactionInput) (
 	if transaction == nil {
 		return nil, errors.New("transaction not found")
 	}
+
+	// Store old values BEFORE any updates (needed for TransactionUpdated event)
+	oldType := transaction.TransactionType().Value()
+	oldAmount := transaction.Amount()
 
 	// Update type if provided
 	if input.Type != nil {
@@ -119,7 +124,15 @@ func (uc *UpdateTransactionUseCase) Execute(input dtos.UpdateTransactionInput) (
 		return nil, fmt.Errorf("failed to save transaction: %w", err)
 	}
 
-	// Publish domain events
+	// Get new values after update
+	newType := transaction.TransactionType().Value()
+	newAmount := transaction.Amount()
+
+	// Check if amount or type changed (these affect account balance)
+	amountChanged := !oldAmount.Equals(newAmount)
+	typeChanged := oldType != newType
+
+	// Publish domain events from entity
 	domainEvents := transaction.GetEvents()
 	for _, event := range domainEvents {
 		if err := uc.eventBus.Publish(event); err != nil {
@@ -130,6 +143,22 @@ func (uc *UpdateTransactionUseCase) Execute(input dtos.UpdateTransactionInput) (
 		}
 	}
 	transaction.ClearEvents()
+
+	// If amount or type changed, publish TransactionUpdated event for balance update
+	if amountChanged || typeChanged {
+		updateEvent := transactionevents.NewTransactionUpdated(
+			transaction.ID().Value(),
+			transaction.AccountID().Value(),
+			oldType,
+			oldAmount,
+			newType,
+			newAmount,
+		)
+		if err := uc.eventBus.Publish(updateEvent); err != nil {
+			// Log error but don't fail the transaction update
+			_ = err // Ignore for now, but should be logged
+		}
+	}
 
 	// Build output
 	amount := transaction.Amount()

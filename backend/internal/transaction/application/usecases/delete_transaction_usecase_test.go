@@ -7,6 +7,7 @@ import (
 
 	accountvalueobjects "gestao-financeira/backend/internal/account/domain/valueobjects"
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
+	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
 	"gestao-financeira/backend/internal/transaction/application/dtos"
 	"gestao-financeira/backend/internal/transaction/domain/entities"
 	transactionvalueobjects "gestao-financeira/backend/internal/transaction/domain/valueobjects"
@@ -150,7 +151,7 @@ func TestDeleteTransactionUseCase_Execute(t *testing.T) {
 				}
 			}
 
-			useCase := NewDeleteTransactionUseCase(mockRepo)
+			useCase := NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
 			output, err := useCase.Execute(tt.input)
 
 			if tt.wantError {

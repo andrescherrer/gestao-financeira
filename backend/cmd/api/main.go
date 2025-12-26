@@ -7,6 +7,7 @@ import (
 	"time"
 
 	accountusecases "gestao-financeira/backend/internal/account/application/usecases"
+	accountinfrahandlers "gestao-financeira/backend/internal/account/infrastructure/handlers"
 	accountpersistence "gestao-financeira/backend/internal/account/infrastructure/persistence"
 	accounthandlers "gestao-financeira/backend/internal/account/presentation/handlers"
 	accountroutes "gestao-financeira/backend/internal/account/presentation/routes"
@@ -89,12 +90,20 @@ func main() {
 	listAccountsUseCase := accountusecases.NewListAccountsUseCase(accountRepository)
 	getAccountUseCase := accountusecases.NewGetAccountUseCase(accountRepository)
 
+	// Initialize account event handlers
+	updateBalanceHandler := accountinfrahandlers.NewUpdateBalanceHandler(accountRepository)
+
+	// Subscribe to transaction events for balance updates
+	eventBus.Subscribe("TransactionCreated", updateBalanceHandler.HandleTransactionCreated)
+	eventBus.Subscribe("TransactionUpdated", updateBalanceHandler.HandleTransactionUpdated)
+	eventBus.Subscribe("TransactionDeleted", updateBalanceHandler.HandleTransactionDeleted)
+
 	// Initialize transaction use cases
 	createTransactionUseCase := transactionusecases.NewCreateTransactionUseCase(transactionRepository, eventBus)
 	listTransactionsUseCase := transactionusecases.NewListTransactionsUseCase(transactionRepository)
 	getTransactionUseCase := transactionusecases.NewGetTransactionUseCase(transactionRepository)
 	updateTransactionUseCase := transactionusecases.NewUpdateTransactionUseCase(transactionRepository, eventBus)
-	deleteTransactionUseCase := transactionusecases.NewDeleteTransactionUseCase(transactionRepository)
+	deleteTransactionUseCase := transactionusecases.NewDeleteTransactionUseCase(transactionRepository, eventBus)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUserUseCase, loginUseCase)
