@@ -4,7 +4,7 @@
     @update:model-value="handleChange"
     :disabled="isLoading || disabled"
   >
-    <SelectTrigger :class="errorClass">
+    <SelectTrigger :class="errorClass" @blur="$emit('blur')">
       <SelectValue :placeholder="placeholder" />
     </SelectTrigger>
     <SelectContent>
@@ -58,6 +58,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
+  'blur': []
 }>()
 
 const categoriesStore = useCategoriesStore()
@@ -76,7 +77,12 @@ onMounted(async () => {
 })
 
 function handleChange(value: AcceptableValue) {
-  if (value === null || value === undefined) {
+  // Garantir que sempre emite uma string
+  if (value === null || value === undefined || value === '') {
+    emit('update:modelValue', '')
+  } else if (typeof value === 'object') {
+    // Se for um objeto (não deveria acontecer, mas por segurança)
+    console.warn('CategorySelect recebeu um objeto em vez de string:', value)
     emit('update:modelValue', '')
   } else {
     emit('update:modelValue', String(value))

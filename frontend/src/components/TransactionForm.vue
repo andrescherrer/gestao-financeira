@@ -123,7 +123,12 @@
         >
           <CategorySelect
             :model-value="field.value || ''"
-            @update:model-value="(value) => { field.onChange({ target: { value } }) }"
+            @update:model-value="(value) => { 
+              const stringValue = value || ''
+              field.value = stringValue
+              field.onChange(stringValue)
+            }"
+            @blur="field.onBlur"
             placeholder="Selecione uma categoria (opcional)"
             :error="!!(errors.category_id || (meta.touched && !meta.valid))"
             :disabled="isLoading"

@@ -44,10 +44,25 @@ export const createTransactionSchema = z.object({
     .min(1, 'Data é obrigatória')
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data deve estar no formato YYYY-MM-DD'),
   category_id: z
-    .string()
-    .uuid('ID da categoria inválido')
-    .optional()
-    .or(z.literal('')),
+    .preprocess(
+      (val) => {
+        // Se for objeto, retornar string vazia
+        if (typeof val === 'object' && val !== null) {
+          return ''
+        }
+        // Se for null ou undefined, retornar string vazia
+        if (val === null || val === undefined) {
+          return ''
+        }
+        // Converter para string
+        return String(val)
+      },
+      z
+        .string()
+        .uuid('ID da categoria inválido')
+        .optional()
+        .or(z.literal(''))
+    ),
 })
 
 export type CreateTransactionFormData = z.infer<typeof createTransactionSchema>
