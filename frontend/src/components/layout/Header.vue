@@ -23,7 +23,7 @@
         </Button>
 
         <!-- Avatar do Usuário com Dropdown Menu -->
-        <DropdownMenu v-if="authStore.user">
+        <DropdownMenu v-if="authStore.user || authStore.token">
           <DropdownMenuTrigger as-child>
             <Button
               variant="ghost"
@@ -34,7 +34,9 @@
               </div>
               <div class="hidden flex-col items-start sm:flex">
                 <span class="text-sm font-semibold text-foreground">{{ userName }}</span>
-                <span class="text-xs text-muted-foreground">{{ authStore.user.email }}</span>
+                <span class="text-xs text-muted-foreground">
+                  {{ authStore.user?.email || 'Usuário autenticado' }}
+                </span>
               </div>
               <ChevronDown class="h-4 w-4 text-muted-foreground" />
             </Button>
@@ -43,7 +45,9 @@
             <DropdownMenuLabel>
               <div class="flex flex-col space-y-1">
                 <p class="text-sm font-medium leading-none">{{ userName }}</p>
-                <p class="text-xs leading-none text-muted-foreground">{{ authStore.user.email }}</p>
+                <p class="text-xs leading-none text-muted-foreground">
+                  {{ authStore.user?.email || 'Usuário autenticado' }}
+                </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -89,14 +93,20 @@ const authStore = useAuthStore()
 const hasNotifications = ref(false)
 
 const userName = computed(() => {
-  if (!authStore.user) return 'Usuário'
+  if (!authStore.user) {
+    // Se não há user mas há token, mostrar placeholder
+    return authStore.token ? 'Usuário' : 'Usuário'
+  }
   const firstName = authStore.user.first_name || ''
   const lastName = authStore.user.last_name || ''
   return `${firstName} ${lastName}`.trim() || authStore.user.email
 })
 
 const userInitials = computed(() => {
-  if (!authStore.user) return 'U'
+  if (!authStore.user) {
+    // Se não há user mas há token, mostrar 'U'
+    return 'U'
+  }
   const firstName = authStore.user.first_name || ''
   const lastName = authStore.user.last_name || ''
   if (firstName && lastName) {

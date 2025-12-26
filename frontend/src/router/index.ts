@@ -86,7 +86,7 @@ const router = createRouter({
 })
 
 // Navigation guard
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
   // Verificar autenticação baseado no token no localStorage e na store
@@ -96,6 +96,19 @@ router.beforeEach((to, from, next) => {
   // Se não há token na store mas há no storage, inicializar
   if (!hasTokenInStore && hasTokenInStorage) {
     authStore.init()
+  }
+  
+  // Se há token e estamos acessando rota protegida, validar token
+  if (to.meta.requiresAuth && (hasTokenInStorage || hasTokenInStore)) {
+    // Se ainda não foi validado, validar agora
+    if (!authStore.isValidated) {
+      const isValid = await authStore.validateToken()
+      if (!isValid) {
+        // Token inválido, redirecionar para login
+        next({ name: 'login', query: { redirect: to.fullPath } })
+        return
+      }
+    }
   }
   
   // Verificar autenticação (usar storage como fonte da verdade)
