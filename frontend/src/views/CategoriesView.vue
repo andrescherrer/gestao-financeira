@@ -51,25 +51,15 @@
       </Card>
 
       <!-- Empty State -->
-      <Card
+      <EmptyState
         v-else-if="categoriesStore.categories.length === 0"
-      >
-        <CardContent class="p-12 text-center">
-          <Tag class="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-          <h3 class="text-xl font-semibold text-foreground mb-2">
-            Nenhuma categoria encontrada
-          </h3>
-          <p class="text-muted-foreground mb-6">
-            Comece criando sua primeira categoria
-          </p>
-          <Button as-child>
-            <router-link to="/categories/new">
-              <Plus class="h-4 w-4 mr-2" />
-              Criar Primeira Categoria
-            </router-link>
-          </Button>
-        </CardContent>
-      </Card>
+        :icon="Tag"
+        title="Nenhuma categoria encontrada"
+        description="Comece criando sua primeira categoria"
+        action-label="Criar Primeira Categoria"
+        action-to="/categories/new"
+        :action-icon="Plus"
+      />
 
       <!-- Categories List -->
       <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -110,6 +100,7 @@ import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCategoriesStore } from '@/stores/categories'
 import Layout from '@/components/layout/Layout.vue'
+import EmptyState from '@/components/EmptyState.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'

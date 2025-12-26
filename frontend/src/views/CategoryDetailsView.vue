@@ -159,6 +159,7 @@ function goBack() {
 async function handleDelete() {
   if (!category.value) return
 
+  // Por enquanto, usar confirm nativo
   if (!confirm(`Tem certeza que deseja deletar a categoria "${category.value.name}"?`)) {
     return
   }
@@ -166,9 +167,20 @@ async function handleDelete() {
   isDeleting.value = true
   try {
     await categoriesStore.deleteCategory(category.value.category_id)
+    
+    // Mostrar toast de sucesso
+    const { toast } = await import('@/components/ui/toast')
+    toast.success('Categoria deletada com sucesso!')
+    
     router.push('/categories')
-  } catch (err) {
+  } catch (err: any) {
     console.error('Erro ao deletar categoria:', err)
+    
+    // Mostrar toast de erro
+    const { toast } = await import('@/components/ui/toast')
+    toast.error('Erro ao deletar categoria', {
+      description: err.message || 'Tente novamente mais tarde.',
+    })
   } finally {
     isDeleting.value = false
   }

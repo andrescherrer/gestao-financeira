@@ -86,6 +86,13 @@ async function handleSubmit(values: CreateCategoryFormData | UpdateCategoryFormD
     }
 
     const category = await categoriesStore.createCategory(categoryData)
+    
+    // Mostrar toast de sucesso
+    const { toast } = await import('@/components/ui/toast')
+    toast.success('Categoria criada com sucesso!', {
+      description: `A categoria "${category.name}" foi criada.`,
+    })
+    
     router.push(`/categories/${category.category_id}`)
   } catch (err: any) {
     if (import.meta.env.DEV) {
@@ -102,6 +109,12 @@ async function handleSubmit(values: CreateCategoryFormData | UpdateCategoryFormD
       err.response?.data?.message ||
       err.message ||
       'Erro ao criar categoria. Tente novamente.'
+    
+    // Mostrar toast de erro
+    const { toast } = await import('@/components/ui/toast')
+    toast.error('Erro ao criar categoria', {
+      description: errorMessage,
+    })
     
     error.value = errorMessage
   } finally {

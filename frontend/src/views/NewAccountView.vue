@@ -103,6 +103,13 @@ async function handleSubmit(values: CreateAccountFormData) {
     }
 
     const account = await accountsStore.createAccount(accountData)
+    
+    // Mostrar toast de sucesso
+    const { toast } = await import('@/components/ui/toast')
+    toast.success('Conta criada com sucesso!', {
+      description: `A conta "${account.name}" foi criada.`,
+    })
+    
     router.push(`/accounts/${account.account_id}`)
   } catch (err: any) {
     if (import.meta.env.DEV) {
@@ -119,6 +126,12 @@ async function handleSubmit(values: CreateAccountFormData) {
       err.response?.data?.message ||
       err.message ||
       'Erro ao criar conta. Tente novamente.'
+    
+    // Mostrar toast de erro
+    const { toast } = await import('@/components/ui/toast')
+    toast.error('Erro ao criar conta', {
+      description: errorMessage,
+    })
     
     if (formRef.value) {
       formRef.value.setError(errorMessage)

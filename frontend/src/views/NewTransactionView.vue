@@ -125,6 +125,12 @@ async function handleSubmit(values: CreateTransactionFormData) {
     // O backend já atualizou o saldo via event handler, mas precisamos atualizar no frontend
     await accountsStore.refreshAccount(transaction.account_id)
     
+    // Mostrar toast de sucesso
+    const { toast } = await import('@/components/ui/toast')
+    toast.success('Transação criada com sucesso!', {
+      description: `Saldo da conta atualizado automaticamente.`,
+    })
+    
     router.push(`/transactions/${transaction.transaction_id}`)
   } catch (err: any) {
     if (import.meta.env.DEV) {
@@ -141,6 +147,12 @@ async function handleSubmit(values: CreateTransactionFormData) {
       err.response?.data?.message ||
       err.message ||
       'Erro ao criar transação. Tente novamente.'
+    
+    // Mostrar toast de erro
+    const { toast } = await import('@/components/ui/toast')
+    toast.error('Erro ao criar transação', {
+      description: errorMessage,
+    })
     
     if (formRef.value) {
       formRef.value.setError(errorMessage)

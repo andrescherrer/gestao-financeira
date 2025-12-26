@@ -59,25 +59,15 @@
       </Card>
 
       <!-- Empty State -->
-      <Card
+      <EmptyState
         v-else-if="accountsStore.accounts.length === 0"
-      >
-        <CardContent class="p-12 text-center">
-          <Wallet class="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-          <h3 class="text-xl font-semibold text-foreground mb-2">
-            Nenhuma conta encontrada
-          </h3>
-          <p class="text-muted-foreground mb-6">
-            Comece criando sua primeira conta financeira
-          </p>
-          <Button as-child>
-            <router-link to="/accounts/new">
-              <Plus class="h-4 w-4 mr-2" />
-              Criar Primeira Conta
-            </router-link>
-          </Button>
-        </CardContent>
-      </Card>
+        :icon="Wallet"
+        title="Nenhuma conta encontrada"
+        description="Comece criando sua primeira conta financeira"
+        action-label="Criar Primeira Conta"
+        action-to="/accounts/new"
+        :action-icon="Plus"
+      />
 
       <!-- Accounts List -->
       <div v-else class="space-y-4">
@@ -153,6 +143,7 @@ import { useAccountsStore } from '@/stores/accounts'
 import { useAuthStore } from '@/stores/auth'
 import Layout from '@/components/layout/Layout.vue'
 import AccountCard from '@/components/AccountCard.vue'
+import EmptyState from '@/components/EmptyState.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'

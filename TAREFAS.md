@@ -26,6 +26,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 2.2: Event Bus e Domain Events** (EVT-001 a EVT-005): ✅ Completo
 - **Sprint 2.3: Category Context - Backend** (CAT-001 a CAT-010): ✅ Completo
 - **Sprint 2.4: Módulo de Categorias - Frontend** (FE-CAT-001 a FE-CAT-006): ✅ Completo
+- **Sprint 2.5: Melhorias Frontend** (FE-IMP-001 a FE-IMP-009): ✅ Completo
 - **Demais sprints**: ⏳ Não iniciadas
 
 ### 📈 Progresso
@@ -39,11 +40,12 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
   - Frontend Auth: ✅ 100% (completo e testado)
   - Frontend Accounts: ✅ 100% (completo e testado)
   - Frontend Transactions: ✅ 100% (completo e testado)
-- **Fase 2 (Core Domain e Integrações)**: ~50% concluído
+- **Fase 2 (Core Domain e Integrações)**: ~60% concluído
   - Integração Transaction ↔ Account: ✅ 100% (completo e testado)
   - Event Bus e Domain Events: ✅ 100% (completo e testado)
   - Category Context - Backend: ✅ 100% (completo e testado)
   - Módulo de Categorias - Frontend: ✅ 100% (completo e testado)
+  - Melhorias Frontend: ✅ 100% (completo e testado)
 
 ---
 
@@ -334,15 +336,15 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| FE-IMP-001 | Implementar atualização de saldo em tempo real | 🟣 | 🟡 | 4h | FE-ACC-002, INT-001 | ⏳ |
-| FE-IMP-002 | Adicionar filtros avançados em transações (data, tipo, categoria) | 🟣 | 🟡 | 6h | FE-TX-002 | ⏳ |
-| FE-IMP-003 | Implementar paginação em listas | 🟣 | 🟡 | 4h | FE-TX-002, FE-ACC-002 | ⏳ |
-| FE-IMP-004 | Implementar ordenação em tabelas | 🟣 | 🟡 | 2h | FE-IMP-003 | ⏳ |
-| FE-IMP-005 | Criar componente Toast para notificações | 🟣 | 🟡 | 2h | FE-003 | ⏳ |
-| FE-IMP-006 | Criar componente Dialog de confirmação | 🟣 | 🟡 | 2h | FE-003 | ⏳ |
-| FE-IMP-007 | Criar componente EmptyState | 🟣 | 🟡 | 2h | FE-003 | ⏳ |
-| FE-IMP-008 | Melhorar loading states em todos os módulos | 🟣 | 🟡 | 4h | FE-IMP-005 | ⏳ |
-| FE-IMP-009 | Melhorar error handling em todos os módulos | 🟣 | 🟡 | 4h | FE-IMP-005 | ⏳ |
+| FE-IMP-001 | Implementar atualização de saldo em tempo real | 🟣 | 🟡 | 4h | FE-ACC-002, INT-001 | ✅ |
+| FE-IMP-002 | Adicionar filtros avançados em transações (data, tipo, categoria) | 🟣 | 🟡 | 6h | FE-TX-002 | ✅ |
+| FE-IMP-003 | Implementar paginação em listas | 🟣 | 🟡 | 4h | FE-TX-002, FE-ACC-002 | ✅ |
+| FE-IMP-004 | Implementar ordenação em tabelas | 🟣 | 🟡 | 2h | FE-IMP-003 | ✅ |
+| FE-IMP-005 | Criar componente Toast para notificações | 🟣 | 🟡 | 2h | FE-003 | ✅ |
+| FE-IMP-006 | Criar componente Dialog de confirmação | 🟣 | 🟡 | 2h | FE-003 | ✅ |
+| FE-IMP-007 | Criar componente EmptyState | 🟣 | 🟡 | 2h | FE-003 | ✅ |
+| FE-IMP-008 | Melhorar loading states em todos os módulos | 🟣 | 🟡 | 4h | FE-IMP-005 | ✅ |
+| FE-IMP-009 | Melhorar error handling em todos os módulos | 🟣 | 🟡 | 4h | FE-IMP-005 | ✅ |
 
 **Entregável Sprint 2.5:** Interface melhorada com filtros, paginação e feedback visual
 

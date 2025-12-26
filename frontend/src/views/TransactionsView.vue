@@ -49,25 +49,15 @@
       </Card>
 
       <!-- Empty State -->
-      <Card
+      <EmptyState
         v-else-if="transactionsStore.transactions.length === 0"
-      >
-        <CardContent class="p-12 text-center">
-          <CreditCard class="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-          <h3 class="text-xl font-semibold text-foreground mb-2">
-            Nenhuma transação encontrada
-          </h3>
-          <p class="text-muted-foreground mb-6">
-            Comece registrando sua primeira transação financeira
-          </p>
-          <Button as-child>
-            <router-link to="/transactions/new">
-              <Plus class="h-4 w-4 mr-2" />
-              Criar Primeira Transação
-            </router-link>
-          </Button>
-        </CardContent>
-      </Card>
+        :icon="CreditCard"
+        title="Nenhuma transação encontrada"
+        description="Comece registrando sua primeira transação financeira"
+        action-label="Criar Primeira Transação"
+        action-to="/transactions/new"
+        :action-icon="Plus"
+      />
 
       <!-- Transactions List -->
       <div v-else class="space-y-4">
@@ -155,54 +145,39 @@
         </div>
 
         <!-- Filters -->
-        <div class="flex flex-wrap gap-3 items-center">
-          <label class="text-sm font-medium text-foreground">Filtros:</label>
-          <select
-            v-model="selectedType"
-            @change="handleFilterChange"
-            class="flex h-9 w-full max-w-xs rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="">Todos os tipos</option>
-            <option value="INCOME">Receitas</option>
-            <option value="EXPENSE">Despesas</option>
-          </select>
-          <select
-            v-model="selectedAccountId"
-            @change="handleFilterChange"
-            class="flex h-9 w-full max-w-xs rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="">Todas as contas</option>
-            <option
-              v-for="account in accountsStore.accounts"
-              :key="account.account_id"
-              :value="account.account_id"
-            >
-              {{ account.name }}
-            </option>
-          </select>
-          <Button
-            v-if="selectedType || selectedAccountId"
-            variant="ghost"
-            size="sm"
-            @click="clearFilters"
-          >
-            Limpar filtros
-          </Button>
-        </div>
+        <TransactionFilters
+          :filters="filters"
+          :accounts="accountsStore.accounts"
+          @update:filters="handleFiltersUpdate"
+          @clear="clearFilters"
+        />
 
         <!-- Transactions Table -->
-        <TransactionTable :transactions="transactionsStore.transactions" />
+        <TransactionTable :transactions="paginatedTransactions" />
+
+        <!-- Pagination -->
+        <Pagination
+          v-if="totalPages > 1"
+          :current-page="currentPage"
+          :total-pages="totalPages"
+          :total="transactionsStore.transactions.length"
+          :items-per-page="itemsPerPage"
+          @update:current-page="handlePageChange"
+        />
       </div>
     </div>
   </Layout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useTransactionsStore } from '@/stores/transactions'
 import { useAccountsStore } from '@/stores/accounts'
 import Layout from '@/components/layout/Layout.vue'
 import TransactionTable from '@/components/TransactionTable.vue'
+import TransactionFilters from '@/components/TransactionFilters.vue'
+import Pagination from '@/components/Pagination.vue'
+import EmptyState from '@/components/EmptyState.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -211,8 +186,56 @@ import { List, ArrowDown, ArrowUp, TrendingUp, CreditCard, Plus, Loader2, AlertC
 const transactionsStore = useTransactionsStore()
 const accountsStore = useAccountsStore()
 
-const selectedType = ref<'INCOME' | 'EXPENSE' | ''>('')
-const selectedAccountId = ref<string>('')
+const filters = ref<{
+  type?: 'INCOME' | 'EXPENSE' | ''
+  accountId?: string
+  startDate?: string
+  endDate?: string
+}>({
+  type: undefined,
+  accountId: undefined,
+  startDate: undefined,
+  endDate: undefined,
+})
+
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
+
+const filteredTransactions = computed(() => {
+  let result = [...transactionsStore.transactions]
+
+  // Filtrar por tipo
+  if (filters.value.type) {
+    result = result.filter((tx) => tx.type === filters.value.type)
+  }
+
+  // Filtrar por conta
+  if (filters.value.accountId) {
+    result = result.filter((tx) => tx.account_id === filters.value.accountId)
+  }
+
+  // Filtrar por data inicial
+  if (filters.value.startDate) {
+    result = result.filter((tx) => tx.date >= filters.value.startDate!)
+  }
+
+  // Filtrar por data final
+  if (filters.value.endDate) {
+    result = result.filter((tx) => tx.date <= filters.value.endDate!)
+  }
+
+  return result
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredTransactions.value.length / itemsPerPage.value)
+})
+
+const paginatedTransactions = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return filteredTransactions.value.slice(start, end)
+})
 
 onMounted(async () => {
   if (accountsStore.accounts.length === 0) {
@@ -223,25 +246,35 @@ onMounted(async () => {
   }
 })
 
-async function handleFilterChange() {
-  await transactionsStore.listTransactions(
-    selectedAccountId.value || undefined,
-    selectedType.value || undefined
-  )
+function handleFiltersUpdate(newFilters: {
+  type?: 'INCOME' | 'EXPENSE' | ''
+  accountId?: string
+  startDate?: string
+  endDate?: string
+}) {
+  filters.value = { ...newFilters }
+  currentPage.value = 1 // Reset para primeira página ao filtrar
 }
 
 function clearFilters() {
-  selectedType.value = ''
-  selectedAccountId.value = ''
-  transactionsStore.listTransactions()
+  filters.value = {
+    type: undefined,
+    accountId: undefined,
+    startDate: undefined,
+    endDate: undefined,
+  }
+  currentPage.value = 1
+}
+
+function handlePageChange(page: number) {
+  currentPage.value = page
+  // Scroll to top quando mudar de página
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 function handleRetry() {
   transactionsStore.clearError()
-  transactionsStore.listTransactions(
-    selectedAccountId.value || undefined,
-    selectedType.value || undefined
-  )
+  transactionsStore.listTransactions()
 }
 
 function formatCurrency(value: number): string {
