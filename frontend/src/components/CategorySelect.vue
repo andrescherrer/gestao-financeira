@@ -4,7 +4,7 @@
     @update:model-value="handleChange"
     :disabled="isLoading || disabled"
   >
-    <SelectTrigger :class="errorClass" @blur="(e) => $emit('blur', e)">
+    <SelectTrigger :class="errorClass" @blur="(e: Event) => $emit('blur', e)">
       <SelectValue :placeholder="placeholder" />
     </SelectTrigger>
     <SelectContent>
