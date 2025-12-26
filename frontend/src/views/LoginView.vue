@@ -44,10 +44,16 @@
                 id="email"
                 name="email"
                 type="email"
-                as-child
+                v-slot="{ field, meta }"
               >
                 <Input
-                  :class="errors.email ? 'border-destructive' : ''"
+                  id="email"
+                  :name="field.name"
+                  :value="field.value"
+                  @input="field.onInput"
+                  @change="field.onChange"
+                  @blur="field.onBlur"
+                  :class="errors.email || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
                   placeholder="seu@email.com"
                   class="pr-10"
                 />
@@ -69,10 +75,17 @@
                 id="password"
                 name="password"
                 :type="showPassword ? 'text' : 'password'"
-                as-child
+                v-slot="{ field, meta }"
               >
                 <Input
-                  :class="errors.password ? 'border-destructive' : ''"
+                  id="password"
+                  :name="field.name"
+                  :type="showPassword ? 'text' : 'password'"
+                  :value="field.value"
+                  @input="field.onInput"
+                  @change="field.onChange"
+                  @blur="field.onBlur"
+                  :class="errors.password || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
                   placeholder="••••••••"
                   class="pr-10"
                 />
