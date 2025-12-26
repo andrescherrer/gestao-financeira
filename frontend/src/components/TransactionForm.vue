@@ -71,10 +71,19 @@
           type="number"
           step="0.01"
           min="0.01"
-          as-child
+          v-slot="{ field, meta }"
         >
           <Input
-            :class="errors.amount ? 'border-destructive' : ''"
+            id="amount"
+            :name="field.name"
+            type="number"
+            step="0.01"
+            min="0.01"
+            :value="field.value"
+            @input="field.onInput"
+            @change="field.onChange"
+            @blur="field.onBlur"
+            :class="errors.amount || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
             placeholder="0.00"
             :disabled="isLoading"
           />
@@ -110,13 +119,19 @@
         <Field
           id="description"
           name="description"
-          as-child
+          v-slot="{ field, meta }"
         >
           <Textarea
-            :class="errors.description ? 'border-destructive' : ''"
+            id="description"
+            :name="field.name"
+            :value="field.value"
+            @input="field.onInput"
+            @change="field.onChange"
+            @blur="field.onBlur"
+            :class="errors.description || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
             placeholder="Descreva a transação..."
             :disabled="isLoading"
-            rows="3"
+            :rows="3"
           />
         </Field>
         <p class="mt-1 text-xs text-muted-foreground">
@@ -134,10 +149,17 @@
           id="date"
           name="date"
           type="date"
-          as-child
+          v-slot="{ field, meta }"
         >
           <Input
-            :class="errors.date ? 'border-destructive' : ''"
+            id="date"
+            :name="field.name"
+            type="date"
+            :value="field.value"
+            @input="field.onInput"
+            @change="field.onChange"
+            @blur="field.onBlur"
+            :class="errors.date || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
             :disabled="isLoading"
           />
         </Field>
