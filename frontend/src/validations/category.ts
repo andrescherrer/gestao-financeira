@@ -5,7 +5,8 @@ export const createCategorySchema = z.object({
     .string()
     .min(2, 'O nome deve ter no mínimo 2 caracteres')
     .max(100, 'O nome deve ter no máximo 100 caracteres')
-    .regex(/^[a-zA-Z0-9\s\-']+$/, 'O nome contém caracteres inválidos'),
+    // Aceita letras (incluindo acentos e ç), números, espaços, hífens e apostrofes
+    .regex(/^[\p{L}\p{N}\s\-']+$/u, 'O nome contém caracteres inválidos'),
   description: z
     .string()
     .max(500, 'A descrição deve ter no máximo 500 caracteres')
@@ -18,7 +19,8 @@ export const updateCategorySchema = z.object({
     .string()
     .min(2, 'O nome deve ter no mínimo 2 caracteres')
     .max(100, 'O nome deve ter no máximo 100 caracteres')
-    .regex(/^[a-zA-Z0-9\s\-']+$/, 'O nome contém caracteres inválidos')
+    // Aceita letras (incluindo acentos e ç), números, espaços, hífens e apostrofes
+    .regex(/^[\p{L}\p{N}\s\-']+$/u, 'O nome contém caracteres inválidos')
     .optional(),
   description: z
     .string()
