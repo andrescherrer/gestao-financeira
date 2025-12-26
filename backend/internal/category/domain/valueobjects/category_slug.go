@@ -95,10 +95,17 @@ func GenerateSlugFromName(name string) CategorySlug {
 	return CategorySlug{value: slug}
 }
 
-// removeAccents removes accents from a string.
+// removeAccents removes accents and special characters from a string.
+// It handles both combining marks (like á, é, í) and special letters (like ç).
 func removeAccents(s string) string {
+	// First, normalize to NFD (decomposed form) to separate base characters from marks
 	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	result, _, _ := transform.String(t, s)
+
+	// Handle special cases: ç -> c
+	result = strings.ReplaceAll(result, "ç", "c")
+	result = strings.ReplaceAll(result, "Ç", "c")
+
 	return result
 }
 
