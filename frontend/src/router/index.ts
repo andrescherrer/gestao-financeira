@@ -89,19 +89,17 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
-  // Verificar autenticação baseado no token no localStorage e na store
-  const hasTokenInStorage = !!localStorage.getItem('auth_token')
-  const hasTokenInStore = !!authStore.token
-  
-  // Se não há token na store mas há no storage, inicializar
-  if (!hasTokenInStore && hasTokenInStorage) {
+  // Inicializar store se necessário
+  if (!authStore.token) {
     authStore.init()
   }
   
   // Se estamos acessando rota protegida
   if (to.meta.requiresAuth) {
+    const hasToken = !!localStorage.getItem('auth_token') || !!authStore.token
+    
     // Se não há token, redirecionar imediatamente
-    if (!hasTokenInStorage && !hasTokenInStore) {
+    if (!hasToken) {
       authStore.logout()
       next({ name: 'login', query: { redirect: to.fullPath } })
       return
@@ -109,15 +107,24 @@ router.beforeEach(async (to, from, next) => {
     
     // Se há token, SEMPRE validar antes de permitir acesso
     // Isso garante que se o banco foi zerado, o token será invalidado
-    const isValid = await authStore.validateToken()
-    if (!isValid) {
-      // Token inválido, redirecionar para login
-      next({ name: 'login', query: { redirect: to.fullPath } })
-      return
-    }
-    
-    // Verificar se ainda está autenticado após validação
-    if (!authStore.isAuthenticated) {
+    try {
+      const isValid = await authStore.validateToken()
+      if (!isValid) {
+        // Token inválido, limpar e redirecionar para login
+        authStore.logout()
+        next({ name: 'login', query: { redirect: to.fullPath } })
+        return
+      }
+      
+      // Verificar se ainda está autenticado após validação
+      if (!authStore.isAuthenticated) {
+        authStore.logout()
+        next({ name: 'login', query: { redirect: to.fullPath } })
+        return
+      }
+    } catch (error) {
+      // Em caso de erro na validação, considerar token inválido
+      console.error('Erro ao validar token:', error)
       authStore.logout()
       next({ name: 'login', query: { redirect: to.fullPath } })
       return

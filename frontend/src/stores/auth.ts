@@ -52,7 +52,8 @@ export const useAuthStore = defineStore('auth', () => {
       while (isValidating.value) {
         await new Promise(resolve => setTimeout(resolve, 50))
       }
-      return isValidated.value && !!token.value
+      // Retornar baseado no estado atual após validação
+      return isValidated.value && !!token.value && !!authService.getToken()
     }
 
     isValidating.value = true
@@ -64,20 +65,31 @@ export const useAuthStore = defineStore('auth', () => {
       await accountService.list()
       
       // Se chegou aqui, o token é válido
+      // Verificar se o token ainda existe (não foi removido durante a requisição)
+      const currentToken = authService.getToken()
+      if (!currentToken || currentToken !== storedToken) {
+        // Token foi removido durante a validação
+        logout()
+        isValidated.value = true
+        return false
+      }
+      
       token.value = storedToken
       isValidated.value = true
       // Nota: não temos endpoint /me, então não podemos carregar user aqui
       // Mas o token é válido, então mantemos o estado
       return true
     } catch (error: any) {
-      // Se retornou 401, o token é inválido
-      if (error.response?.status === 401) {
+      // Se retornou 401 ou 403, o token é inválido ou expirado
+      if (error.response?.status === 401 || error.response?.status === 403) {
         // Limpar token inválido
         logout()
         isValidated.value = true
         return false
       }
-      // Outros erros podem ser temporários, mas por segurança, limpamos
+      // Para outros erros (500, network, etc), por segurança também limpamos
+      // Pois não podemos garantir que o token é válido
+      console.error('Erro ao validar token:', error)
       logout()
       isValidated.value = true
       return false

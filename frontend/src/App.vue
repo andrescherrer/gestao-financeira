@@ -21,21 +21,40 @@ onMounted(async () => {
   const currentPath = window.location.pathname
   const isProtectedRoute = currentPath !== '/login' && currentPath !== '/register'
   
-  // Sempre validar token se houver, especialmente em rotas protegidas
-  const hasToken = authStore.token || authService.getToken()
-  if (hasToken) {
-    const isValid = await authStore.validateToken()
+  // Se estamos em rota protegida, validar token
+  if (isProtectedRoute) {
+    const hasToken = authStore.token || authService.getToken()
     
-    // Se o token é inválido e estamos em uma rota protegida, redirecionar para login
-    if (!isValid && isProtectedRoute) {
-      // Usar window.location para garantir redirecionamento completo
+    if (!hasToken) {
+      // Não há token, redirecionar imediatamente
+      authStore.logout()
       window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
       return
     }
-  } else if (isProtectedRoute) {
-    // Se não há token e estamos em rota protegida, redirecionar
-    window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
-    return
+    
+    // Validar token
+    try {
+      const isValid = await authStore.validateToken()
+      if (!isValid) {
+        // Token inválido, limpar e redirecionar
+        authStore.logout()
+        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
+        return
+      }
+      
+      // Verificar se ainda está autenticado após validação
+      if (!authStore.isAuthenticated) {
+        authStore.logout()
+        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
+        return
+      }
+    } catch (error) {
+      // Em caso de erro, considerar token inválido
+      console.error('Erro ao validar token no App.vue:', error)
+      authStore.logout()
+      window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
+      return
+    }
   }
 })
 </script>
