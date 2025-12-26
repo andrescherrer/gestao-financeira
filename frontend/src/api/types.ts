@@ -91,3 +91,28 @@ export interface ListTransactionsResponse {
   count: number
 }
 
+export interface Category {
+  category_id: string
+  user_id: string
+  name: string
+  description: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateCategoryRequest {
+  name: string
+  description?: string
+}
+
+export interface UpdateCategoryRequest {
+  name?: string
+  description?: string
+}
+
+export interface ListCategoriesResponse {
+  categories: Category[]
+  count: number
+}
+

@@ -25,6 +25,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 2.1: Integração Transaction ↔ Account** (INT-001 a INT-006, FE-INT-001): ✅ Completo
 - **Sprint 2.2: Event Bus e Domain Events** (EVT-001 a EVT-005): ✅ Completo
 - **Sprint 2.3: Category Context - Backend** (CAT-001 a CAT-010): ✅ Completo
+- **Sprint 2.4: Módulo de Categorias - Frontend** (FE-CAT-001 a FE-CAT-006): ✅ Completo
 - **Demais sprints**: ⏳ Não iniciadas
 
 ### 📈 Progresso
@@ -38,10 +39,11 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
   - Frontend Auth: ✅ 100% (completo e testado)
   - Frontend Accounts: ✅ 100% (completo e testado)
   - Frontend Transactions: ✅ 100% (completo e testado)
-- **Fase 2 (Core Domain e Integrações)**: ~40% concluído
+- **Fase 2 (Core Domain e Integrações)**: ~50% concluído
   - Integração Transaction ↔ Account: ✅ 100% (completo e testado)
   - Event Bus e Domain Events: ✅ 100% (completo e testado)
   - Category Context - Backend: ✅ 100% (completo e testado)
+  - Módulo de Categorias - Frontend: ✅ 100% (completo e testado)
 
 ---
 
@@ -317,12 +319,12 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| FE-CAT-001 | Criar hook useCategories (TanStack Query) | 🟣 | 🔴 | 2h | FE-007 | ⏳ |
-| FE-CAT-002 | Criar página de lista de categorias (/categories) | 🟣 | 🔴 | 4h | FE-006, FE-CAT-001 | ⏳ |
-| FE-CAT-003 | Criar formulário de categoria | 🟣 | 🔴 | 4h | FE-003, FE-004 | ⏳ |
-| FE-CAT-004 | Integrar com API de categorias | 🟣 | 🔴 | 4h | FE-CAT-002, CAT-009 | ⏳ |
-| FE-CAT-005 | Adicionar seleção de categoria no formulário de transação | 🟣 | 🔴 | 4h | FE-TX-006, FE-CAT-001 | ⏳ |
-| FE-CAT-006 | Criar componente de seleção de categoria (combobox) | 🟣 | 🟡 | 4h | FE-003, FE-CAT-001 | ⏳ |
+| FE-CAT-001 | Criar hook useCategories (TanStack Query) | 🟣 | 🔴 | 2h | FE-007 | ✅ |
+| FE-CAT-002 | Criar página de lista de categorias (/categories) | 🟣 | 🔴 | 4h | FE-006, FE-CAT-001 | ✅ |
+| FE-CAT-003 | Criar formulário de categoria | 🟣 | 🔴 | 4h | FE-003, FE-004 | ✅ |
+| FE-CAT-004 | Integrar com API de categorias | 🟣 | 🔴 | 4h | FE-CAT-002, CAT-009 | ✅ |
+| FE-CAT-005 | Adicionar seleção de categoria no formulário de transação | 🟣 | 🔴 | 4h | FE-TX-006, FE-CAT-001 | ✅ |
+| FE-CAT-006 | Criar componente de seleção de categoria (combobox) | 🟣 | 🟡 | 4h | FE-003, FE-CAT-001 | ✅ |
 
 **Entregável Sprint 2.4:** Módulo de categorias funcionando no frontend
 

@@ -64,6 +64,24 @@ const router = createRouter({
       component: () => import('@/views/TransactionDetailsView.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/categories',
+      name: 'categories',
+      component: () => import('@/views/CategoriesView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/categories/new',
+      name: 'new-category',
+      component: () => import('@/views/NewCategoryView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/categories/:id',
+      name: 'category-details',
+      component: () => import('@/views/CategoryDetailsView.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 

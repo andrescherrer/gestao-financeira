@@ -43,6 +43,11 @@ export const createTransactionSchema = z.object({
     .string()
     .min(1, 'Data é obrigatória')
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data deve estar no formato YYYY-MM-DD'),
+  category_id: z
+    .string()
+    .uuid('ID da categoria inválido')
+    .optional()
+    .or(z.literal('')),
 })
 
 export type CreateTransactionFormData = z.infer<typeof createTransactionSchema>

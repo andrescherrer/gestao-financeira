@@ -70,6 +70,24 @@
               </div>
             </RouterLink>
           </li>
+          <li>
+            <RouterLink
+              to="/categories"
+              class="group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
+              :class="
+                $route.name === 'categories' ||
+                $route.name === 'new-category' ||
+                $route.name === 'category-details'
+                  ? 'bg-accent text-accent-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+              "
+            >
+              <div class="flex items-center gap-3">
+                <Tag class="h-4 w-4" />
+                <span>Categorias</span>
+              </div>
+            </RouterLink>
+          </li>
         </ul>
       </nav>
     </div>
@@ -77,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { Home, Wallet, List } from 'lucide-vue-next'
+import { Home, Wallet, List, Tag } from 'lucide-vue-next'
 
 defineProps<{
   isOpen?: boolean

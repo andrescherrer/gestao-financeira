@@ -111,6 +111,27 @@
         <ErrorMessage name="currency" class="mt-1 text-sm text-destructive" />
       </div>
 
+      <!-- Categoria (Opcional) -->
+      <div>
+        <Label for="category_id" class="mb-1">
+          Categoria
+        </Label>
+        <Field
+          id="category_id"
+          name="category_id"
+          v-slot="{ field, meta }"
+        >
+          <CategorySelect
+            :model-value="field.value || ''"
+            @update:model-value="(value) => { field.onChange({ target: { value } }) }"
+            placeholder="Selecione uma categoria (opcional)"
+            :error="!!(errors.category_id || (meta.touched && !meta.valid))"
+            :disabled="isLoading"
+          />
+        </Field>
+        <ErrorMessage name="category_id" class="mt-1 text-sm text-destructive" />
+      </div>
+
       <!-- Descrição -->
       <div>
         <Label for="description" class="mb-1">
@@ -198,6 +219,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, Loader2, Check } from 'lucide-vue-next'
+import CategorySelect from '@/components/CategorySelect.vue'
 import type { CreateTransactionFormData } from '@/validations/transaction'
 
 interface Props {
