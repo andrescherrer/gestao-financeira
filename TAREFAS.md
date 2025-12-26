@@ -23,6 +23,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 1.9: Módulo de Contas** (FE-ACC-001 a FE-ACC-010): ✅ Completo
 - **Sprint 1.10: Módulo de Transações** (FE-TX-001 a FE-TX-010): ✅ Completo
 - **Sprint 2.1: Integração Transaction ↔ Account** (INT-001 a INT-006, FE-INT-001): ✅ Completo
+- **Sprint 2.2: Event Bus e Domain Events** (EVT-001 a EVT-005): ✅ Completo
 - **Demais sprints**: ⏳ Não iniciadas
 
 ### 📈 Progresso
@@ -36,8 +37,9 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
   - Frontend Auth: ✅ 100% (completo e testado)
   - Frontend Accounts: ✅ 100% (completo e testado)
   - Frontend Transactions: ✅ 100% (completo e testado)
-- **Fase 2 (Core Domain e Integrações)**: ~15% concluído
+- **Fase 2 (Core Domain e Integrações)**: ~30% concluído
   - Integração Transaction ↔ Account: ✅ 100% (completo e testado)
+  - Event Bus e Domain Events: ✅ 100% (completo e testado)
 
 ---
 
@@ -280,13 +282,13 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| EVT-001 | Expandir Event Bus com retry e error handling | 🔵 | 🟡 | 4h | SK-005 | ⏳ |
-| EVT-002 | Criar domain events para User (UserRegistered, etc.) | 🔵 | 🟡 | 2h | SK-004, ID-004 | ⏳ |
-| EVT-003 | Criar domain events para Account (AccountCreated, etc.) | 🔵 | 🟡 | 2h | SK-004, AC-002 | ⏳ |
-| EVT-004 | Implementar publicação automática de eventos nos use cases | 🔵 | 🟡 | 4h | EVT-002, EVT-003, INT-004 | ⏳ |
-| EVT-005 | Criar event handlers para logging | 🔵 | 🟢 | 2h | EVT-001 | ⏳ |
+| EVT-001 | Expandir Event Bus com retry e error handling | 🔵 | 🟡 | 4h | SK-005 | ✅ |
+| EVT-002 | Criar domain events para User (UserRegistered, etc.) | 🔵 | 🟡 | 2h | SK-004, ID-004 | ✅ |
+| EVT-003 | Criar domain events para Account (AccountCreated, etc.) | 🔵 | 🟡 | 2h | SK-004, AC-002 | ✅ |
+| EVT-004 | Implementar publicação automática de eventos nos use cases | 🔵 | 🟡 | 4h | EVT-002, EVT-003, INT-004 | ✅ |
+| EVT-005 | Criar event handlers para logging | 🔵 | 🟢 | 2h | EVT-001 | ✅ |
 
-**Entregável Sprint 2.2:** Sistema de eventos de domínio funcionando
+**Entregável Sprint 2.2:** ✅ Sistema de eventos de domínio funcionando - Completo
 
 ---
 
