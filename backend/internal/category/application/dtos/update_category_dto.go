@@ -9,10 +9,10 @@ type UpdateCategoryInput struct {
 
 // UpdateCategoryOutput represents the output after updating a category.
 type UpdateCategoryOutput struct {
-	CategoryID  string
-	UserID      string
-	Name        string
-	Description string
-	IsActive    bool
-	UpdatedAt   string
+	CategoryID  string `json:"category_id"`
+	UserID      string `json:"user_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	IsActive    bool   `json:"is_active"`
+	UpdatedAt   string `json:"updated_at"`
 }

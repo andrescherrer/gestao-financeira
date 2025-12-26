@@ -8,6 +8,6 @@ type ListCategoriesInput struct {
 
 // ListCategoriesOutput represents the output for listing categories.
 type ListCategoriesOutput struct {
-	Categories []GetCategoryOutput
-	Count      int64
+	Categories []GetCategoryOutput `json:"categories"`
+	Count      int64               `json:"count"`
 }
