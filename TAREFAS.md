@@ -454,7 +454,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | REP-002 | Criar use case para relatório anual | 🔵 | 🔴 | 4h | REP-001 | ✅ |
 | REP-003 | Criar use case para relatório por categoria | 🔵 | 🔴 | 4h | REP-001 | ✅ |
 | REP-004 | Criar use case para receitas vs despesas | 🔵 | 🔴 | 4h | REP-001 | ✅ |
-| REP-005 | Criar ReportHandler | 🔵 | 🔴 | 4h | REP-001, REP-002, REP-003, REP-004 | ⏳ |
+| REP-005 | Criar ReportHandler | 🔵 | 🔴 | 4h | REP-001, REP-002, REP-003, REP-004 | ✅ |
 | REP-006 | Configurar rotas de reports (/api/v1/reports/*) | 🔵 | 🔴 | 2h | REP-005, ID-011 | ⏳ |
 | REP-007 | Adicionar anotações Swagger para Reports | 🔵 | 🟡 | 2h | REP-005, DOC-001 | ⏳ |
 | REP-008 | Implementar cache de relatórios (Redis) | 🔵 | 🟡 | 4h | REP-001, SETUP-004 | ⏳ |
