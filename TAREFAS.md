@@ -473,7 +473,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | PERF-003 | Implementar cache em CategoryRepository | 🔵 | 🟡 | 4h | CAT-004, PERF-001 | ✅ |
 | PERF-004 | Implementar paginação no backend | 🔵 | 🟡 | 4h | TX-009, AC-007 | ✅ |
 | PERF-005 | Implementar rate limiting | 🔵 | 🟡 | 4h | BE-003, PERF-001 | ✅ |
-| PERF-006 | Criar índices no banco de dados | 🔵 | 🟡 | 4h | BE-004 | ⏳ |
+| PERF-006 | Criar índices no banco de dados | 🔵 | 🟡 | 4h | BE-004 | ✅ |
 
 **Entregável Sprint 3.4:** Sistema otimizado com cache e paginação
 
