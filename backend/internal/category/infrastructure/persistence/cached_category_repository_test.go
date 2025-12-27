@@ -88,9 +88,8 @@ func TestCachedCategoryRepository_FindByUserID(t *testing.T) {
 	mockRepo := newMockCategoryRepository()
 	userID, _ := identityvalueobjects.NewUserID("123e4567-e89b-12d3-a456-426614174000")
 	categoryName, _ := valueobjects.NewCategoryName("Test Category")
-	categorySlug := valueobjects.GenerateSlugFromName("Test Category")
 
-	category, err := entities.NewCategory(userID, categoryName, categorySlug, "Test description")
+	category, err := entities.NewCategory(userID, categoryName, "Test description")
 	require.NoError(t, err)
 	require.NotNil(t, category)
 	mockRepo.users[userID.Value()] = []*entities.Category{category}
@@ -113,9 +112,8 @@ func TestCachedCategoryRepository_WithoutCache(t *testing.T) {
 	mockRepo := newMockCategoryRepository()
 	userID, _ := identityvalueobjects.NewUserID("123e4567-e89b-12d3-a456-426614174000")
 	categoryName, _ := valueobjects.NewCategoryName("Test Category")
-	categorySlug := valueobjects.GenerateSlugFromName("Test Category")
 
-	category, err := entities.NewCategory(userID, categoryName, categorySlug, "Test description")
+	category, err := entities.NewCategory(userID, categoryName, "Test description")
 	require.NoError(t, err)
 	require.NotNil(t, category)
 	mockRepo.categories[category.ID().Value()] = category
