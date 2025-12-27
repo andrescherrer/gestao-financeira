@@ -387,6 +387,7 @@ docker-compose --profile recurring run process-recurring
 - ✅ REP-004: Use case para receitas vs despesas (2025-12-27)
 - ✅ REP-005: ReportHandler criado (2025-12-27)
 - ✅ REP-006: Rotas de reports configuradas (2025-12-27)
+- ✅ REP-007: Anotações Swagger adicionadas (2025-12-27)
 
 **Conclusão:** 🚧 **EM PROGRESSO** - REP-001 implementado e testado. Demais tarefas pendentes.
 
