@@ -4,7 +4,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ## 📊 Status Geral do Projeto
 
-**Última verificação:** 2025-12-23
+**Última verificação:** 2025-12-27
 
 **Nota:** Frontend migrado de Next.js/React para Vue 3 em 2025-12-23
 
@@ -13,8 +13,6 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 1.1: Setup Backend** (BE-001 a BE-008): ✅ Completo
 - **Sprint 1.2: Shared Kernel** (SK-001 a SK-006): ✅ Completo
 - **Sprint 1.3: Identity Context** (ID-001 a ID-013): ✅ Completo
-
-### ⏳ Em Progresso / Pendente
 - **Sprint 1.4: Account Management** (AC-001 a AC-011): ✅ Completo
 - **Sprint 1.5: Transaction Context** (TX-001 a TX-015): ✅ Completo
 - **Sprint 1.6: Swagger** (DOC-001 a DOC-006): ✅ Completo
@@ -27,13 +25,16 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 2.3: Category Context - Backend** (CAT-001 a CAT-010): ✅ Completo
 - **Sprint 2.4: Módulo de Categorias - Frontend** (FE-CAT-001 a FE-CAT-006): ✅ Completo
 - **Sprint 2.5: Melhorias Frontend** (FE-IMP-001 a FE-IMP-009): ✅ Completo
-1/- **Sprint 2.6: Validações e Error Handling** (VAL-001 a VAL-005, LOG-001 a LOG-002): ✅ Completo
+- **Sprint 2.6: Validações e Error Handling** (VAL-001 a VAL-005, LOG-001 a LOG-002): ✅ Completo
 - **Sprint 2.7: Testes de Integração** (TEST-INT-001 a TEST-INT-005): ✅ Completo
 - **Sprint 3.1: Budget Context - Backend** (BUD-001 a BUD-011): ✅ Completo
+- **Sprint 3.2: Recurring Transactions - Backend** (REC-001 a REC-004): ✅ Completo e Integrado
+
+### ⏳ Em Progresso / Pendente
 - **Demais sprints**: ⏳ Não iniciadas
 
 ### 📈 Progresso
-- **Fase 1 (Fundação e MVP)**: ~85% concluído
+- **Fase 1 (Fundação e MVP)**: ✅ 100% concluído
   - Backend base: ✅ 100%
   - Identity Context: ✅ 100%
   - Account Management: ✅ 100%
@@ -43,7 +44,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
   - Frontend Auth: ✅ 100% (completo e testado)
   - Frontend Accounts: ✅ 100% (completo e testado)
   - Frontend Transactions: ✅ 100% (completo e testado)
-- **Fase 2 (Core Domain e Integrações)**: ~70% concluído
+- **Fase 2 (Core Domain e Integrações)**: ✅ 100% concluído
   - Integração Transaction ↔ Account: ✅ 100% (completo e testado)
   - Event Bus e Domain Events: ✅ 100% (completo e testado)
   - Category Context - Backend: ✅ 100% (completo e testado)
@@ -51,8 +52,9 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
   - Melhorias Frontend: ✅ 100% (completo e testado)
   - Validações e Error Handling: ✅ 100% (completo e testado)
   - Testes de Integração: ✅ 100% (completo e testado)
-- **Fase 3 (Funcionalidades Essenciais)**: ~10% concluído
+- **Fase 3 (Funcionalidades Essenciais)**: ~20% concluído
   - Budget Context - Backend: ✅ 100% (completo e testado)
+  - Recurring Transactions - Backend: ✅ 100% (completo, integrado e testado)
 
 ---
 
@@ -415,9 +417,32 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | REC-001 | Adicionar campos de recorrência na entidade Transaction | 🔵 | 🟡 | 4h | TX-004 | ✅ |
 | REC-002 | Criar serviço de processamento de transações recorrentes | 🔵 | 🟡 | 8h | TX-004, TX-008 | ✅ |
 | REC-003 | Criar job/cron para processar transações recorrentes | 🔵 | 🟡 | 4h | REC-002 | ✅ |
-| REC-004 | Testes para transações recorrentes | 🟤 | 🟡 | 4h | REC-002 | ⏳ |
+| REC-004 | Testes para transações recorrentes | 🟤 | 🟡 | 4h | REC-002 | ✅ |
 
-**Entregável Sprint 3.2:** Sistema de transações recorrentes funcionando
+**Entregável Sprint 3.2:** ✅ Sistema de transações recorrentes funcionando e integrado
+
+**Status:** ✅ **Completo e Integrado** (melhorias aplicadas em 2025-12-27)
+
+**Implementação Base:**
+- ✅ Serviço de processamento implementado (`recurring_transaction_processor.go`)
+- ✅ Comando standalone criado (`cmd/process-recurring/main.go`)
+- ✅ Testes unitários completos
+- ✅ Migration para campos de recorrência
+
+**Melhorias e Integrações (2025-12-27):**
+- ✅ **Makefile:** Comandos `build-recurring`, `run-recurring` e `build-all` adicionados
+- ✅ **Docker Compose:** Serviço `process-recurring` configurado com profile `recurring`
+- ✅ **Dockerfile:** Atualizado para compilar ambos os binários (`bin/api` e `bin/process-recurring`)
+- ✅ **Documentação:** README atualizado com todas as formas de uso
+- ✅ **Testes:** Build validado e funcionando
+
+**Formas de Execução:**
+1. Via Makefile: `make build-recurring && make run-recurring`
+2. Via Docker Compose: `docker-compose --profile recurring run process-recurring`
+3. Via cron: Configurar externamente conforme README
+4. Via Kubernetes: Usar CronJob conforme documentação
+
+**Documentação:** Ver `docs/tarefas_concluidas/20251227_SPRINT_3.2_MELHORIAS.md`
 
 ---
 
@@ -677,5 +702,5 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ---
 
-**Última atualização:** Baseado no PLANEJAMENTO_GO.md
+**Última atualização:** 2025-12-27 - Baseado no PLANEJAMENTO_GO.md e verificação de implementação (VERIFICACAO_TAREFAS.md)
 

@@ -96,6 +96,29 @@ services:
       retries: 3
       start_period: 20s
 
+  process-recurring:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gestao-financeira-process-recurring
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-gestao_financeira}
+      - POSTGRES_SSLMODE=disable
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    command: ./bin/process-recurring
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - gestao-financeira-network
+    restart: "no"  # Executa uma vez e sai (para uso com cron)
+    profiles:
+      - recurring  # Apenas inicia quando explicitamente solicitado
+
 volumes:
   postgres_data:
     driver: local

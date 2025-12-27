@@ -37,8 +37,16 @@ test-unit: ## Executa apenas testes unitários (sem integração)
 build: ## Compila a aplicação
 	$(GO) build -o bin/api ./cmd/api
 
+build-recurring: ## Compila o processador de transações recorrentes
+	$(GO) build -o bin/process-recurring ./cmd/process-recurring
+
+build-all: build build-recurring ## Compila todos os binários
+
 run: ## Executa a aplicação
 	$(GO) run ./cmd/api/main.go
+
+run-recurring: ## Executa o processador de transações recorrentes
+	$(GO) run ./cmd/process-recurring/main.go
 
 clean: ## Remove arquivos gerados
 	rm -f $(COVERAGE_FILE) $(COVERAGE_HTML)

@@ -4,6 +4,21 @@ Este comando processa transações recorrentes e cria novas instâncias quando n
 
 ## Uso
 
+### Via Makefile (Recomendado)
+
+```bash
+# Compilar o comando
+make build-recurring
+
+# Executar o comando
+make run-recurring
+
+# Ou compilar todos os binários
+make build-all
+```
+
+### Via Go Diretamente
+
 ```bash
 # Compilar o comando
 go build -o bin/process-recurring ./cmd/process-recurring
@@ -33,26 +48,46 @@ crontab -e
 
 ## Docker
 
-Se estiver usando Docker, você pode executar o comando em um container:
+### Via Docker Compose (Recomendado)
+
+O serviço `process-recurring` já está configurado no `docker-compose.yml`:
 
 ```bash
-docker-compose exec backend ./bin/process-recurring
+# Executar uma vez
+docker-compose --profile recurring run process-recurring
+
+# Ou executar no container da API (se o binário estiver disponível)
+docker-compose exec api ./bin/process-recurring
 ```
 
-Ou criar um serviço separado no `docker-compose.yml`:
+### Agendamento Automático
 
-```yaml
-services:
-  process-recurring:
-    build: ./backend
-    command: ./bin/process-recurring
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - LOG_LEVEL=${LOG_LEVEL}
-    depends_on:
-      - db
-    restart: "no"  # Executa uma vez e sai
-```
+Para executar automaticamente, você pode:
 
-E agendar com cron no host ou usar um scheduler como Kubernetes CronJob.
+1. **Usar cron no host:**
+   ```bash
+   # Adicionar ao crontab
+   0 0 * * * cd /caminho/para/projeto && docker-compose --profile recurring run process-recurring
+   ```
+
+2. **Usar Kubernetes CronJob:**
+   ```yaml
+   apiVersion: batch/v1
+   kind: CronJob
+   metadata:
+     name: process-recurring-transactions
+   spec:
+     schedule: "0 0 * * *"  # Diariamente às 00:00
+     jobTemplate:
+       spec:
+         template:
+           spec:
+             containers:
+             - name: process-recurring
+               image: gestao-financeira-backend:latest
+               command: ["./bin/process-recurring"]
+             restartPolicy: OnFailure
+   ```
+
+3. **Usar um scheduler externo** (ex: GitHub Actions, GitLab CI, etc.)
 
