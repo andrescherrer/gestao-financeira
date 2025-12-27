@@ -109,3 +109,8 @@ func (c *CacheService) DeletePattern(pattern string) error {
 func (c *CacheService) Close() error {
 	return c.client.Close()
 }
+
+// Ping checks if the Redis connection is alive.
+func (c *CacheService) Ping() error {
+	return c.client.Ping(c.ctx).Err()
+}

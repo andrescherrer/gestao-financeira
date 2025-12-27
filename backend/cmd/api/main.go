@@ -262,8 +262,8 @@ func main() {
 	// Error handler middleware (must be after all other middlewares)
 	app.Use(middleware.ErrorHandlerMiddleware())
 
-	// Initialize health checker
-	healthChecker := health.NewHealthChecker()
+	// Initialize health checker (with cache service if available)
+	healthChecker := health.NewHealthCheckerWithCache(cacheService)
 
 	// Health check endpoints
 	app.Get("/health", healthChecker.HealthCheck)

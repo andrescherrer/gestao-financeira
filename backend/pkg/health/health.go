@@ -9,11 +9,27 @@ import (
 )
 
 // HealthChecker handles health check endpoints
-type HealthChecker struct{}
+type HealthChecker struct {
+	cacheService interface {
+		Ping() error
+	}
+}
+
+// CachePinger interface for cache services that can be pinged
+type CachePinger interface {
+	Ping() error
+}
 
 // NewHealthChecker creates a new health checker
 func NewHealthChecker() *HealthChecker {
 	return &HealthChecker{}
+}
+
+// NewHealthCheckerWithCache creates a new health checker with cache service
+func NewHealthCheckerWithCache(cacheService CachePinger) *HealthChecker {
+	return &HealthChecker{
+		cacheService: cacheService,
+	}
 }
 
 // LivenessCheck checks if the application is alive
@@ -37,13 +53,15 @@ func (h *HealthChecker) ReadinessCheck(c *fiber.Ctx) error {
 		checks["database"] = "healthy"
 	}
 
-	// TODO: Add Redis check when Redis is configured
-	// if err := redis.Ping(ctx); err != nil {
-	// 	checks["cache"] = "unhealthy"
-	// 	allHealthy = false
-	// } else {
-	// 	checks["cache"] = "healthy"
-	// }
+	// Check Redis cache connection (if configured)
+	if h.cacheService != nil {
+		if err := h.cacheService.Ping(); err != nil {
+			checks["cache"] = "unhealthy"
+			allHealthy = false
+		} else {
+			checks["cache"] = "healthy"
+		}
+	}
 
 	if !allHealthy {
 		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
