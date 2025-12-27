@@ -400,10 +400,12 @@ docker-compose --profile recurring run process-recurring
 
 ## 🔧 Erros e Correções Necessárias
 
-### 1. Erro de Formatação na Linha 30
+### 1. Erro de Formatação na Linha 30 ✅ CORRIGIDO
 **Localização:** `TAREFAS.md:30`  
 **Problema:** `1/- **Sprint 2.6: Validações e Error Handling**`  
-**Correção:** Deve ser `- **Sprint 2.6: Validações e Error Handling**`
+**Correção:** ✅ Corrigido para `- **Sprint 2.6: Validações e Error Handling**`
+
+**Nota:** Não há mais erros ou discrepâncias pendentes. Todas as correções foram aplicadas.
 
 ---
 
