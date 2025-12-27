@@ -230,10 +230,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBudgets } from '@/hooks/useBudgets'
 import { useCategoriesStore } from '@/stores/categories'
+import { useBudgetAlerts } from '@/composables/useBudgetAlerts'
 import Layout from '@/components/layout/Layout.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
@@ -352,5 +353,24 @@ function handleMonthChange(value: AcceptableValue) {
 watch(queryParams, () => {
   refetchBudgets()
 }, { deep: true })
+
+// Monitorar alertas de orçamento
+const { monitorAllBudgets, clearAlerts } = useBudgetAlerts()
+let cleanupAlerts: (() => void) | null = null
+
+onMounted(() => {
+  // Iniciar monitoramento de alertas após um pequeno delay
+  // para garantir que os dados foram carregados
+  setTimeout(() => {
+    cleanupAlerts = monitorAllBudgets()
+  }, 1000)
+})
+
+onUnmounted(() => {
+  if (cleanupAlerts) {
+    cleanupAlerts()
+  }
+  clearAlerts()
+})
 </script>
 
