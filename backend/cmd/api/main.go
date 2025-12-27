@@ -17,6 +17,7 @@ import (
 	budgethandlers "gestao-financeira/backend/internal/budget/presentation/handlers"
 	budgetroutes "gestao-financeira/backend/internal/budget/presentation/routes"
 	categoryusecases "gestao-financeira/backend/internal/category/application/usecases"
+	categoryrepositories "gestao-financeira/backend/internal/category/domain/repositories"
 	categorypersistence "gestao-financeira/backend/internal/category/infrastructure/persistence"
 	categoryhandlers "gestao-financeira/backend/internal/category/presentation/handlers"
 	categoryroutes "gestao-financeira/backend/internal/category/presentation/routes"
@@ -138,7 +139,15 @@ func main() {
 	).(accountrepositories.AccountRepository)
 
 	transactionRepository := transactionpersistence.NewGormTransactionRepository(db)
-	categoryRepository := categorypersistence.NewGormCategoryRepository(db)
+
+	// Initialize category repository with cache
+	baseCategoryRepository := categorypersistence.NewGormCategoryRepository(db)
+	categoryRepository := categorypersistence.NewCachedCategoryRepository(
+		baseCategoryRepository,
+		cacheService,
+		15*time.Minute, // Cache categories for 15 minutes
+	).(categoryrepositories.CategoryRepository)
+
 	budgetRepository := budgetpersistence.NewGormBudgetRepository(db)
 
 	// Initialize services
