@@ -122,12 +122,16 @@ func (h *TransactionHandler) List(c *fiber.Ctx) error {
 	// Get optional filters from query parameters
 	accountID := c.Query("account_id", "")
 	transactionType := c.Query("type", "")
+	page := c.Query("page", "")
+	limit := c.Query("limit", "")
 
 	// Build input
 	input := dtos.ListTransactionsInput{
 		UserID:    userID,
 		AccountID: accountID,
 		Type:      transactionType,
+		Page:      page,
+		Limit:     limit,
 	}
 
 	// Execute use case

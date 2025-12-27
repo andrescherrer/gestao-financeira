@@ -41,7 +41,7 @@ func (r *GormTransactionRepository) FindByID(id transactionvalueobjects.Transact
 // FindByUserID finds all transactions for a given user.
 func (r *GormTransactionRepository) FindByUserID(userID identityvalueobjects.UserID) ([]*entities.Transaction, error) {
 	var models []TransactionModel
-	if err := r.db.Where("user_id = ?", userID.Value()).Find(&models).Error; err != nil {
+	if err := r.db.Where("user_id = ?", userID.Value()).Order("date DESC, created_at DESC").Find(&models).Error; err != nil {
 		return nil, fmt.Errorf("failed to find transactions by user ID: %w", err)
 	}
 
@@ -55,6 +55,83 @@ func (r *GormTransactionRepository) FindByUserID(userID identityvalueobjects.Use
 	}
 
 	return transactions, nil
+}
+
+// FindByUserIDWithPagination finds transactions for a given user with pagination.
+func (r *GormTransactionRepository) FindByUserIDWithPagination(userID identityvalueobjects.UserID, offset, limit int) ([]*entities.Transaction, int64, error) {
+	var models []TransactionModel
+	var total int64
+
+	// Count total
+	if err := r.db.Model(&TransactionModel{}).Where("user_id = ?", userID.Value()).Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to count transactions: %w", err)
+	}
+
+	// Get paginated results
+	if err := r.db.Where("user_id = ?", userID.Value()).
+		Order("date DESC, created_at DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&models).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to find transactions by user ID: %w", err)
+	}
+
+	transactions := make([]*entities.Transaction, 0, len(models))
+	for _, model := range models {
+		transaction, err := r.toDomain(&model)
+		if err != nil {
+			return nil, 0, fmt.Errorf("failed to convert transaction model to domain: %w", err)
+		}
+		transactions = append(transactions, transaction)
+	}
+
+	return transactions, total, nil
+}
+
+// FindByUserIDAndFiltersWithPagination finds transactions with filters and pagination.
+func (r *GormTransactionRepository) FindByUserIDAndFiltersWithPagination(
+	userID identityvalueobjects.UserID,
+	accountID string,
+	transactionType string,
+	offset, limit int,
+) ([]*entities.Transaction, int64, error) {
+	var models []TransactionModel
+	var total int64
+
+	query := r.db.Model(&TransactionModel{}).Where("user_id = ?", userID.Value())
+
+	if accountID != "" {
+		query = query.Where("account_id = ?", accountID)
+	}
+
+	if transactionType != "" {
+		query = query.Where("type = ?", transactionType)
+	}
+
+	// Count total
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to count transactions: %w", err)
+	}
+
+	// Get paginated results
+	if err := query.
+		Order("date DESC, created_at DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&models).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to find transactions: %w", err)
+	}
+
+	transactions := make([]*entities.Transaction, 0, len(models))
+	for _, model := range models {
+		transaction, err := r.toDomain(&model)
+		if err != nil {
+			return nil, 0, fmt.Errorf("failed to convert transaction model to domain: %w", err)
+		}
+		transactions = append(transactions, transaction)
+	}
+
+	return transactions, total, nil
 }
 
 // FindByAccountID finds all transactions for a given account.

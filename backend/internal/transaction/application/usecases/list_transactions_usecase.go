@@ -9,6 +9,7 @@ import (
 	"gestao-financeira/backend/internal/transaction/domain/entities"
 	"gestao-financeira/backend/internal/transaction/domain/repositories"
 	transactionvalueobjects "gestao-financeira/backend/internal/transaction/domain/valueobjects"
+	"gestao-financeira/backend/pkg/pagination"
 )
 
 // ListTransactionsUseCase handles listing transactions for a user.
@@ -27,7 +28,7 @@ func NewListTransactionsUseCase(
 
 // Execute performs the transaction listing.
 // It validates the input, retrieves transactions from the repository,
-// and returns them as DTOs. Supports filtering by account ID and/or type.
+// and returns them as DTOs. Supports filtering by account ID and/or type, and pagination.
 func (uc *ListTransactionsUseCase) Execute(input dtos.ListTransactionsInput) (*dtos.ListTransactionsOutput, error) {
 	// Create user ID value object
 	userID, err := identityvalueobjects.NewUserID(input.UserID)
@@ -35,60 +36,81 @@ func (uc *ListTransactionsUseCase) Execute(input dtos.ListTransactionsInput) (*d
 		return nil, fmt.Errorf("invalid user ID: %w", err)
 	}
 
+	// Parse pagination parameters
+	paginationParams := pagination.ParsePaginationParams(input.Page, input.Limit)
+	usePagination := input.Page != "" || input.Limit != ""
+
 	var domainTransactions []*entities.Transaction
+	var total int64
 
-	// If both account ID and type are provided
-	if input.AccountID != "" && input.Type != "" {
-		accountID, err := accountvalueobjects.NewAccountID(input.AccountID)
-		if err != nil {
-			return nil, fmt.Errorf("invalid account ID: %w", err)
-		}
-
-		transactionType, err := transactionvalueobjects.NewTransactionType(input.Type)
-		if err != nil {
-			return nil, fmt.Errorf("invalid transaction type: %w", err)
-		}
-
-		// Find by user ID, account ID, and filter by type manually
-		allTransactions, err := uc.transactionRepository.FindByUserIDAndAccountID(userID, accountID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to find transactions: %w", err)
-		}
-
-		// Filter by type
-		for _, tx := range allTransactions {
-			if tx.TransactionType().Value() == transactionType.Value() {
-				domainTransactions = append(domainTransactions, tx)
-			}
-		}
-	} else if input.AccountID != "" {
-		// If only account ID is provided
-		accountID, err := accountvalueobjects.NewAccountID(input.AccountID)
-		if err != nil {
-			return nil, fmt.Errorf("invalid account ID: %w", err)
-		}
-
-		domainTransactions, err = uc.transactionRepository.FindByUserIDAndAccountID(userID, accountID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to find transactions: %w", err)
-		}
-	} else if input.Type != "" {
-		// If only type is provided
-		transactionType, err := transactionvalueobjects.NewTransactionType(input.Type)
-		if err != nil {
-			return nil, fmt.Errorf("invalid transaction type: %w", err)
-		}
-
-		domainTransactions, err = uc.transactionRepository.FindByUserIDAndType(userID, transactionType)
+	// Check if we should use pagination
+	if usePagination {
+		// Use paginated query
+		domainTransactions, total, err = uc.transactionRepository.FindByUserIDAndFiltersWithPagination(
+			userID,
+			input.AccountID,
+			input.Type,
+			paginationParams.CalculateOffset(),
+			paginationParams.Limit,
+		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to find transactions: %w", err)
 		}
 	} else {
-		// Find all transactions for the user
-		domainTransactions, err = uc.transactionRepository.FindByUserID(userID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to find transactions: %w", err)
+		// Use non-paginated query (backward compatibility)
+		if input.AccountID != "" && input.Type != "" {
+			accountID, err := accountvalueobjects.NewAccountID(input.AccountID)
+			if err != nil {
+				return nil, fmt.Errorf("invalid account ID: %w", err)
+			}
+
+			transactionType, err := transactionvalueobjects.NewTransactionType(input.Type)
+			if err != nil {
+				return nil, fmt.Errorf("invalid transaction type: %w", err)
+			}
+
+			// Find by user ID, account ID, and filter by type manually
+			allTransactions, err := uc.transactionRepository.FindByUserIDAndAccountID(userID, accountID)
+			if err != nil {
+				return nil, fmt.Errorf("failed to find transactions: %w", err)
+			}
+
+			// Filter by type
+			for _, tx := range allTransactions {
+				if tx.TransactionType().Value() == transactionType.Value() {
+					domainTransactions = append(domainTransactions, tx)
+				}
+			}
+		} else if input.AccountID != "" {
+			// If only account ID is provided
+			accountID, err := accountvalueobjects.NewAccountID(input.AccountID)
+			if err != nil {
+				return nil, fmt.Errorf("invalid account ID: %w", err)
+			}
+
+			domainTransactions, err = uc.transactionRepository.FindByUserIDAndAccountID(userID, accountID)
+			if err != nil {
+				return nil, fmt.Errorf("failed to find transactions: %w", err)
+			}
+		} else if input.Type != "" {
+			// If only type is provided
+			transactionType, err := transactionvalueobjects.NewTransactionType(input.Type)
+			if err != nil {
+				return nil, fmt.Errorf("invalid transaction type: %w", err)
+			}
+
+			domainTransactions, err = uc.transactionRepository.FindByUserIDAndType(userID, transactionType)
+			if err != nil {
+				return nil, fmt.Errorf("failed to find transactions: %w", err)
+			}
+		} else {
+			// Find all transactions for the user
+			domainTransactions, err = uc.transactionRepository.FindByUserID(userID)
+			if err != nil {
+				return nil, fmt.Errorf("failed to find transactions: %w", err)
+			}
 		}
+		total = int64(len(domainTransactions))
 	}
 
 	transactions := uc.toTransactionOutputs(domainTransactions)
@@ -96,6 +118,12 @@ func (uc *ListTransactionsUseCase) Execute(input dtos.ListTransactionsInput) (*d
 	output := &dtos.ListTransactionsOutput{
 		Transactions: transactions,
 		Count:        len(transactions),
+	}
+
+	// Add pagination metadata if pagination was used
+	if usePagination {
+		paginationResult := pagination.BuildPaginationResult(paginationParams, total)
+		output.Pagination = &paginationResult
 	}
 
 	return output, nil

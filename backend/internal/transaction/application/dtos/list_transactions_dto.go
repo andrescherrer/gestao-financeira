@@ -1,10 +1,14 @@
 package dtos
 
+import "gestao-financeira/backend/pkg/pagination"
+
 // ListTransactionsInput represents the input for listing transactions.
 type ListTransactionsInput struct {
 	UserID    string `json:"user_id" validate:"required,uuid"`
 	AccountID string `json:"account_id,omitempty" validate:"omitempty,uuid"`
 	Type      string `json:"type,omitempty" validate:"omitempty,oneof=INCOME EXPENSE"`
+	Page      string `json:"page,omitempty"`  // Query parameter
+	Limit     string `json:"limit,omitempty"` // Query parameter
 }
 
 // TransactionOutput represents a single transaction in the list.
@@ -23,6 +27,7 @@ type TransactionOutput struct {
 
 // ListTransactionsOutput represents the output for listing transactions.
 type ListTransactionsOutput struct {
-	Transactions []*TransactionOutput `json:"transactions"`
-	Count        int                  `json:"count"`
+	Transactions []*TransactionOutput         `json:"transactions"`
+	Count        int                          `json:"count"`
+	Pagination   *pagination.PaginationResult `json:"pagination,omitempty"`
 }

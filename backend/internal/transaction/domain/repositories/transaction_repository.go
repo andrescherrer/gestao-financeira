@@ -47,4 +47,13 @@ type TransactionRepository interface {
 	// FindByParentIDAndDate finds a transaction instance by parent transaction ID and date.
 	// Returns nil if not found.
 	FindByParentIDAndDate(parentID transactionvalueobjects.TransactionID, date time.Time) (*entities.Transaction, error)
+
+	// FindByUserIDAndFiltersWithPagination finds transactions with filters and pagination.
+	// Returns transactions, total count, and error.
+	FindByUserIDAndFiltersWithPagination(
+		userID identityvalueobjects.UserID,
+		accountID string,
+		transactionType string,
+		offset, limit int,
+	) ([]*entities.Transaction, int64, error)
 }
