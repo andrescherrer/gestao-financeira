@@ -18,11 +18,11 @@ type MonthlyReportOutput struct {
 	TotalCount   int `json:"total_count"`
 
 	// Category breakdown (optional, can be added later)
-	CategoryBreakdown []CategorySummary `json:"category_breakdown,omitempty"`
+	CategoryBreakdown []MonthlyCategorySummary `json:"category_breakdown,omitempty"`
 }
 
-// CategorySummary represents a summary of transactions by category.
-type CategorySummary struct {
+// MonthlyCategorySummary represents a summary of transactions by category for monthly reports.
+type MonthlyCategorySummary struct {
 	CategoryID   string  `json:"category_id"`
 	CategoryName string  `json:"category_name,omitempty"`
 	TotalAmount  float64 `json:"total_amount"`
