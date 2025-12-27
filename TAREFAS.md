@@ -452,7 +452,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 |----|--------|------|------------|---------|--------------|--------|
 | REP-001 | Criar use case para relatório mensal | 🔵 | 🔴 | 6h | TX-005, CAT-003 | ✅ |
 | REP-002 | Criar use case para relatório anual | 🔵 | 🔴 | 4h | REP-001 | ✅ |
-| REP-003 | Criar use case para relatório por categoria | 🔵 | 🔴 | 4h | REP-001 | ⏳ |
+| REP-003 | Criar use case para relatório por categoria | 🔵 | 🔴 | 4h | REP-001 | ✅ |
 | REP-004 | Criar use case para receitas vs despesas | 🔵 | 🔴 | 4h | REP-001 | ⏳ |
 | REP-005 | Criar ReportHandler | 🔵 | 🔴 | 4h | REP-001, REP-002, REP-003, REP-004 | ⏳ |
 | REP-006 | Configurar rotas de reports (/api/v1/reports/*) | 🔵 | 🔴 | 2h | REP-005, ID-011 | ⏳ |
