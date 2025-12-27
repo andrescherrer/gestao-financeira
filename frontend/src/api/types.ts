@@ -117,3 +117,57 @@ export interface ListCategoriesResponse {
   count: number
 }
 
+export interface Budget {
+  budget_id: string
+  user_id: string
+  category_id: string
+  amount: number
+  currency: 'BRL' | 'USD' | 'EUR'
+  period_type: 'MONTHLY' | 'YEARLY'
+  year: number
+  month?: number
+  context: 'PERSONAL' | 'BUSINESS'
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateBudgetRequest {
+  category_id: string
+  amount: number
+  currency: 'BRL' | 'USD' | 'EUR'
+  period_type: 'MONTHLY' | 'YEARLY'
+  year: number
+  month?: number
+  context: 'PERSONAL' | 'BUSINESS'
+}
+
+export interface UpdateBudgetRequest {
+  amount?: number
+  currency?: 'BRL' | 'USD' | 'EUR'
+  period_type?: 'MONTHLY' | 'YEARLY'
+  year?: number
+  month?: number
+  context?: 'PERSONAL' | 'BUSINESS'
+  is_active?: boolean
+}
+
+export interface ListBudgetsResponse {
+  budgets: Budget[]
+  total: number
+}
+
+export interface BudgetProgress {
+  budget_id: string
+  category_id: string
+  budgeted: number
+  spent: number
+  remaining: number
+  percentage_used: number
+  currency: 'BRL' | 'USD' | 'EUR'
+  is_exceeded: boolean
+  period_type: 'MONTHLY' | 'YEARLY'
+  year: number
+  month?: number
+}
+

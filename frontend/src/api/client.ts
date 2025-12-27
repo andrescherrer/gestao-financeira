@@ -75,9 +75,9 @@ apiClient.interceptors.response.use(
         code: error.code,
         isNetworkError: !error.response, // Erro de rede (sem resposta do servidor)
         isTimeout: error.code === 'ECONNABORTED',
-        errorType: errorData?.error_type,
-        requestId: errorData?.request_id,
-        errorDetails: errorData?.details,
+        errorType: (errorData as any)?.error_type,
+        requestId: (errorData as any)?.request_id,
+        errorDetails: (errorData as any)?.details,
       })
     }
 
