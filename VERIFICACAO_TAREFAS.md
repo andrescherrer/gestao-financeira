@@ -447,7 +447,70 @@ docker-compose --profile recurring run process-recurring
 1. ✅ **Erro de formatação corrigido** na linha 30 do TAREFAS.md
 2. ✅ **Sprint 3.2 melhorada** - Comandos Makefile e integração Docker adicionados
 3. ✅ **Sprint 3.3 implementada** - Reporting Context completo e funcional
-4. **Próximos passos:** Iniciar Sprint 3.4 ou outras sprints pendentes
+4. **Próximos passos:** Continuar Sprint 3.4 (PERF-004, PERF-005, PERF-006)
+
+---
+
+## Sprint 3.4: Cache e Performance - Backend (Parcial)
+
+**Status no TAREFAS.md:** ⏳ Em progresso (3/6 tarefas concluídas)  
+**Status Real:** ✅ **PARCIALMENTE IMPLEMENTADO**
+
+### Tarefas Implementadas
+
+#### PERF-001: Configurar Redis no backend ✅
+**Status:** ✅ **CONFIRMADO**
+
+**Evidências:**
+- ✅ `backend/pkg/cache/cache.go` - Serviço de cache genérico
+- ✅ `backend/pkg/cache/cache_test.go` - Testes unitários
+- ✅ `backend/pkg/health/health.go` - Verificação de Redis no health check
+- ✅ `backend/cmd/api/main.go` - Cache service inicializado
+- ✅ `docs/tarefas_concluidas/20251227_PERF-001.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Serviço de cache genérico com Redis
+- ✅ Health check integrado
+- ✅ Tratamento de erros (graceful degradation)
+- ✅ Testes unitários passando
+
+#### PERF-002: Implementar cache em AccountRepository ✅
+**Status:** ✅ **CONFIRMADO**
+
+**Evidências:**
+- ✅ `backend/internal/account/infrastructure/persistence/cached_account_repository.go` - Decorator de cache
+- ✅ `backend/internal/account/infrastructure/persistence/cached_account_data.go` - Estrutura serializável
+- ✅ `backend/internal/account/infrastructure/persistence/cached_account_repository_test.go` - Testes unitários
+- ✅ `backend/cmd/api/main.go` - Integração do cached repository
+- ✅ `docs/tarefas_concluidas/20251227_PERF-002.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Cache de FindByID, FindByUserID, FindByUserIDAndContext
+- ✅ Invalidação automática em Save e Delete
+- ✅ TTL de 15 minutos
+- ✅ Testes unitários passando
+
+#### PERF-003: Implementar cache em CategoryRepository ✅
+**Status:** ✅ **CONFIRMADO**
+
+**Evidências:**
+- ✅ `backend/internal/category/infrastructure/persistence/cached_category_repository.go` - Decorator de cache
+- ✅ `backend/internal/category/infrastructure/persistence/cached_category_data.go` - Estrutura serializável
+- ✅ `backend/internal/category/infrastructure/persistence/cached_category_repository_test.go` - Testes unitários
+- ✅ `backend/cmd/api/main.go` - Integração do cached repository
+- ✅ `docs/tarefas_concluidas/20251227_PERF-003.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Cache de FindByID, FindByUserID, FindByUserIDAndActive, FindByUserIDAndSlug
+- ✅ Invalidação automática em Save e Delete
+- ✅ TTL de 15 minutos
+- ✅ Testes unitários passando
+
+### Tarefas Pendentes
+
+- ⏳ PERF-004: Implementar paginação no backend
+- ⏳ PERF-005: Implementar rate limiting
+- ⏳ PERF-006: Criar índices no banco de dados
 
 ---
 
