@@ -470,7 +470,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 |----|--------|------|------------|---------|--------------|--------|
 | PERF-001 | Configurar Redis no backend | 🔵 | 🟡 | 2h | SETUP-004 | ✅ |
 | PERF-002 | Implementar cache em AccountRepository | 🔵 | 🟡 | 4h | AC-004, PERF-001 | ✅ |
-| PERF-003 | Implementar cache em CategoryRepository | 🔵 | 🟡 | 4h | CAT-004, PERF-001 | ⏳ |
+| PERF-003 | Implementar cache em CategoryRepository | 🔵 | 🟡 | 4h | CAT-004, PERF-001 | ✅ |
 | PERF-004 | Implementar paginação no backend | 🔵 | 🟡 | 4h | TX-009, AC-007 | ⏳ |
 | PERF-005 | Implementar rate limiting | 🔵 | 🟡 | 4h | BE-003, PERF-001 | ⏳ |
 | PERF-006 | Criar índices no banco de dados | 🔵 | 🟡 | 4h | BE-004 | ⏳ |
