@@ -88,6 +88,24 @@
               </div>
             </RouterLink>
           </li>
+          <li>
+            <RouterLink
+              to="/budgets"
+              class="group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
+              :class="
+                $route.name === 'budgets' ||
+                $route.name === 'new-budget' ||
+                $route.name === 'budget-details'
+                  ? 'bg-accent text-accent-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+              "
+            >
+              <div class="flex items-center gap-3">
+                <Target class="h-4 w-4" />
+                <span>Orçamentos</span>
+              </div>
+            </RouterLink>
+          </li>
         </ul>
       </nav>
     </div>
@@ -95,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { Home, Wallet, List, Tag } from 'lucide-vue-next'
+import { Home, Wallet, List, Tag, Target } from 'lucide-vue-next'
 
 defineProps<{
   isOpen?: boolean
