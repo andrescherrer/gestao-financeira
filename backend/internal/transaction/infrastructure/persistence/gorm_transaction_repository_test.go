@@ -30,6 +30,50 @@ func setupTransactionTestDB(t *testing.T) *gorm.DB {
 	return db
 }
 
+// createTestRecurringTransactionEntity creates a test recurring transaction entity.
+func createTestRecurringTransactionEntity(
+	t *testing.T,
+	userID identityvalueobjects.UserID,
+	accountID accountvalueobjects.AccountID,
+	frequency transactionvalueobjects.RecurrenceFrequency,
+	date time.Time,
+	endDate *time.Time,
+) *entities.Transaction {
+	transactionType := transactionvalueobjects.ExpenseType()
+	currency, err := sharedvalueobjects.NewCurrency("BRL")
+	if err != nil {
+		t.Fatalf("Failed to create currency: %v", err)
+	}
+
+	amount, err := sharedvalueobjects.NewMoney(5000, currency) // 50.00 BRL
+	if err != nil {
+		t.Fatalf("Failed to create amount: %v", err)
+	}
+
+	description, err := transactionvalueobjects.NewTransactionDescription("Assinatura mensal")
+	if err != nil {
+		t.Fatalf("Failed to create description: %v", err)
+	}
+
+	transaction, err := entities.NewTransactionWithRecurrence(
+		userID,
+		accountID,
+		transactionType,
+		amount,
+		description,
+		date,
+		true,
+		&frequency,
+		endDate,
+		nil,
+	)
+	if err != nil {
+		t.Fatalf("Failed to create recurring transaction: %v", err)
+	}
+
+	return transaction
+}
+
 // createTestTransactionEntity creates a test transaction entity.
 func createTestTransactionEntity(t *testing.T, userID identityvalueobjects.UserID, accountID accountvalueobjects.AccountID) *entities.Transaction {
 	transactionType := transactionvalueobjects.IncomeType()
@@ -408,5 +452,171 @@ func TestGormTransactionRepository_FindByUserIDAndType(t *testing.T) {
 
 	if len(transactions) != 1 {
 		t.Errorf("FindByUserIDAndType() returned %d transactions, want 1", len(transactions))
+	}
+}
+
+func TestGormTransactionRepository_FindActiveRecurringTransactions(t *testing.T) {
+	db := setupTransactionTestDB(t)
+	repo := NewGormTransactionRepository(db).(*GormTransactionRepository)
+
+	userID := identityvalueobjects.GenerateUserID()
+	accountID := accountvalueobjects.GenerateAccountID()
+
+	// Create active recurring transaction (no end date)
+	frequency1 := transactionvalueobjects.MonthlyFrequency()
+	recurringTx1 := createTestRecurringTransactionEntity(t, userID, accountID, frequency1, time.Now().AddDate(0, -1, 0), nil)
+	_ = repo.Save(recurringTx1)
+
+	// Create active recurring transaction with future end date
+	frequency2 := transactionvalueobjects.WeeklyFrequency()
+	endDate2 := time.Now().AddDate(0, 6, 0)
+	recurringTx2 := createTestRecurringTransactionEntity(t, userID, accountID, frequency2, time.Now().AddDate(0, -1, 0), &endDate2)
+	_ = repo.Save(recurringTx2)
+
+	// Create expired recurring transaction (past end date)
+	frequency3 := transactionvalueobjects.DailyFrequency()
+	endDate3 := time.Now().AddDate(0, -1, 0) // Past date
+	recurringTx3 := createTestRecurringTransactionEntity(t, userID, accountID, frequency3, time.Now().AddDate(0, -2, 0), &endDate3)
+	_ = repo.Save(recurringTx3)
+
+	// Create non-recurring transaction
+	nonRecurring := createTestTransactionEntity(t, userID, accountID)
+	_ = repo.Save(nonRecurring)
+
+	// Create instance (child transaction) - should not be returned
+	parentID := recurringTx1.ID()
+	instance, _ := entities.NewTransactionWithRecurrence(
+		userID,
+		accountID,
+		transactionvalueobjects.ExpenseType(),
+		recurringTx1.Amount(),
+		recurringTx1.Description(),
+		time.Now(),
+		false,
+		nil,
+		nil,
+		&parentID,
+	)
+	_ = repo.Save(instance)
+
+	// Find active recurring transactions
+	activeRecurring, err := repo.FindActiveRecurringTransactions()
+	if err != nil {
+		t.Fatalf("FindActiveRecurringTransactions() error = %v", err)
+	}
+
+	// Should return only active recurring transactions (2)
+	if len(activeRecurring) != 2 {
+		t.Errorf("FindActiveRecurringTransactions() returned %d transactions, want 2", len(activeRecurring))
+	}
+
+	// Verify all returned transactions are recurring
+	for _, tx := range activeRecurring {
+		if !tx.IsRecurring() {
+			t.Error("FindActiveRecurringTransactions() returned non-recurring transaction")
+		}
+		if tx.ParentTransactionID() != nil {
+			t.Error("FindActiveRecurringTransactions() returned instance transaction")
+		}
+	}
+}
+
+func TestGormTransactionRepository_FindByParentIDAndDate(t *testing.T) {
+	db := setupTransactionTestDB(t)
+	repo := NewGormTransactionRepository(db).(*GormTransactionRepository)
+
+	userID := identityvalueobjects.GenerateUserID()
+	accountID := accountvalueobjects.GenerateAccountID()
+
+	// Create parent recurring transaction
+	frequency := transactionvalueobjects.MonthlyFrequency()
+	parentTx := createTestRecurringTransactionEntity(t, userID, accountID, frequency, time.Now().AddDate(0, -1, 0), nil)
+	_ = repo.Save(parentTx)
+
+	// Create instance for specific date
+	parentID := parentTx.ID()
+	instanceDate := time.Now()
+	instance, _ := entities.NewTransactionWithRecurrence(
+		userID,
+		accountID,
+		transactionvalueobjects.ExpenseType(),
+		parentTx.Amount(),
+		parentTx.Description(),
+		instanceDate,
+		false,
+		nil,
+		nil,
+		&parentID,
+	)
+	_ = repo.Save(instance)
+
+	// Find instance by parent ID and date
+	found, err := repo.FindByParentIDAndDate(parentID, instanceDate)
+	if err != nil {
+		t.Fatalf("FindByParentIDAndDate() error = %v", err)
+	}
+
+	if found == nil {
+		t.Fatal("FindByParentIDAndDate() should find the instance")
+	}
+
+	if !found.ID().Equals(instance.ID()) {
+		t.Errorf("FindByParentIDAndDate() returned wrong transaction")
+	}
+
+	// Try to find non-existent instance
+	nonExistentDate := time.Now().AddDate(0, 1, 0)
+	notFound, err := repo.FindByParentIDAndDate(parentID, nonExistentDate)
+	if err != nil {
+		t.Fatalf("FindByParentIDAndDate() error = %v", err)
+	}
+
+	if notFound != nil {
+		t.Error("FindByParentIDAndDate() should return nil for non-existent instance")
+	}
+}
+
+func TestGormTransactionRepository_SaveRecurringTransaction(t *testing.T) {
+	db := setupTransactionTestDB(t)
+	repo := NewGormTransactionRepository(db).(*GormTransactionRepository)
+
+	userID := identityvalueobjects.GenerateUserID()
+	accountID := accountvalueobjects.AccountID{}
+	accountID, _ = accountvalueobjects.NewAccountID(accountvalueobjects.GenerateAccountID().Value())
+
+	frequency := transactionvalueobjects.MonthlyFrequency()
+	endDate := time.Now().AddDate(1, 0, 0)
+	recurringTx := createTestRecurringTransactionEntity(t, userID, accountID, frequency, time.Now(), &endDate)
+
+	// Save recurring transaction
+	err := repo.Save(recurringTx)
+	if err != nil {
+		t.Fatalf("Save() error = %v", err)
+	}
+
+	// Verify transaction was saved with recurrence fields
+	saved, err := repo.FindByID(recurringTx.ID())
+	if err != nil {
+		t.Fatalf("FindByID() error = %v", err)
+	}
+
+	if saved == nil {
+		t.Fatal("Save() transaction was not saved")
+	}
+
+	if !saved.IsRecurring() {
+		t.Error("Save() isRecurring should be true")
+	}
+
+	if saved.RecurrenceFrequency() == nil {
+		t.Error("Save() recurrenceFrequency should not be nil")
+	} else if !saved.RecurrenceFrequency().Equals(frequency) {
+		t.Errorf("Save() recurrenceFrequency = %v, want %v", saved.RecurrenceFrequency(), frequency)
+	}
+
+	if saved.RecurrenceEndDate() == nil {
+		t.Error("Save() recurrenceEndDate should not be nil")
+	} else if !saved.RecurrenceEndDate().Equal(endDate) {
+		t.Errorf("Save() recurrenceEndDate = %v, want %v", saved.RecurrenceEndDate(), endDate)
 	}
 }

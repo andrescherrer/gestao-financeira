@@ -414,7 +414,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 |----|--------|------|------------|---------|--------------|--------|
 | REC-001 | Adicionar campos de recorrência na entidade Transaction | 🔵 | 🟡 | 4h | TX-004 | ✅ |
 | REC-002 | Criar serviço de processamento de transações recorrentes | 🔵 | 🟡 | 8h | TX-004, TX-008 | ✅ |
-| REC-003 | Criar job/cron para processar transações recorrentes | 🔵 | 🟡 | 4h | REC-002 | ⏳ |
+| REC-003 | Criar job/cron para processar transações recorrentes | 🔵 | 🟡 | 4h | REC-002 | ✅ |
 | REC-004 | Testes para transações recorrentes | 🟤 | 🟡 | 4h | REC-002 | ⏳ |
 
 **Entregável Sprint 3.2:** Sistema de transações recorrentes funcionando
