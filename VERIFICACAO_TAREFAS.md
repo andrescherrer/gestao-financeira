@@ -384,6 +384,7 @@ docker-compose --profile recurring run process-recurring
 - ✅ REP-001: Use case para relatório mensal (2025-12-27)
 - ✅ REP-002: Use case para relatório anual (2025-12-27)
 - ✅ REP-003: Use case para relatório por categoria (2025-12-27)
+- ✅ REP-004: Use case para receitas vs despesas (2025-12-27)
 
 **Conclusão:** 🚧 **EM PROGRESSO** - REP-001 implementado e testado. Demais tarefas pendentes.
 
