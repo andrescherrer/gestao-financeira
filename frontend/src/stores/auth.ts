@@ -83,11 +83,68 @@ export const useAuthStore = defineStore('auth', () => {
       // - Verifica se o token é válido (middleware de auth)
       // - Verifica se o usuário existe no banco (busca accounts do user_id)
       // - Retorna 401/403 se o usuário não existir ou token for inválido
-      const { accountService } = await import('@/api/accounts')
+      //
+      // IMPORTANTE: Usamos a store de accounts para fazer a chamada, assim:
+      // 1. A store é atualizada automaticamente
+      // 2. Evitamos chamadas duplicadas (componentes podem verificar se já tem dados)
+      // 3. Mantemos consistência entre validação e dados exibidos
+      const { useAccountsStore } = await import('@/stores/accounts')
+      const accountsStore = useAccountsStore()
       
-      // Fazer requisição HTTP real (sem cache)
+      // Se já está carregando, aguardar para evitar chamadas duplicadas
+      if (accountsStore.isLoading) {
+        while (accountsStore.isLoading) {
+          await new Promise(resolve => setTimeout(resolve, 50))
+        }
+        // Se já tem dados, token é válido
+        if (accountsStore.accounts.length > 0) {
+          const currentToken = authService.getToken()
+          if (currentToken && currentToken === storedToken) {
+            token.value = storedToken
+            if (!user.value) {
+              const storedUser = localStorage.getItem('auth_user')
+              if (storedUser) {
+                try {
+                  user.value = JSON.parse(storedUser)
+                } catch (error) {
+                  console.error('Erro ao carregar dados do usuário do localStorage:', error)
+                  localStorage.removeItem('auth_user')
+                }
+              }
+            }
+            isValidated.value = true
+            isValidating.value = false
+            return true
+          }
+        }
+      }
+      
+      // Se já tem dados na store, não precisa fazer nova chamada
+      // Apenas verificar se o token ainda é o mesmo
+      if (accountsStore.accounts.length > 0 && !accountsStore.isLoading) {
+        const currentToken = authService.getToken()
+        if (currentToken && currentToken === storedToken) {
+          token.value = storedToken
+          if (!user.value) {
+            const storedUser = localStorage.getItem('auth_user')
+            if (storedUser) {
+              try {
+                user.value = JSON.parse(storedUser)
+              } catch (error) {
+                console.error('Erro ao carregar dados do usuário do localStorage:', error)
+                localStorage.removeItem('auth_user')
+              }
+            }
+          }
+          isValidated.value = true
+          isValidating.value = false
+          return true
+        }
+      }
+      
+      // Fazer requisição HTTP real através da store (atualiza a store automaticamente)
       // Se o usuário não existir no banco, o backend retornará 401/403
-      await accountService.list()
+      await accountsStore.listAccounts()
       
       // Se chegou aqui, o token é válido E o usuário existe no banco
       // Verificar se o token ainda existe (não foi removido durante a requisição)

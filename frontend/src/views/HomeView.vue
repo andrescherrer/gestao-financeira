@@ -302,8 +302,14 @@ onMounted(async () => {
   }
 
   // Carregar dados apenas se autenticado e validado
-  // Se validateToken já carregou accounts (reutilizando a chamada), não precisa chamar novamente
+  // Se validateToken já carregou accounts (através da store), não precisa chamar novamente
   try {
+    // Aguardar um pouco para garantir que validateToken terminou (se ainda estiver rodando)
+    if (authStore.isValidating) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+    
+    // Só carregar se não tiver dados E não estiver carregando
     if (accountsStore.accounts.length === 0 && !accountsStore.isLoading) {
       await accountsStore.listAccounts()
     }
