@@ -458,7 +458,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | REP-006 | Configurar rotas de reports (/api/v1/reports/*) | 🔵 | 🔴 | 2h | REP-005, ID-011 | ✅ |
 | REP-007 | Adicionar anotações Swagger para Reports | 🔵 | 🟡 | 2h | REP-005, DOC-001 | ✅ |
 | REP-008 | Implementar cache de relatórios (Redis) | 🔵 | 🟡 | 4h | REP-001, SETUP-004 | ✅ |
-| REP-009 | Testes para Reporting Context | 🟤 | 🟡 | 6h | REP-001 | ⏳ |
+| REP-009 | Testes para Reporting Context | 🟤 | 🟡 | 6h | REP-001 | ✅ |
 
 **Entregável Sprint 3.3:** API de relatórios funcionando com cache
 
