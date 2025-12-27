@@ -5,6 +5,7 @@ import (
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
 	"gestao-financeira/backend/internal/transaction/domain/entities"
 	transactionvalueobjects "gestao-financeira/backend/internal/transaction/domain/valueobjects"
+	"time"
 )
 
 // TransactionRepository defines the interface for transaction persistence operations.
@@ -38,4 +39,12 @@ type TransactionRepository interface {
 
 	// CountByAccountID returns the total number of transactions for a given account.
 	CountByAccountID(accountID accountvalueobjects.AccountID) (int64, error)
+
+	// FindActiveRecurringTransactions finds all active recurring transactions that need to be processed.
+	// Returns transactions where isRecurring = true and (recurrenceEndDate IS NULL OR recurrenceEndDate >= currentDate).
+	FindActiveRecurringTransactions() ([]*entities.Transaction, error)
+
+	// FindByParentIDAndDate finds a transaction instance by parent transaction ID and date.
+	// Returns nil if not found.
+	FindByParentIDAndDate(parentID transactionvalueobjects.TransactionID, date time.Time) (*entities.Transaction, error)
 }

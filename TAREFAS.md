@@ -412,7 +412,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| REC-001 | Adicionar campos de recorrência na entidade Transaction | 🔵 | 🟡 | 4h | TX-004 | ⏳ |
+| REC-001 | Adicionar campos de recorrência na entidade Transaction | 🔵 | 🟡 | 4h | TX-004 | ✅ |
 | REC-002 | Criar serviço de processamento de transações recorrentes | 🔵 | 🟡 | 8h | TX-004, TX-008 | ⏳ |
 | REC-003 | Criar job/cron para processar transações recorrentes | 🔵 | 🟡 | 4h | REC-002 | ⏳ |
 | REC-004 | Testes para transações recorrentes | 🟤 | 🟡 | 4h | REC-002 | ⏳ |

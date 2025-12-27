@@ -3,6 +3,7 @@ package persistence
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	accountvalueobjects "gestao-financeira/backend/internal/account/domain/valueobjects"
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
@@ -175,6 +176,52 @@ func (r *GormTransactionRepository) CountByAccountID(accountID accountvalueobjec
 	}
 
 	return count, nil
+}
+
+// FindActiveRecurringTransactions finds all active recurring transactions that need to be processed.
+func (r *GormTransactionRepository) FindActiveRecurringTransactions() ([]*entities.Transaction, error) {
+	var models []TransactionModel
+	today := time.Now().Format("2006-01-02")
+
+	// Find transactions where:
+	// - is_recurring = true
+	// - (recurrence_end_date IS NULL OR recurrence_end_date >= today)
+	// - parent_transaction_id IS NULL (only parent transactions, not generated instances)
+	query := r.db.Where("is_recurring = ? AND parent_transaction_id IS NULL", true).
+		Where("recurrence_end_date IS NULL OR recurrence_end_date >= ?", today)
+
+	if err := query.Find(&models).Error; err != nil {
+		return nil, fmt.Errorf("failed to find active recurring transactions: %w", err)
+	}
+
+	transactions := make([]*entities.Transaction, 0, len(models))
+	for _, model := range models {
+		transaction, err := r.toDomain(&model)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert transaction model to domain: %w", err)
+		}
+		transactions = append(transactions, transaction)
+	}
+
+	return transactions, nil
+}
+
+// FindByParentIDAndDate finds a transaction instance by parent transaction ID and date.
+func (r *GormTransactionRepository) FindByParentIDAndDate(
+	parentID transactionvalueobjects.TransactionID,
+	date time.Time,
+) (*entities.Transaction, error) {
+	var model TransactionModel
+	dateStr := date.Format("2006-01-02")
+
+	if err := r.db.Where("parent_transaction_id = ? AND date = ?", parentID.Value(), dateStr).First(&model).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to find transaction by parent ID and date: %w", err)
+	}
+
+	return r.toDomain(&model)
 }
 
 // toDomain converts a TransactionModel to a Transaction entity.
