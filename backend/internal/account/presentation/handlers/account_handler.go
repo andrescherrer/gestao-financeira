@@ -9,6 +9,7 @@ import (
 	"gestao-financeira/backend/internal/account/application/dtos"
 	"gestao-financeira/backend/internal/account/application/usecases"
 	"gestao-financeira/backend/pkg/middleware"
+	"gestao-financeira/backend/pkg/validator"
 )
 
 // AccountHandler handles account-related HTTP requests.
@@ -59,7 +60,7 @@ func (h *AccountHandler) Create(c *fiber.Ctx) error {
 	// Parse request body
 	var input dtos.CreateAccountInput
 	if err := c.BodyParser(&input); err != nil {
-		log.Warn().Err(err).Msg("Failed to parse request body")
+		log.Warn().Err(err).Str("request_id", middleware.GetRequestID(c)).Msg("Failed to parse request body")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
 			"code":  fiber.StatusBadRequest,
@@ -68,6 +69,12 @@ func (h *AccountHandler) Create(c *fiber.Ctx) error {
 
 	// Set user ID from context (override any user_id in request body for security)
 	input.UserID = userID
+
+	// Validate input
+	if err := validator.Validate(&input); err != nil {
+		// Validation error is already an AppError, just return it
+		return err
+	}
 
 	// Execute use case
 	output, err := h.createAccountUseCase.Execute(input)

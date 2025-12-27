@@ -8,6 +8,8 @@ import (
 
 	"gestao-financeira/backend/internal/identity/application/dtos"
 	"gestao-financeira/backend/internal/identity/application/usecases"
+	"gestao-financeira/backend/pkg/middleware"
+	"gestao-financeira/backend/pkg/validator"
 )
 
 // AuthHandler handles authentication-related HTTP requests.
@@ -43,40 +45,17 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	// Parse request body
 	var input dtos.RegisterUserInput
 	if err := c.BodyParser(&input); err != nil {
-		log.Warn().Err(err).Msg("Failed to parse request body")
+		log.Warn().Err(err).Str("request_id", middleware.GetRequestID(c)).Msg("Failed to parse request body")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Corpo da requisição inválido",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
 
-	// Validate input (basic validation - can be enhanced with a validator)
-	if input.Email == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Email é obrigatório",
-			"code":  fiber.StatusBadRequest,
-		})
-	}
-
-	if input.Password == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Senha é obrigatória",
-			"code":  fiber.StatusBadRequest,
-		})
-	}
-
-	if input.FirstName == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Nome é obrigatório",
-			"code":  fiber.StatusBadRequest,
-		})
-	}
-
-	if input.LastName == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Sobrenome é obrigatório",
-			"code":  fiber.StatusBadRequest,
-		})
+	// Validate input using validator
+	if err := validator.Validate(&input); err != nil {
+		// Validation error is already an AppError, just return it
+		return err
 	}
 
 	// Execute use case
@@ -155,26 +134,17 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	// Parse request body
 	var input dtos.LoginInput
 	if err := c.BodyParser(&input); err != nil {
-		log.Warn().Err(err).Msg("Failed to parse request body")
+		log.Warn().Err(err).Str("request_id", middleware.GetRequestID(c)).Msg("Failed to parse request body")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Corpo da requisição inválido",
 			"code":  fiber.StatusBadRequest,
 		})
 	}
 
-	// Validate input
-	if input.Email == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Email é obrigatório",
-			"code":  fiber.StatusBadRequest,
-		})
-	}
-
-	if input.Password == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Senha é obrigatória",
-			"code":  fiber.StatusBadRequest,
-		})
+	// Validate input using validator
+	if err := validator.Validate(&input); err != nil {
+		// Validation error is already an AppError, just return it
+		return err
 	}
 
 	// Execute use case

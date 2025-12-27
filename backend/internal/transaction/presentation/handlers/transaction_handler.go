@@ -9,6 +9,7 @@ import (
 	"gestao-financeira/backend/internal/transaction/application/dtos"
 	"gestao-financeira/backend/internal/transaction/application/usecases"
 	"gestao-financeira/backend/pkg/middleware"
+	"gestao-financeira/backend/pkg/validator"
 )
 
 // TransactionHandler handles transaction-related HTTP requests.
@@ -64,7 +65,7 @@ func (h *TransactionHandler) Create(c *fiber.Ctx) error {
 	// Parse request body
 	var input dtos.CreateTransactionInput
 	if err := c.BodyParser(&input); err != nil {
-		log.Warn().Err(err).Msg("Failed to parse request body")
+		log.Warn().Err(err).Str("request_id", middleware.GetRequestID(c)).Msg("Failed to parse request body")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
 			"code":  fiber.StatusBadRequest,
@@ -73,6 +74,12 @@ func (h *TransactionHandler) Create(c *fiber.Ctx) error {
 
 	// Set user ID from context (override any user_id in request body for security)
 	input.UserID = userID
+
+	// Validate input
+	if err := validator.Validate(&input); err != nil {
+		// Validation error is already an AppError, just return it
+		return err
+	}
 
 	// Execute use case
 	output, err := h.createTransactionUseCase.Execute(input)

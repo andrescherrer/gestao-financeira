@@ -9,6 +9,7 @@ import (
 	"gestao-financeira/backend/internal/category/application/dtos"
 	"gestao-financeira/backend/internal/category/application/usecases"
 	"gestao-financeira/backend/pkg/middleware"
+	"gestao-financeira/backend/pkg/validator"
 )
 
 // CategoryHandler handles category-related HTTP requests.
@@ -64,7 +65,7 @@ func (h *CategoryHandler) Create(c *fiber.Ctx) error {
 	// Parse request body
 	var input dtos.CreateCategoryInput
 	if err := c.BodyParser(&input); err != nil {
-		log.Warn().Err(err).Msg("Failed to parse request body")
+		log.Warn().Err(err).Str("request_id", middleware.GetRequestID(c)).Msg("Failed to parse request body")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
 			"code":  fiber.StatusBadRequest,
@@ -73,6 +74,12 @@ func (h *CategoryHandler) Create(c *fiber.Ctx) error {
 
 	// Set user ID from context
 	input.UserID = userID
+
+	// Validate input
+	if err := validator.Validate(&input); err != nil {
+		// Validation error is already an AppError, just return it
+		return err
+	}
 
 	// Execute use case
 	output, err := h.createCategoryUseCase.Execute(input)

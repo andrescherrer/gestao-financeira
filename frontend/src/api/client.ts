@@ -65,6 +65,7 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     // Log detalhado do erro em desenvolvimento
     if (import.meta.env.DEV) {
+      const errorData = error.response?.data
       console.error('[API Client] Erro na requisição:', {
         url: error.config?.url,
         method: error.config?.method?.toUpperCase(),
@@ -74,6 +75,9 @@ apiClient.interceptors.response.use(
         code: error.code,
         isNetworkError: !error.response, // Erro de rede (sem resposta do servidor)
         isTimeout: error.code === 'ECONNABORTED',
+        errorType: errorData?.error_type,
+        requestId: errorData?.request_id,
+        errorDetails: errorData?.details,
       })
     }
 

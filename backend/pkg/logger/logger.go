@@ -15,11 +15,23 @@ func InitLogger(level string) {
 	zerolog.TimeFieldFormat = time.RFC3339Nano
 	zerolog.SetGlobalLevel(parseLevel(level))
 
-	Logger = zerolog.New(os.Stdout).
-		With().
-		Timestamp().
-		Str("service", "gestao-financeira").
-		Logger()
+	// Configure console writer with colors in development
+	output := os.Stdout
+	if os.Getenv("ENV") == "production" {
+		// In production, use JSON format
+		Logger = zerolog.New(output).
+			With().
+			Timestamp().
+			Str("service", "gestao-financeira").
+			Logger()
+	} else {
+		// In development, use console writer with colors
+		Logger = zerolog.New(zerolog.ConsoleWriter{Out: output, TimeFormat: time.RFC3339}).
+			With().
+			Timestamp().
+			Str("service", "gestao-financeira").
+			Logger()
+	}
 
 	// Set as global logger
 	log.Logger = Logger

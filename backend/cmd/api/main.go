@@ -29,6 +29,8 @@ import (
 	"gestao-financeira/backend/pkg/database"
 	"gestao-financeira/backend/pkg/health"
 	"gestao-financeira/backend/pkg/logger"
+	"gestao-financeira/backend/pkg/middleware"
+	"gestao-financeira/backend/pkg/validator"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -74,6 +76,10 @@ func main() {
 	defer database.Close()
 
 	log.Info().Msg("Database connection established")
+
+	// Initialize validator
+	validator.Init()
+	log.Info().Msg("Validator initialized")
 
 	// Initialize Event Bus
 	eventBus := eventbus.NewEventBus()
@@ -168,10 +174,19 @@ func main() {
 		BodyLimit: 10 * 1024 * 1024,
 	})
 
+	// Store environment in locals for error handler
+	app.Use(func(c *fiber.Ctx) error {
+		c.Locals("env", os.Getenv("ENV"))
+		return c.Next()
+	})
+
+	// Request ID middleware (must be early in the chain)
+	app.Use(middleware.RequestIDMiddleware())
+
 	// Global middlewares
 	app.Use(recover.New())
 	app.Use(fiberlogger.New(fiberlogger.Config{
-		Format:     "[${time}] ${status} - ${latency} ${method} ${path}\n",
+		Format:     "[${time}] ${status} - ${latency} ${method} ${path} [${header:X-Request-ID}]\n",
 		TimeFormat: "2006-01-02 15:04:05",
 		TimeZone:   "America/Sao_Paulo",
 	}))
@@ -185,10 +200,13 @@ func main() {
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     allowedOrigins,
 		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
-		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Request-ID",
 		AllowCredentials: true,
 		MaxAge:           86400, // 24 horas
 	}))
+
+	// Error handler middleware (must be after all other middlewares)
+	app.Use(middleware.ErrorHandlerMiddleware())
 
 	// Initialize health checker
 	healthChecker := health.NewHealthChecker()
@@ -257,8 +275,11 @@ func main() {
 	log.Info().Msg("Server exited")
 }
 
-// customErrorHandler handles errors globally
+// customErrorHandler handles errors globally (fallback for Fiber errors)
 func customErrorHandler(c *fiber.Ctx, err error) error {
+	// Get request ID
+	requestID := middleware.GetRequestID(c)
+
 	code := fiber.StatusInternalServerError
 	message := "Internal server error"
 
@@ -270,6 +291,7 @@ func customErrorHandler(c *fiber.Ctx, err error) error {
 	// Log error with structured logging
 	if code == fiber.StatusInternalServerError {
 		log.Error().
+			Str("request_id", requestID).
 			Err(err).
 			Str("path", c.Path()).
 			Str("method", c.Method()).
@@ -277,6 +299,7 @@ func customErrorHandler(c *fiber.Ctx, err error) error {
 			Msg("Internal server error")
 	} else {
 		log.Warn().
+			Str("request_id", requestID).
 			Err(err).
 			Str("path", c.Path()).
 			Str("method", c.Method()).
@@ -284,8 +307,14 @@ func customErrorHandler(c *fiber.Ctx, err error) error {
 			Msg("Request error")
 	}
 
-	return c.Status(code).JSON(fiber.Map{
+	response := fiber.Map{
 		"error": message,
 		"code":  code,
-	})
+	}
+
+	if requestID != "" {
+		response["request_id"] = requestID
+	}
+
+	return c.Status(code).JSON(response)
 }

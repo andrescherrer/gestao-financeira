@@ -354,13 +354,13 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| VAL-001 | Implementar validações customizadas no backend | 🔵 | 🟡 | 4h | BE-002 | ⏳ |
-| VAL-002 | Melhorar error handling no backend (error types) | 🔵 | 🟡 | 4h | BE-003 | ⏳ |
-| VAL-003 | Criar middleware de tratamento de erros global | 🔵 | 🟡 | 4h | VAL-002 | ⏳ |
-| VAL-004 | Implementar validações no frontend (Zod schemas) | 🟣 | 🟡 | 4h | FE-004 | ⏳ |
-| VAL-005 | Melhorar mensagens de erro no frontend | 🟣 | 🟡 | 2h | VAL-004 | ⏳ |
-| LOG-001 | Configurar logging estruturado completo | 🔵 | 🟡 | 4h | BE-006 | ⏳ |
-| LOG-002 | Adicionar request ID em todas as requisições | 🔵 | 🟡 | 2h | LOG-001 | ⏳ |
+| VAL-001 | Implementar validações customizadas no backend | 🔵 | 🟡 | 4h | BE-002 | ✅ |
+| VAL-002 | Melhorar error handling no backend (error types) | 🔵 | 🟡 | 4h | BE-003 | ✅ |
+| VAL-003 | Criar middleware de tratamento de erros global | 🔵 | 🟡 | 4h | VAL-002 | ✅ |
+| VAL-004 | Implementar validações no frontend (Zod schemas) | 🟣 | 🟡 | 4h | FE-004 | ✅ |
+| VAL-005 | Melhorar mensagens de erro no frontend | 🟣 | 🟡 | 2h | VAL-004 | ✅ |
+| LOG-001 | Configurar logging estruturado completo | 🔵 | 🟡 | 4h | BE-006 | ✅ |
+| LOG-002 | Adicionar request ID em todas as requisições | 🔵 | 🟡 | 2h | LOG-001 | ✅ |
 
 **Entregável Sprint 2.6:** Sistema robusto de validação e tratamento de erros
 
