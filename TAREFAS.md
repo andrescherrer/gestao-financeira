@@ -370,11 +370,11 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| TEST-INT-001 | Criar testes de integração para Identity Context | 🟤 | 🟡 | 4h | ID-013 | ⏳ |
-| TEST-INT-002 | Criar testes de integração para Account Context | 🟤 | 🟡 | 4h | AC-011 | ⏳ |
-| TEST-INT-003 | Criar testes de integração para Transaction Context | 🟤 | 🟡 | 4h | TX-015 | ⏳ |
-| TEST-INT-004 | Criar testes de integração para Category Context | 🟤 | 🟡 | 4h | CAT-010 | ⏳ |
-| TEST-INT-005 | Criar testes E2E básicos (autenticação → criar conta → criar transação) | 🟤 | 🟡 | 8h | FE-AUTH-010, FE-ACC-010, FE-TX-010 | ⏳ |
+| TEST-INT-001 | Criar testes de integração para Identity Context | 🟤 | 🟡 | 4h | ID-013 | ✅ |
+| TEST-INT-002 | Criar testes de integração para Account Context | 🟤 | 🟡 | 4h | AC-011 | ✅ |
+| TEST-INT-003 | Criar testes de integração para Transaction Context | 🟤 | 🟡 | 4h | TX-015 | ✅ |
+| TEST-INT-004 | Criar testes de integração para Category Context | 🟤 | 🟡 | 4h | CAT-010 | ✅ |
+| TEST-INT-005 | Criar testes E2E básicos (autenticação → criar conta → criar transação) | 🟤 | 🟡 | 8h | FE-AUTH-010, FE-ACC-010, FE-TX-010 | ✅ |
 
 **Entregável Sprint 2.7:** Suite de testes de integração completa
 

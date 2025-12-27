@@ -96,8 +96,16 @@ func (r *GormCategoryRepository) Save(category *entities.Category) error {
 	} else if err != nil {
 		return fmt.Errorf("failed to check category existence: %w", err)
 	} else {
-		// Update existing category
-		if err := r.db.Save(model).Error; err != nil {
+		// Update existing category - use Select to ensure all fields including isActive are updated
+		if err := r.db.Model(&CategoryModel{}).Where("id = ?", model.ID).
+			Select("name", "slug", "description", "is_active", "updated_at").
+			Updates(map[string]interface{}{
+				"name":        model.Name,
+				"slug":        model.Slug,
+				"description": model.Description,
+				"is_active":   model.IsActive,
+				"updated_at":  model.UpdatedAt,
+			}).Error; err != nil {
 			return fmt.Errorf("failed to update category: %w", err)
 		}
 	}
