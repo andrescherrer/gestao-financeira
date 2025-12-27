@@ -100,7 +100,7 @@ func TestReportHandler_GetMonthlyReport(t *testing.T) {
 	}
 
 	// Create use cases
-	monthlyUseCase := usecases.NewMonthlyReportUseCase(mockRepo)
+	monthlyUseCase := usecases.NewMonthlyReportUseCase(mockRepo, nil) // nil cache for tests
 	annualUseCase := usecases.NewAnnualReportUseCase(mockRepo)
 	categoryUseCase := usecases.NewCategoryReportUseCase(mockRepo)
 	incomeVsExpenseUseCase := usecases.NewIncomeVsExpenseUseCase(mockRepo)
@@ -144,7 +144,7 @@ func TestReportHandler_GetMonthlyReport(t *testing.T) {
 
 func TestReportHandler_GetMonthlyReport_Unauthorized(t *testing.T) {
 	mockRepo := &mockTransactionRepositoryForReports{transactions: []*entities.Transaction{}}
-	monthlyUseCase := usecases.NewMonthlyReportUseCase(mockRepo)
+	monthlyUseCase := usecases.NewMonthlyReportUseCase(mockRepo, nil) // nil cache for tests
 	handler := NewReportHandler(monthlyUseCase, nil, nil, nil)
 
 	app := fiber.New()
@@ -159,7 +159,7 @@ func TestReportHandler_GetMonthlyReport_Unauthorized(t *testing.T) {
 func TestReportHandler_GetMonthlyReport_MissingParams(t *testing.T) {
 	userID, _ := identityvalueobjects.NewUserID("123e4567-e89b-12d3-a456-426614174000")
 	mockRepo := &mockTransactionRepositoryForReports{transactions: []*entities.Transaction{}}
-	monthlyUseCase := usecases.NewMonthlyReportUseCase(mockRepo)
+	monthlyUseCase := usecases.NewMonthlyReportUseCase(mockRepo, nil) // nil cache for tests
 	handler := NewReportHandler(monthlyUseCase, nil, nil, nil)
 
 	app := fiber.New()

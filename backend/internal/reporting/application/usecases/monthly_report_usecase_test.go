@@ -96,7 +96,7 @@ func TestMonthlyReportUseCase_Execute(t *testing.T) {
 	}
 
 	// Create use case
-	useCase := NewMonthlyReportUseCase(mockRepo)
+	useCase := NewMonthlyReportUseCase(mockRepo, nil) // nil cache for tests
 
 	// Execute
 	input := dtos.MonthlyReportInput{
@@ -155,7 +155,7 @@ func TestMonthlyReportUseCase_Execute(t *testing.T) {
 
 func TestMonthlyReportUseCase_Execute_InvalidInput(t *testing.T) {
 	mockRepo := &mockTransactionRepository{transactions: []*entities.Transaction{}}
-	useCase := NewMonthlyReportUseCase(mockRepo)
+	useCase := NewMonthlyReportUseCase(mockRepo, nil) // nil cache for tests
 
 	tests := []struct {
 		name  string
