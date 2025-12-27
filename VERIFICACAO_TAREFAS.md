@@ -506,11 +506,58 @@ docker-compose --profile recurring run process-recurring
 - ✅ TTL de 15 minutos
 - ✅ Testes unitários passando
 
-### Tarefas Pendentes
+#### PERF-004: Implementar paginação no backend ✅
+**Status:** ✅ **CONFIRMADO**
 
-- ⏳ PERF-004: Implementar paginação no backend
-- ⏳ PERF-005: Implementar rate limiting
-- ⏳ PERF-006: Criar índices no banco de dados
+**Evidências:**
+- ✅ `backend/pkg/pagination/pagination.go` - Pacote genérico de paginação
+- ✅ `backend/pkg/pagination/pagination_test.go` - Testes unitários
+- ✅ `backend/internal/transaction/` - Paginação implementada em Transactions
+- ✅ `docs/tarefas_concluidas/20251227_PERF-004.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Paginação genérica reutilizável
+- ✅ Paginação em Transactions com filtros
+- ✅ Metadata de paginação na resposta
+- ✅ Compatibilidade retroativa
+- ✅ Testes unitários passando
+
+#### PERF-005: Implementar rate limiting ✅
+**Status:** ✅ **CONFIRMADO**
+
+**Evidências:**
+- ✅ `backend/pkg/middleware/ratelimit.go` - Middleware de rate limiting
+- ✅ `backend/pkg/middleware/ratelimit_test.go` - Testes unitários
+- ✅ `backend/cmd/api/main.go` - Rate limiting integrado
+- ✅ `docs/tarefas_concluidas/20251227_PERF-005.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Rate limiting por IP (100 req/min)
+- ✅ Rate limiting por usuário autenticado
+- ✅ Headers de rate limit na resposta
+- ✅ Graceful degradation (funciona sem Redis)
+- ✅ Testes unitários passando
+
+#### PERF-006: Criar índices no banco de dados ✅
+**Status:** ✅ **CONFIRMADO**
+
+**Evidências:**
+- ✅ `migrations/009_add_performance_indexes.sql` - Migration com índices
+- ✅ `docs/tarefas_concluidas/20251227_PERF-006.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Índices compostos para queries de relatórios
+- ✅ Índices parciais (com WHERE clause)
+- ✅ Índices para transações recorrentes
+- ✅ Índices para lookups otimizados
+- ✅ 15+ índices adicionais criados
+
+### Status da Sprint 3.4
+
+**Status no TAREFAS.md:** ✅ Completo  
+**Status Real:** ✅ **COMPLETO E INTEGRADO**
+
+**Tarefas Concluídas:** 6/6 (100%)
 
 ---
 
