@@ -187,6 +187,34 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
     user.value = null
     isValidated.value = false
+    
+    // Limpar dados de todas as stores para evitar dados obsoletos em cache
+    // Isso é crítico quando o banco é resetado mas o frontend ainda tem cache
+    Promise.all([
+      import('@/stores/accounts').then(m => {
+        const store = m.useAccountsStore()
+        store.accounts = []
+        store.currentAccount = null
+        store.error = null
+      }),
+      import('@/stores/transactions').then(m => {
+        const store = m.useTransactionsStore()
+        store.transactions = []
+        store.currentTransaction = null
+        store.error = null
+      }),
+      import('@/stores/categories').then(m => {
+        const store = m.useCategoriesStore()
+        store.categories = []
+        store.currentCategory = null
+        store.error = null
+      }),
+    ]).catch(err => {
+      // Log mas não falha se alguma store não existir
+      if (import.meta.env.DEV) {
+        console.warn('[Auth] Erro ao limpar stores:', err)
+      }
+    })
   }
 
   return {
