@@ -255,6 +255,18 @@ func main() {
 	// Request ID middleware (must be early in the chain)
 	app.Use(middleware.RequestIDMiddleware())
 
+	// Rate limiting middleware (must be early, before other middlewares)
+	if cacheService != nil {
+		rateLimitConfig := middleware.DefaultRateLimitConfig()
+		rateLimitConfig.CacheService = cacheService
+		rateLimitConfig.MaxRequests = 100 // 100 requests per minute per IP
+		rateLimitConfig.Window = 1 * time.Minute
+		app.Use(middleware.RateLimitMiddleware(rateLimitConfig))
+		log.Info().Msg("Rate limiting enabled")
+	} else {
+		log.Warn().Msg("Rate limiting disabled: Redis not available")
+	}
+
 	// Global middlewares
 	app.Use(recover.New())
 	app.Use(fiberlogger.New(fiberlogger.Config{
