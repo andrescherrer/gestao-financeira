@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"fmt"
+	"strings"
 
 	"gestao-financeira/backend/internal/category/application/dtos"
 	"gestao-financeira/backend/internal/category/domain/entities"
@@ -44,6 +45,18 @@ func (uc *CreateCategoryUseCase) Execute(input dtos.CreateCategoryInput) (*dtos.
 		return nil, fmt.Errorf("invalid category name: %w", err)
 	}
 
+	// Generate slug from name to check for duplicates
+	slug := valueobjects.GenerateSlugFromName(categoryName.Value())
+
+	// Check if a category with the same slug already exists for this user
+	existingCategory, err := uc.categoryRepository.FindByUserIDAndSlug(userID, slug)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check if category exists: %w", err)
+	}
+	if existingCategory != nil {
+		return nil, fmt.Errorf("category with this name already exists")
+	}
+
 	// Create category entity
 	category, err := entities.NewCategory(userID, categoryName, input.Description)
 	if err != nil {
@@ -52,6 +65,10 @@ func (uc *CreateCategoryUseCase) Execute(input dtos.CreateCategoryInput) (*dtos.
 
 	// Save category to repository
 	if err := uc.categoryRepository.Save(category); err != nil {
+		// Check if error is about duplicate (fallback in case check above didn't catch it)
+		if strings.Contains(err.Error(), "already exists") {
+			return nil, fmt.Errorf("category with this name already exists")
+		}
 		return nil, fmt.Errorf("failed to save category: %w", err)
 	}
 

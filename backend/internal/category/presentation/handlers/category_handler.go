@@ -282,6 +282,13 @@ func (h *CategoryHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
 		})
 	}
 
+	if strings.Contains(errMsg, "already exists") {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"error": "Já existe uma categoria com este nome",
+			"code":  fiber.StatusConflict,
+		})
+	}
+
 	if strings.Contains(errMsg, "invalid") || strings.Contains(errMsg, "cannot be empty") {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": errMsg,

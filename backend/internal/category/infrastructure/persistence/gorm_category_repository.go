@@ -3,6 +3,7 @@ package persistence
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"gestao-financeira/backend/internal/category/domain/entities"
 	"gestao-financeira/backend/internal/category/domain/repositories"
@@ -84,6 +85,12 @@ func (r *GormCategoryRepository) Save(category *entities.Category) error {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		// Create new category
 		if err := r.db.Create(model).Error; err != nil {
+			// Check if it's a unique constraint violation (duplicate slug)
+			if strings.Contains(err.Error(), "duplicate key") ||
+				strings.Contains(err.Error(), "unique constraint") ||
+				strings.Contains(err.Error(), "idx_user_slug") {
+				return fmt.Errorf("category with this name already exists")
+			}
 			return fmt.Errorf("failed to create category: %w", err)
 		}
 	} else if err != nil {
@@ -125,6 +132,19 @@ func (r *GormCategoryRepository) Count(userID identityvalueobjects.UserID) (int6
 	}
 
 	return count, nil
+}
+
+// FindByUserIDAndSlug finds a category by user ID and slug.
+func (r *GormCategoryRepository) FindByUserIDAndSlug(userID identityvalueobjects.UserID, slug valueobjects.CategorySlug) (*entities.Category, error) {
+	var model CategoryModel
+	if err := r.db.Where("user_id = ? AND slug = ?", userID.Value(), slug.Value()).First(&model).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to find category by user ID and slug: %w", err)
+	}
+
+	return r.toDomain(&model)
 }
 
 // toDomain converts a CategoryModel to a Category domain entity.

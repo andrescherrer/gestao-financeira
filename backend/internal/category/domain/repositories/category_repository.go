@@ -35,4 +35,8 @@ type CategoryRepository interface {
 
 	// Count returns the total number of categories for a given user.
 	Count(userID identityvalueobjects.UserID) (int64, error)
+
+	// FindByUserIDAndSlug finds a category by user ID and slug.
+	// Returns nil if the category is not found.
+	FindByUserIDAndSlug(userID identityvalueobjects.UserID, slug valueobjects.CategorySlug) (*entities.Category, error)
 }
