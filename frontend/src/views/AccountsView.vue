@@ -168,7 +168,14 @@ onMounted(async () => {
     authStore.init()
   }
   
-  if (accountsStore.accounts.length === 0) {
+  // Aguardar um pouco para garantir que validateToken terminou (se ainda estiver rodando)
+  if (authStore.isValidating) {
+    await new Promise(resolve => setTimeout(resolve, 100))
+  }
+  
+  // Só carregar se não tiver dados E não estiver carregando
+  // validateToken pode já ter carregado os dados através da store
+  if (accountsStore.accounts.length === 0 && !accountsStore.isLoading) {
     await accountsStore.listAccounts()
   }
 })
