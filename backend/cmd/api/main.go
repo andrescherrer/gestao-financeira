@@ -24,6 +24,9 @@ import (
 	"gestao-financeira/backend/internal/identity/infrastructure/services"
 	"gestao-financeira/backend/internal/identity/presentation/handlers"
 	"gestao-financeira/backend/internal/identity/presentation/routes"
+	reportingusecases "gestao-financeira/backend/internal/reporting/application/usecases"
+	reporthandlers "gestao-financeira/backend/internal/reporting/presentation/handlers"
+	reportroutes "gestao-financeira/backend/internal/reporting/presentation/routes"
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
 	sharedhandlers "gestao-financeira/backend/internal/shared/infrastructure/handlers"
 	transactionusecases "gestao-financeira/backend/internal/transaction/application/usecases"
@@ -155,6 +158,12 @@ func main() {
 	deleteBudgetUseCase := budgetusecases.NewDeleteBudgetUseCase(budgetRepository, eventBus)
 	getBudgetProgressUseCase := budgetusecases.NewGetBudgetProgressUseCase(budgetRepository, transactionRepository)
 
+	// Initialize reporting use cases
+	monthlyReportUseCase := reportingusecases.NewMonthlyReportUseCase(transactionRepository)
+	annualReportUseCase := reportingusecases.NewAnnualReportUseCase(transactionRepository)
+	categoryReportUseCase := reportingusecases.NewCategoryReportUseCase(transactionRepository)
+	incomeVsExpenseUseCase := reportingusecases.NewIncomeVsExpenseUseCase(transactionRepository)
+
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUserUseCase, loginUseCase)
 	accountHandler := accounthandlers.NewAccountHandler(createAccountUseCase, listAccountsUseCase, getAccountUseCase)
@@ -179,6 +188,12 @@ func main() {
 		updateBudgetUseCase,
 		deleteBudgetUseCase,
 		getBudgetProgressUseCase,
+	)
+	reportHandler := reporthandlers.NewReportHandler(
+		monthlyReportUseCase,
+		annualReportUseCase,
+		categoryReportUseCase,
+		incomeVsExpenseUseCase,
 	)
 
 	// Create Fiber app
@@ -266,6 +281,9 @@ func main() {
 
 		// Setup budget routes (protected)
 		budgetroutes.SetupBudgetRoutes(api, budgetHandler, jwtService)
+
+		// Setup report routes (protected)
+		reportroutes.SetupReportRoutes(api, reportHandler, jwtService)
 	}
 
 	// Get port from environment or use default
