@@ -294,18 +294,7 @@ const recentTransactions = computed(() => {
 
 onMounted(async () => {
   // Validar token antes de carregar dados
-  const hasToken = authStore.token || localStorage.getItem('auth_token')
-  if (hasToken) {
-    const isValid = await authStore.validateToken()
-    if (!isValid) {
-      // Token inválido, redirecionar para login
-      authStore.logout()
-      router.push({ name: 'login', query: { redirect: '/' } })
-      return
-    }
-  }
-  
-  // Se não estiver autenticado, redirecionar para login
+  // O validateToken já foi chamado no router guard, então só verificamos se está autenticado
   if (!authStore.isAuthenticated) {
     authStore.logout()
     router.push({ name: 'login', query: { redirect: '/' } })
@@ -313,11 +302,12 @@ onMounted(async () => {
   }
 
   // Carregar dados apenas se autenticado e validado
+  // Se validateToken já carregou accounts (reutilizando a chamada), não precisa chamar novamente
   try {
-    if (accountsStore.accounts.length === 0) {
+    if (accountsStore.accounts.length === 0 && !accountsStore.isLoading) {
       await accountsStore.listAccounts()
     }
-    if (transactionsStore.transactions.length === 0) {
+    if (transactionsStore.transactions.length === 0 && !transactionsStore.isLoading) {
       await transactionsStore.listTransactions()
     }
   } catch (error: any) {

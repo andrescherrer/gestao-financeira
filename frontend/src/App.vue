@@ -17,44 +17,8 @@ onMounted(async () => {
   // Inicializar token do localStorage
   authStore.init()
   
-  // Verificar se estamos em uma rota protegida
-  const currentPath = window.location.pathname
-  const isProtectedRoute = currentPath !== '/login' && currentPath !== '/register'
-  
-  // Se estamos em rota protegida, validar token
-  if (isProtectedRoute) {
-    const hasToken = authStore.token || authService.getToken()
-    
-    if (!hasToken) {
-      // Não há token, redirecionar imediatamente
-      authStore.logout()
-      window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
-      return
-    }
-    
-    // Validar token
-    try {
-      const isValid = await authStore.validateToken()
-      if (!isValid) {
-        // Token inválido, limpar e redirecionar
-        authStore.logout()
-        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
-        return
-      }
-      
-      // Verificar se ainda está autenticado após validação
-      if (!authStore.isAuthenticated) {
-        authStore.logout()
-        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
-        return
-      }
-    } catch (error) {
-      // Em caso de erro, considerar token inválido
-      console.error('Erro ao validar token no App.vue:', error)
-      authStore.logout()
-      window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
-      return
-    }
-  }
+  // A validação do token já é feita no router guard (beforeEach)
+  // Não precisamos validar novamente aqui para evitar chamadas duplicadas
+  // O router guard já cuida de redirecionar se necessário
 })
 </script>

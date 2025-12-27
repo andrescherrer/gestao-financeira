@@ -71,7 +71,61 @@ export const useAuthStore = defineStore('auth', () => {
     isValidating.value = true
 
     try {
-      // Tentar fazer uma requisição protegida para validar o token
+      // Tentar reutilizar a chamada de accounts se já estiver em andamento ou concluída
+      // Isso evita múltiplas chamadas HTTP desnecessárias
+      const { useAccountsStore } = await import('@/stores/accounts')
+      const accountsStore = useAccountsStore()
+      
+      // Se accounts já está carregando, aguardar e usar o resultado
+      if (accountsStore.isLoading) {
+        // Aguardar até que a requisição de accounts termine
+        while (accountsStore.isLoading) {
+          await new Promise(resolve => setTimeout(resolve, 50))
+        }
+        // Se não houve erro, o token é válido
+        if (!accountsStore.error) {
+          const currentToken = authService.getToken()
+          if (currentToken && currentToken === storedToken) {
+            token.value = storedToken
+            if (!user.value) {
+              const storedUser = localStorage.getItem('auth_user')
+              if (storedUser) {
+                try {
+                  user.value = JSON.parse(storedUser)
+                } catch (error) {
+                  console.error('Erro ao carregar dados do usuário do localStorage:', error)
+                }
+              }
+            }
+            isValidated.value = true
+            isValidating.value = false
+            return true
+          }
+        }
+      }
+      
+      // Se accounts já tem dados, o token é válido (não precisa fazer nova requisição)
+      if (accountsStore.accounts.length > 0) {
+        const currentToken = authService.getToken()
+        if (currentToken && currentToken === storedToken) {
+          token.value = storedToken
+          if (!user.value) {
+            const storedUser = localStorage.getItem('auth_user')
+            if (storedUser) {
+              try {
+                user.value = JSON.parse(storedUser)
+              } catch (error) {
+                console.error('Erro ao carregar dados do usuário do localStorage:', error)
+              }
+            }
+          }
+          isValidated.value = true
+          isValidating.value = false
+          return true
+        }
+      }
+      
+      // Se não podemos reutilizar, fazer uma requisição leve para validar
       // Usamos /accounts porque é um endpoint simples e protegido
       const { accountService } = await import('@/api/accounts')
       await accountService.list()
