@@ -29,9 +29,14 @@
           <Input
             id="name"
             :name="field.name"
-            :value="field.value"
+            :value="field.value || ''"
             @input="field.onInput"
-            @change="field.onChange"
+            @change="(e) => {
+              const target = e.target as HTMLInputElement
+              const value = target?.value || ''
+              field.value = value
+              field.onChange(value)
+            }"
             @blur="field.onBlur"
             :class="errors.name || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
             placeholder="Ex: Alimentação"
@@ -55,7 +60,12 @@
             :name="field.name"
             :value="field.value || ''"
             @input="field.onInput"
-            @change="field.onChange"
+            @change="(e) => {
+              const target = e.target as HTMLTextAreaElement
+              const value = target?.value || ''
+              field.value = value
+              field.onChange(value)
+            }"
             @blur="field.onBlur"
             :class="errors.description || (meta.touched && !meta.valid) ? 'border-destructive' : ''"
             placeholder="Descreva a categoria (opcional)"
