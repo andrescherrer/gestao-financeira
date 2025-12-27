@@ -475,7 +475,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | PERF-005 | Implementar rate limiting | 🔵 | 🟡 | 4h | BE-003, PERF-001 | ✅ |
 | PERF-006 | Criar índices no banco de dados | 🔵 | 🟡 | 4h | BE-004 | ✅ |
 
-**Entregável Sprint 3.4:** Sistema otimizado com cache e paginação
+**Entregável Sprint 3.4:** Sistema otimizado com cache e paginação ✅ Completo
 
 ---
 
