@@ -27,6 +27,9 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 2.3: Category Context - Backend** (CAT-001 a CAT-010): ✅ Completo
 - **Sprint 2.4: Módulo de Categorias - Frontend** (FE-CAT-001 a FE-CAT-006): ✅ Completo
 - **Sprint 2.5: Melhorias Frontend** (FE-IMP-001 a FE-IMP-009): ✅ Completo
+1/- **Sprint 2.6: Validações e Error Handling** (VAL-001 a VAL-005, LOG-001 a LOG-002): ✅ Completo
+- **Sprint 2.7: Testes de Integração** (TEST-INT-001 a TEST-INT-005): ✅ Completo
+- **Sprint 3.1: Budget Context - Backend** (BUD-001 a BUD-011): ✅ Completo
 - **Demais sprints**: ⏳ Não iniciadas
 
 ### 📈 Progresso
@@ -40,12 +43,16 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
   - Frontend Auth: ✅ 100% (completo e testado)
   - Frontend Accounts: ✅ 100% (completo e testado)
   - Frontend Transactions: ✅ 100% (completo e testado)
-- **Fase 2 (Core Domain e Integrações)**: ~60% concluído
+- **Fase 2 (Core Domain e Integrações)**: ~70% concluído
   - Integração Transaction ↔ Account: ✅ 100% (completo e testado)
   - Event Bus e Domain Events: ✅ 100% (completo e testado)
   - Category Context - Backend: ✅ 100% (completo e testado)
   - Módulo de Categorias - Frontend: ✅ 100% (completo e testado)
   - Melhorias Frontend: ✅ 100% (completo e testado)
+  - Validações e Error Handling: ✅ 100% (completo e testado)
+  - Testes de Integração: ✅ 100% (completo e testado)
+- **Fase 3 (Funcionalidades Essenciais)**: ~10% concluído
+  - Budget Context - Backend: ✅ 100% (completo e testado)
 
 ---
 
@@ -386,20 +393,19 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| BUD-001 | Criar value object BudgetID | 🔵 | 🔴 | 1h | BE-001 | ⏳ |
-| BUD-002 | Criar entidade Budget (agregado raiz) | 🔵 | 🔴 | 6h | BUD-001, SK-001, CAT-001 | ⏳ |
-| BUD-003 | Criar interface BudgetRepository | 🔵 | 🔴 | 1h | BUD-002 | ⏳ |
-| BUD-004 | Implementar GormBudgetRepository | 🔵 | 🔴 | 6h | BUD-003, BE-004 | ⏳ |
-| BUD-005 | Criar migration para tabela budgets | 🔵 | 🔴 | 2h | BUD-004 | ⏳ |
-| BUD-006 | Implementar use cases de Budget (CRUD) | 🔵 | 🔴 | 8h | BUD-002, BUD-003 | ⏳ |
-| BUD-007 | Implementar cálculo de progresso do orçamento | 🔵 | 🔴 | 4h | BUD-002, TX-005 | ⏳ |
-| BUD-008 | Criar BudgetHandler | 🔵 | 🔴 | 4h | BUD-006 | ⏳ |
-| BUD-009 | Configurar rotas de budgets (/api/v1/budgets/*) | 🔵 | 🔴 | 2h | BUD-008, ID-011 | ⏳ |
-| BUD-010 | Adicionar anotações Swagger para Budget | 🔵 | 🟡 | 2h | BUD-008, DOC-001 | ⏳ |
-| BUD-011 | Testes unitários para Budget Context | 🟤 | 🟡 | 6h | BUD-002, BUD-006 | ⏳ |
+| BUD-001 | Criar value object BudgetID | 🔵 | 🔴 | 1h | BE-001 | ✅ |
+| BUD-002 | Criar entidade Budget (agregado raiz) | 🔵 | 🔴 | 6h | BUD-001, SK-001, CAT-001 | ✅ |
+| BUD-003 | Criar interface BudgetRepository | 🔵 | 🔴 | 1h | BUD-002 | ✅ |
+| BUD-004 | Implementar GormBudgetRepository | 🔵 | 🔴 | 6h | BUD-003, BE-004 | ✅ |
+| BUD-005 | Criar migration para tabela budgets | 🔵 | 🔴 | 2h | BUD-004 | ✅ |
+| BUD-006 | Implementar use cases de Budget (CRUD) | 🔵 | 🔴 | 8h | BUD-002, BUD-003 | ✅ |
+| BUD-007 | Implementar cálculo de progresso do orçamento | 🔵 | 🔴 | 4h | BUD-002, TX-005 | ✅ |
+| BUD-008 | Criar BudgetHandler | 🔵 | 🔴 | 4h | BUD-006 | ✅ |
+| BUD-009 | Configurar rotas de budgets (/api/v1/budgets/*) | 🔵 | 🔴 | 2h | BUD-008, ID-011 | ✅ |
+| BUD-010 | Adicionar anotações Swagger para Budget | 🔵 | 🟡 | 2h | BUD-008, DOC-001 | ✅ |
+| BUD-011 | Testes unitários para Budget Context | 🟤 | 🟡 | 6h | BUD-002, BUD-006 | ✅ |
 
-**Entregável Sprint 3.1:** API de orçamentos funcionando
-
+**Entregável Sprint 3.1:** ✅ API de orçamentos funcionando - Completo
 ---
 
 ### Sprint 3.2: Recurring Transactions - Backend (Semana 10)

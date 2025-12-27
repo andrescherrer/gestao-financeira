@@ -215,8 +215,27 @@ func (r *GormTransactionRepository) toDomain(model *TransactionModel) (*entities
 		return nil, fmt.Errorf("invalid transaction description: %w", err)
 	}
 
+	// Convert recurrence fields
+	var recurrenceFrequency *transactionvalueobjects.RecurrenceFrequency
+	if model.IsRecurring && model.RecurrenceFrequency != nil {
+		rf, err := transactionvalueobjects.NewRecurrenceFrequency(*model.RecurrenceFrequency)
+		if err != nil {
+			return nil, fmt.Errorf("invalid recurrence frequency: %w", err)
+		}
+		recurrenceFrequency = &rf
+	}
+
+	var parentTransactionID *transactionvalueobjects.TransactionID
+	if model.ParentTransactionID != nil {
+		pid, err := transactionvalueobjects.NewTransactionID(*model.ParentTransactionID)
+		if err != nil {
+			return nil, fmt.Errorf("invalid parent transaction ID: %w", err)
+		}
+		parentTransactionID = &pid
+	}
+
 	// Reconstruct transaction entity from persisted data
-	return entities.TransactionFromPersistence(
+	return entities.TransactionFromPersistenceWithRecurrence(
 		transactionID,
 		userID,
 		accountID,
@@ -226,6 +245,10 @@ func (r *GormTransactionRepository) toDomain(model *TransactionModel) (*entities
 		model.Date,
 		model.CreatedAt,
 		model.UpdatedAt,
+		model.IsRecurring,
+		recurrenceFrequency,
+		model.RecurrenceEndDate,
+		parentTransactionID,
 	)
 }
 
@@ -233,16 +256,32 @@ func (r *GormTransactionRepository) toDomain(model *TransactionModel) (*entities
 func (r *GormTransactionRepository) toModel(transaction *entities.Transaction) *TransactionModel {
 	amount := transaction.Amount()
 
+	var recurrenceFrequency *string
+	if transaction.RecurrenceFrequency() != nil {
+		freq := transaction.RecurrenceFrequency().Value()
+		recurrenceFrequency = &freq
+	}
+
+	var parentTransactionID *string
+	if transaction.ParentTransactionID() != nil {
+		pid := transaction.ParentTransactionID().Value()
+		parentTransactionID = &pid
+	}
+
 	return &TransactionModel{
-		ID:          transaction.ID().Value(),
-		UserID:      transaction.UserID().Value(),
-		AccountID:   transaction.AccountID().Value(),
-		Type:        transaction.TransactionType().Value(),
-		Amount:      amount.Amount(), // Amount in cents
-		Currency:    amount.Currency().Code(),
-		Description: transaction.Description().Value(),
-		Date:        transaction.Date(),
-		CreatedAt:   transaction.CreatedAt(),
-		UpdatedAt:   transaction.UpdatedAt(),
+		ID:                  transaction.ID().Value(),
+		UserID:              transaction.UserID().Value(),
+		AccountID:           transaction.AccountID().Value(),
+		Type:                transaction.TransactionType().Value(),
+		Amount:              amount.Amount(), // Amount in cents
+		Currency:            amount.Currency().Code(),
+		Description:         transaction.Description().Value(),
+		Date:                transaction.Date(),
+		IsRecurring:         transaction.IsRecurring(),
+		RecurrenceFrequency: recurrenceFrequency,
+		RecurrenceEndDate:   transaction.RecurrenceEndDate(),
+		ParentTransactionID: parentTransactionID,
+		CreatedAt:           transaction.CreatedAt(),
+		UpdatedAt:           transaction.UpdatedAt(),
 	}
 }

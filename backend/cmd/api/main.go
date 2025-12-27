@@ -11,6 +11,10 @@ import (
 	accountpersistence "gestao-financeira/backend/internal/account/infrastructure/persistence"
 	accounthandlers "gestao-financeira/backend/internal/account/presentation/handlers"
 	accountroutes "gestao-financeira/backend/internal/account/presentation/routes"
+	budgetusecases "gestao-financeira/backend/internal/budget/application/usecases"
+	budgetpersistence "gestao-financeira/backend/internal/budget/infrastructure/persistence"
+	budgethandlers "gestao-financeira/backend/internal/budget/presentation/handlers"
+	budgetroutes "gestao-financeira/backend/internal/budget/presentation/routes"
 	categoryusecases "gestao-financeira/backend/internal/category/application/usecases"
 	categorypersistence "gestao-financeira/backend/internal/category/infrastructure/persistence"
 	categoryhandlers "gestao-financeira/backend/internal/category/presentation/handlers"
@@ -99,12 +103,15 @@ func main() {
 	eventBus.Subscribe("TransactionCreated", eventLoggerHandler.Handle)
 	eventBus.Subscribe("TransactionUpdated", eventLoggerHandler.Handle)
 	eventBus.Subscribe("TransactionDeleted", eventLoggerHandler.Handle)
+	eventBus.Subscribe("BudgetCreated", eventLoggerHandler.Handle)
+	eventBus.Subscribe("BudgetDeleted", eventLoggerHandler.Handle)
 
 	// Initialize repositories
 	userRepository := persistence.NewGormUserRepository(db)
 	accountRepository := accountpersistence.NewGormAccountRepository(db)
 	transactionRepository := transactionpersistence.NewGormTransactionRepository(db)
 	categoryRepository := categorypersistence.NewGormCategoryRepository(db)
+	budgetRepository := budgetpersistence.NewGormBudgetRepository(db)
 
 	// Initialize services
 	jwtService := services.NewJWTService()
@@ -140,6 +147,14 @@ func main() {
 	updateCategoryUseCase := categoryusecases.NewUpdateCategoryUseCase(categoryRepository, eventBus)
 	deleteCategoryUseCase := categoryusecases.NewDeleteCategoryUseCase(categoryRepository)
 
+	// Initialize budget use cases
+	createBudgetUseCase := budgetusecases.NewCreateBudgetUseCase(budgetRepository, eventBus)
+	listBudgetsUseCase := budgetusecases.NewListBudgetsUseCase(budgetRepository)
+	getBudgetUseCase := budgetusecases.NewGetBudgetUseCase(budgetRepository)
+	updateBudgetUseCase := budgetusecases.NewUpdateBudgetUseCase(budgetRepository, eventBus)
+	deleteBudgetUseCase := budgetusecases.NewDeleteBudgetUseCase(budgetRepository, eventBus)
+	getBudgetProgressUseCase := budgetusecases.NewGetBudgetProgressUseCase(budgetRepository, transactionRepository)
+
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUserUseCase, loginUseCase)
 	accountHandler := accounthandlers.NewAccountHandler(createAccountUseCase, listAccountsUseCase, getAccountUseCase)
@@ -156,6 +171,14 @@ func main() {
 		getCategoryUseCase,
 		updateCategoryUseCase,
 		deleteCategoryUseCase,
+	)
+	budgetHandler := budgethandlers.NewBudgetHandler(
+		createBudgetUseCase,
+		listBudgetsUseCase,
+		getBudgetUseCase,
+		updateBudgetUseCase,
+		deleteBudgetUseCase,
+		getBudgetProgressUseCase,
 	)
 
 	// Create Fiber app
@@ -240,6 +263,9 @@ func main() {
 
 		// Setup category routes (protected)
 		categoryroutes.SetupCategoryRoutes(api, categoryHandler, jwtService)
+
+		// Setup budget routes (protected)
+		budgetroutes.SetupBudgetRoutes(api, budgetHandler, jwtService)
 	}
 
 	// Get port from environment or use default

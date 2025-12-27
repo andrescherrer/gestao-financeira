@@ -24,6 +24,12 @@ type Transaction struct {
 	createdAt       time.Time
 	updatedAt       time.Time
 
+	// Recurrence fields
+	isRecurring         bool
+	recurrenceFrequency *transactionvalueobjects.RecurrenceFrequency
+	recurrenceEndDate   *time.Time
+	parentTransactionID *transactionvalueobjects.TransactionID
+
 	// Domain events
 	events []events.DomainEvent
 }
@@ -36,6 +42,22 @@ func NewTransaction(
 	amount sharedvalueobjects.Money,
 	description transactionvalueobjects.TransactionDescription,
 	date time.Time,
+) (*Transaction, error) {
+	return NewTransactionWithRecurrence(userID, accountID, transactionType, amount, description, date, false, nil, nil, nil)
+}
+
+// NewTransactionWithRecurrence creates a new Transaction aggregate with recurrence support.
+func NewTransactionWithRecurrence(
+	userID identityvalueobjects.UserID,
+	accountID accountvalueobjects.AccountID,
+	transactionType transactionvalueobjects.TransactionType,
+	amount sharedvalueobjects.Money,
+	description transactionvalueobjects.TransactionDescription,
+	date time.Time,
+	isRecurring bool,
+	recurrenceFrequency *transactionvalueobjects.RecurrenceFrequency,
+	recurrenceEndDate *time.Time,
+	parentTransactionID *transactionvalueobjects.TransactionID,
 ) (*Transaction, error) {
 	if userID.IsEmpty() {
 		return nil, errors.New("user ID cannot be empty")
@@ -65,19 +87,38 @@ func NewTransaction(
 		return nil, errors.New("transaction date cannot be zero")
 	}
 
+	// Validate recurrence fields
+	if isRecurring {
+		if recurrenceFrequency == nil {
+			return nil, errors.New("recurrence frequency is required for recurring transactions")
+		}
+		if recurrenceEndDate != nil && !recurrenceEndDate.IsZero() && recurrenceEndDate.Before(date) {
+			return nil, errors.New("recurrence end date cannot be before transaction date")
+		}
+	} else {
+		// If not recurring, ensure recurrence fields are nil
+		if recurrenceFrequency != nil || recurrenceEndDate != nil {
+			return nil, errors.New("recurrence fields should be nil for non-recurring transactions")
+		}
+	}
+
 	now := time.Now()
 
 	transaction := &Transaction{
-		id:              transactionvalueobjects.GenerateTransactionID(),
-		userID:          userID,
-		accountID:       accountID,
-		transactionType: transactionType,
-		amount:          amount,
-		description:     description,
-		date:            date,
-		createdAt:       now,
-		updatedAt:       now,
-		events:          []events.DomainEvent{},
+		id:                  transactionvalueobjects.GenerateTransactionID(),
+		userID:              userID,
+		accountID:           accountID,
+		transactionType:     transactionType,
+		amount:              amount,
+		description:         description,
+		date:                date,
+		isRecurring:         isRecurring,
+		recurrenceFrequency: recurrenceFrequency,
+		recurrenceEndDate:   recurrenceEndDate,
+		parentTransactionID: parentTransactionID,
+		createdAt:           now,
+		updatedAt:           now,
+		events:              []events.DomainEvent{},
 	}
 
 	// Add domain event with transaction details
@@ -104,6 +145,25 @@ func TransactionFromPersistence(
 	createdAt time.Time,
 	updatedAt time.Time,
 ) (*Transaction, error) {
+	return TransactionFromPersistenceWithRecurrence(id, userID, accountID, transactionType, amount, description, date, createdAt, updatedAt, false, nil, nil, nil)
+}
+
+// TransactionFromPersistenceWithRecurrence reconstructs a Transaction aggregate from persisted data with recurrence support.
+func TransactionFromPersistenceWithRecurrence(
+	id transactionvalueobjects.TransactionID,
+	userID identityvalueobjects.UserID,
+	accountID accountvalueobjects.AccountID,
+	transactionType transactionvalueobjects.TransactionType,
+	amount sharedvalueobjects.Money,
+	description transactionvalueobjects.TransactionDescription,
+	date time.Time,
+	createdAt time.Time,
+	updatedAt time.Time,
+	isRecurring bool,
+	recurrenceFrequency *transactionvalueobjects.RecurrenceFrequency,
+	recurrenceEndDate *time.Time,
+	parentTransactionID *transactionvalueobjects.TransactionID,
+) (*Transaction, error) {
 	if id.IsEmpty() {
 		return nil, errors.New("transaction ID cannot be empty")
 	}
@@ -121,16 +181,20 @@ func TransactionFromPersistence(
 	}
 
 	return &Transaction{
-		id:              id,
-		userID:          userID,
-		accountID:       accountID,
-		transactionType: transactionType,
-		amount:          amount,
-		description:     description,
-		date:            date,
-		createdAt:       createdAt,
-		updatedAt:       updatedAt,
-		events:          []events.DomainEvent{},
+		id:                  id,
+		userID:              userID,
+		accountID:           accountID,
+		transactionType:     transactionType,
+		amount:              amount,
+		description:         description,
+		date:                date,
+		isRecurring:         isRecurring,
+		recurrenceFrequency: recurrenceFrequency,
+		recurrenceEndDate:   recurrenceEndDate,
+		parentTransactionID: parentTransactionID,
+		createdAt:           createdAt,
+		updatedAt:           updatedAt,
+		events:              []events.DomainEvent{},
 	}, nil
 }
 
@@ -177,6 +241,26 @@ func (t *Transaction) CreatedAt() time.Time {
 // UpdatedAt returns the last update timestamp.
 func (t *Transaction) UpdatedAt() time.Time {
 	return t.updatedAt
+}
+
+// IsRecurring returns whether the transaction is recurring.
+func (t *Transaction) IsRecurring() bool {
+	return t.isRecurring
+}
+
+// RecurrenceFrequency returns the recurrence frequency (nil if not recurring).
+func (t *Transaction) RecurrenceFrequency() *transactionvalueobjects.RecurrenceFrequency {
+	return t.recurrenceFrequency
+}
+
+// RecurrenceEndDate returns the recurrence end date (nil if no end date).
+func (t *Transaction) RecurrenceEndDate() *time.Time {
+	return t.recurrenceEndDate
+}
+
+// ParentTransactionID returns the parent transaction ID (nil if not a generated instance).
+func (t *Transaction) ParentTransactionID() *transactionvalueobjects.TransactionID {
+	return t.parentTransactionID
 }
 
 // UpdateAmount updates the transaction amount.
