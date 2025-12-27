@@ -2,10 +2,12 @@ package usecases
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
 	"gestao-financeira/backend/internal/reporting/application/dtos"
+	reportingservices "gestao-financeira/backend/internal/reporting/infrastructure/services"
 	sharedvalueobjects "gestao-financeira/backend/internal/shared/domain/valueobjects"
 	"gestao-financeira/backend/internal/transaction/domain/repositories"
 	transactionvalueobjects "gestao-financeira/backend/internal/transaction/domain/valueobjects"
@@ -14,19 +16,38 @@ import (
 // MonthlyReportUseCase handles generating monthly financial reports.
 type MonthlyReportUseCase struct {
 	transactionRepository repositories.TransactionRepository
+	cacheService          *reportingservices.ReportCacheService
 }
 
 // NewMonthlyReportUseCase creates a new MonthlyReportUseCase instance.
 func NewMonthlyReportUseCase(
 	transactionRepository repositories.TransactionRepository,
+	cacheService *reportingservices.ReportCacheService,
 ) *MonthlyReportUseCase {
 	return &MonthlyReportUseCase{
 		transactionRepository: transactionRepository,
+		cacheService:          cacheService,
 	}
 }
 
 // Execute generates a monthly report for the specified user, year, and month.
 func (uc *MonthlyReportUseCase) Execute(input dtos.MonthlyReportInput) (*dtos.MonthlyReportOutput, error) {
+	// Try to get from cache first
+	if uc.cacheService != nil {
+		cacheKey := uc.cacheService.GenerateKey("monthly", map[string]string{
+			"user_id":  input.UserID,
+			"year":     strconv.Itoa(input.Year),
+			"month":    strconv.Itoa(input.Month),
+			"currency": input.Currency,
+		})
+
+		var cachedOutput dtos.MonthlyReportOutput
+		found, err := uc.cacheService.Get(cacheKey, &cachedOutput)
+		if err == nil && found {
+			return &cachedOutput, nil
+		}
+	}
+
 	// Validate user ID
 	userID, err := identityvalueobjects.NewUserID(input.UserID)
 	if err != nil {
@@ -139,6 +160,17 @@ func (uc *MonthlyReportUseCase) Execute(input dtos.MonthlyReportInput) (*dtos.Mo
 		IncomeCount:  incomeCount,
 		ExpenseCount: expenseCount,
 		TotalCount:   incomeCount + expenseCount,
+	}
+
+	// Cache the result
+	if uc.cacheService != nil {
+		cacheKey := uc.cacheService.GenerateKey("monthly", map[string]string{
+			"user_id":  input.UserID,
+			"year":     strconv.Itoa(input.Year),
+			"month":    strconv.Itoa(input.Month),
+			"currency": input.Currency,
+		})
+		_ = uc.cacheService.Set(cacheKey, output) // Ignore cache errors
 	}
 
 	return output, nil
