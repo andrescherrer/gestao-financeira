@@ -25,6 +25,7 @@ import (
 	"gestao-financeira/backend/internal/identity/presentation/handlers"
 	"gestao-financeira/backend/internal/identity/presentation/routes"
 	reportingusecases "gestao-financeira/backend/internal/reporting/application/usecases"
+	reportingservices "gestao-financeira/backend/internal/reporting/infrastructure/services"
 	reporthandlers "gestao-financeira/backend/internal/reporting/presentation/handlers"
 	reportroutes "gestao-financeira/backend/internal/reporting/presentation/routes"
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
@@ -33,6 +34,7 @@ import (
 	transactionpersistence "gestao-financeira/backend/internal/transaction/infrastructure/persistence"
 	transactionhandlers "gestao-financeira/backend/internal/transaction/presentation/handlers"
 	transactionroutes "gestao-financeira/backend/internal/transaction/presentation/routes"
+	"gestao-financeira/backend/pkg/cache"
 	"gestao-financeira/backend/pkg/database"
 	"gestao-financeira/backend/pkg/health"
 	"gestao-financeira/backend/pkg/logger"
@@ -158,8 +160,22 @@ func main() {
 	deleteBudgetUseCase := budgetusecases.NewDeleteBudgetUseCase(budgetRepository, eventBus)
 	getBudgetProgressUseCase := budgetusecases.NewGetBudgetProgressUseCase(budgetRepository, transactionRepository)
 
+	// Initialize cache service (optional - continues without cache if Redis is unavailable)
+	var cacheService *cache.CacheService
+	var reportCacheService *reportingservices.ReportCacheService
+	redisURL := os.Getenv("REDIS_URL")
+	if redisURL != "" {
+		cacheSvc, err := cache.NewCacheService(redisURL)
+		if err != nil {
+			log.Warn().Err(err).Msg("Failed to initialize cache service, continuing without cache")
+		} else {
+			cacheService = cacheSvc
+			reportCacheService = reportingservices.NewReportCacheService(cacheService, 1*time.Hour)
+		}
+	}
+
 	// Initialize reporting use cases
-	monthlyReportUseCase := reportingusecases.NewMonthlyReportUseCase(transactionRepository)
+	monthlyReportUseCase := reportingusecases.NewMonthlyReportUseCase(transactionRepository, reportCacheService)
 	annualReportUseCase := reportingusecases.NewAnnualReportUseCase(transactionRepository)
 	categoryReportUseCase := reportingusecases.NewCategoryReportUseCase(transactionRepository)
 	incomeVsExpenseUseCase := reportingusecases.NewIncomeVsExpenseUseCase(transactionRepository)
