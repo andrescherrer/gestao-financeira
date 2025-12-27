@@ -129,9 +129,34 @@ export const useAuthStore = defineStore('auth', () => {
         return false
       }
       
-      // Para outros erros (500, network, etc), por segurança também limpamos
+      // Tratar erros de rede separadamente
+      // Se não há resposta (erro de rede), pode ser problema temporário
+      // Não limpar o token imediatamente, mas marcar como não validado
+      if (!error.response) {
+        console.error('[Auth] Erro de rede ao validar token:', {
+          message: error.message,
+          code: error.code,
+          url: error.config?.url,
+          possibleCauses: [
+            'Backend não está rodando',
+            'Problema de conectividade',
+            'Timeout da requisição',
+          ],
+        })
+        // Não limpar o token em caso de erro de rede
+        // O usuário pode tentar novamente ou o problema pode ser temporário
+        isValidated.value = false
+        isValidating.value = false
+        return false
+      }
+      
+      // Para outros erros HTTP (500, 502, 503, etc), por segurança limpamos
       // Pois não podemos garantir que o token é válido sem uma resposta bem-sucedida do backend
-      console.error('[Auth] Erro ao validar token:', error)
+      console.error('[Auth] Erro HTTP ao validar token:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        message: error.message,
+      })
       logout()
       isValidated.value = true
       return false

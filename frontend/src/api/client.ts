@@ -63,8 +63,22 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    // Tratar erro 401 (não autorizado) - token inválido ou expirado
-    if (error.response?.status === 401) {
+    // Log detalhado do erro em desenvolvimento
+    if (import.meta.env.DEV) {
+      console.error('[API Client] Erro na requisição:', {
+        url: error.config?.url,
+        method: error.config?.method?.toUpperCase(),
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        message: error.message,
+        code: error.code,
+        isNetworkError: !error.response, // Erro de rede (sem resposta do servidor)
+        isTimeout: error.code === 'ECONNABORTED',
+      })
+    }
+
+    // Tratar erros de autenticação (401 ou 403)
+    if (error.response?.status === 401 || error.response?.status === 403) {
       // Importar dinamicamente para evitar dependência circular
       const { authService } = await import('./auth')
       const { useAuthStore } = await import('@/stores/auth')
@@ -89,6 +103,29 @@ apiClient.interceptors.response.use(
           }, 100)
         }
       }
+    }
+    
+    // Tratar erros de rede (sem resposta do servidor)
+    // Isso inclui: Failed to fetch, Network Error, timeout, etc.
+    if (!error.response) {
+      // Log do erro de rede
+      if (import.meta.env.DEV) {
+        console.error('[API Client] Erro de rede:', {
+          url: error.config?.url,
+          message: error.message,
+          code: error.code,
+          possibleCauses: [
+            'Backend não está rodando',
+            'Problema de conectividade',
+            'CORS bloqueando requisição',
+            'Timeout da requisição',
+          ],
+        })
+      }
+      
+      // Se for um erro de rede e estivermos em uma rota protegida,
+      // não limpar o token automaticamente (pode ser problema temporário)
+      // O validateToken vai tratar isso adequadamente
     }
     
     return Promise.reject(error)
