@@ -486,7 +486,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | FE-BUD-001 | Criar hook useBudgets (TanStack Query) | 🟣 | 🔴 | 2h | FE-007 | ✅ |
 | FE-BUD-002 | Criar página de dashboard de orçamentos (/budget) | 🟣 | 🔴 | 6h | FE-006, FE-BUD-001 | ✅ |
 | FE-BUD-003 | Criar componente de progresso de orçamento | 🟣 | 🔴 | 4h | FE-003 | ✅ |
-| FE-BUD-004 | Criar formulário de orçamento | 🟣 | 🔴 | 4h | FE-003, FE-004 | ⏳ |
+| FE-BUD-004 | Criar formulário de orçamento | 🟣 | 🔴 | 4h | FE-003, FE-004 | ✅ |
 | FE-BUD-005 | Integrar com API de budgets | 🟣 | 🔴 | 4h | FE-BUD-002, BUD-010 | ⏳ |
 | FE-BUD-006 | Implementar alertas de limite de orçamento | 🟣 | 🟡 | 4h | FE-BUD-003 | ⏳ |
 
