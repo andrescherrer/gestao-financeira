@@ -450,7 +450,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| REP-001 | Criar use case para relatório mensal | 🔵 | 🔴 | 6h | TX-005, CAT-003 | ⏳ |
+| REP-001 | Criar use case para relatório mensal | 🔵 | 🔴 | 6h | TX-005, CAT-003 | ✅ |
 | REP-002 | Criar use case para relatório anual | 🔵 | 🔴 | 4h | REP-001 | ⏳ |
 | REP-003 | Criar use case para relatório por categoria | 🔵 | 🔴 | 4h | REP-001 | ⏳ |
 | REP-004 | Criar use case para receitas vs despesas | 🔵 | 🔴 | 4h | REP-001 | ⏳ |

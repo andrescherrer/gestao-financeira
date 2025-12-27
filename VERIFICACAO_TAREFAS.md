@@ -369,18 +369,21 @@ docker-compose --profile recurring run process-recurring
 
 ---
 
-### Sprint 3.3: Reporting Context - Backend ❌
-**Status no TAREFAS.md:** ⏳ Pendente (linha 428-436)  
-**Status Real:** ⏳ **ESTRUTURA CRIADA, MAS VAZIA**
+### Sprint 3.3: Reporting Context - Backend 🚧
+**Status no TAREFAS.md:** 🚧 Em Progresso (linha 449-461)  
+**Status Real:** 🚧 **EM IMPLEMENTAÇÃO**
 
 **Análise:**
 - ✅ Estrutura de pastas criada (`internal/reporting/`)
-- ❌ Nenhum arquivo implementado (apenas pastas vazias)
-- ❌ Nenhum use case criado
-- ❌ Nenhum handler criado
-- ❌ Nenhuma rota configurada
+- ✅ REP-001: Use case para relatório mensal implementado
+- ✅ DTOs criados (monthly_report_input.go, monthly_report_output.go)
+- ✅ Testes unitários para REP-001
+- ❌ REP-002 a REP-009: Pendentes
 
-**Conclusão:** ⏳ **PENDENTE** - Apenas estrutura de pastas criada, sem implementação.
+**Tarefas Concluídas:**
+- ✅ REP-001: Use case para relatório mensal (2025-12-27)
+
+**Conclusão:** 🚧 **EM PROGRESSO** - REP-001 implementado e testado. Demais tarefas pendentes.
 
 ---
 
