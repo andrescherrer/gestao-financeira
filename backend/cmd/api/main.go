@@ -7,6 +7,7 @@ import (
 	"time"
 
 	accountusecases "gestao-financeira/backend/internal/account/application/usecases"
+	accountrepositories "gestao-financeira/backend/internal/account/domain/repositories"
 	accountinfrahandlers "gestao-financeira/backend/internal/account/infrastructure/handlers"
 	accountpersistence "gestao-financeira/backend/internal/account/infrastructure/persistence"
 	accounthandlers "gestao-financeira/backend/internal/account/presentation/handlers"
@@ -111,9 +112,31 @@ func main() {
 	eventBus.Subscribe("BudgetCreated", eventLoggerHandler.Handle)
 	eventBus.Subscribe("BudgetDeleted", eventLoggerHandler.Handle)
 
+	// Initialize cache service (optional - continues without cache if Redis is unavailable)
+	var cacheService *cache.CacheService
+	var reportCacheService *reportingservices.ReportCacheService
+	redisURL := os.Getenv("REDIS_URL")
+	if redisURL != "" {
+		cacheSvc, err := cache.NewCacheService(redisURL)
+		if err != nil {
+			log.Warn().Err(err).Msg("Failed to initialize cache service, continuing without cache")
+		} else {
+			cacheService = cacheSvc
+			reportCacheService = reportingservices.NewReportCacheService(cacheService, 1*time.Hour)
+		}
+	}
+
 	// Initialize repositories
 	userRepository := persistence.NewGormUserRepository(db)
-	accountRepository := accountpersistence.NewGormAccountRepository(db)
+
+	// Initialize account repository with cache
+	baseAccountRepository := accountpersistence.NewGormAccountRepository(db)
+	accountRepository := accountpersistence.NewCachedAccountRepository(
+		baseAccountRepository,
+		cacheService,
+		15*time.Minute, // Cache accounts for 15 minutes
+	).(accountrepositories.AccountRepository)
+
 	transactionRepository := transactionpersistence.NewGormTransactionRepository(db)
 	categoryRepository := categorypersistence.NewGormCategoryRepository(db)
 	budgetRepository := budgetpersistence.NewGormBudgetRepository(db)
@@ -159,20 +182,6 @@ func main() {
 	updateBudgetUseCase := budgetusecases.NewUpdateBudgetUseCase(budgetRepository, eventBus)
 	deleteBudgetUseCase := budgetusecases.NewDeleteBudgetUseCase(budgetRepository, eventBus)
 	getBudgetProgressUseCase := budgetusecases.NewGetBudgetProgressUseCase(budgetRepository, transactionRepository)
-
-	// Initialize cache service (optional - continues without cache if Redis is unavailable)
-	var cacheService *cache.CacheService
-	var reportCacheService *reportingservices.ReportCacheService
-	redisURL := os.Getenv("REDIS_URL")
-	if redisURL != "" {
-		cacheSvc, err := cache.NewCacheService(redisURL)
-		if err != nil {
-			log.Warn().Err(err).Msg("Failed to initialize cache service, continuing without cache")
-		} else {
-			cacheService = cacheSvc
-			reportCacheService = reportingservices.NewReportCacheService(cacheService, 1*time.Hour)
-		}
-	}
 
 	// Initialize reporting use cases
 	monthlyReportUseCase := reportingusecases.NewMonthlyReportUseCase(transactionRepository, reportCacheService)
