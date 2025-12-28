@@ -451,6 +451,201 @@ docker-compose --profile recurring run process-recurring
 
 ---
 
+## Sprint 3.6: Módulo de Relatórios - Frontend
+
+### FE-REP-001: Instalar e configurar Recharts ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Instalado ApexCharts (substituído Recharts por ser mais adequado para Vue)
+- Biblioteca pronta para uso nos componentes
+
+**Arquivos:**
+- `frontend/package.json` (modificado)
+
+**Validação:**
+- ✅ Biblioteca instalada
+- ✅ Pronta para uso
+
+---
+
+### FE-REP-002: Criar hook useReports (TanStack Query) ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Criado serviço de API reports.ts
+- Criado hook useReports com TanStack Query
+- Suporte a todos os tipos de relatórios
+- Tipos TypeScript completos
+
+**Arquivos:**
+- `frontend/src/api/reports.ts`
+- `frontend/src/hooks/useReports.ts`
+- `frontend/src/api/types.ts` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Hook funcional com TanStack Query
+
+---
+
+### FE-REP-003: Criar página de relatórios (/reports) ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Criada página ReportsView.vue
+- Filtros de período, ano, mês e moeda
+- Componentes de gráficos (stub)
+- Rota configurada
+- Link no Sidebar
+
+**Arquivos:**
+- `frontend/src/views/ReportsView.vue`
+- `frontend/src/components/reports/IncomeVsExpenseChart.vue`
+- `frontend/src/components/reports/CategoryChart.vue`
+- `frontend/src/components/reports/TrendsChart.vue`
+- `frontend/src/router/index.ts` (modificado)
+- `frontend/src/components/layout/Sidebar.vue` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Página funcional
+- ✅ Filtros funcionando
+
+---
+
+### FE-REP-004: Criar componente de gráfico receitas vs despesas ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Implementado gráfico de barras com ApexCharts
+- Integração com useIncomeVsExpenseReport
+- Suporte a breakdown por período
+- Formatação de moeda dinâmica
+
+**Arquivos:**
+- `frontend/src/components/reports/IncomeVsExpenseChart.vue` (modificado)
+- `frontend/src/main.ts` (modificado - plugin VueApexCharts)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Gráfico funcional
+
+---
+
+### FE-REP-005: Criar componente de gráfico por categoria ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Implementado gráfico donut com ApexCharts
+- Integração com useCategoryReport
+- Exibe apenas despesas por categoria
+- Formatação de moeda dinâmica
+
+**Arquivos:**
+- `frontend/src/components/reports/CategoryChart.vue` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Gráfico funcional
+
+---
+
+### FE-REP-006: Criar componente de gráfico de tendências temporais ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Implementado gráfico de linha com ApexCharts
+- Integração com useAnnualReport
+- Três séries: Receitas, Despesas, Saldo
+- Breakdown mensal do ano
+
+**Arquivos:**
+- `frontend/src/components/reports/TrendsChart.vue` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Gráfico funcional
+
+---
+
+### FE-REP-007: Criar filtros de período (mensal, anual) ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Filtros já implementados na página ReportsView
+- Suporte a período mensal, anual e personalizado
+- Filtros de ano, mês e moeda
+
+**Validação:**
+- ✅ Filtros funcionando
+- ✅ Integrados com componentes de gráficos
+
+---
+
+### FE-REP-008: Integrar com API de relatórios ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Integração já realizada através do hook useReports
+- Serviço de API reports.ts criado
+- Todas as operações integradas
+
+**Validação:**
+- ✅ API integrada
+- ✅ Todas as operações funcionando
+
+---
+
+### FE-REP-009: Implementar exportação CSV ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Criado utilitário csvExport.ts
+- Funções para exportar todos os tipos de relatórios
+- Botão de exportação na página
+- Formatação adequada para Excel
+
+**Arquivos:**
+- `frontend/src/utils/csvExport.ts`
+- `frontend/src/views/ReportsView.vue` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Exportação funcionando
+
+---
+
+### FE-REP-010: Implementar exportação PDF ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Instalado jspdf
+- Criado utilitário pdfExport.ts
+- Funções para exportar todos os tipos de relatórios
+- Botão de exportação PDF na página
+- Formatação adequada com jsPDF
+
+**Arquivos:**
+- `frontend/src/utils/pdfExport.ts`
+- `frontend/src/views/ReportsView.vue` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Exportação funcionando
+
+---
+
 ## Sprint 3.5: Módulo de Orçamento - Frontend
 
 ### FE-BUD-001: Criar hook useBudgets (TanStack Query) ✅
