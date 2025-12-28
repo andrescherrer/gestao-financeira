@@ -3,26 +3,99 @@ package middleware
 import (
 	"net/http/httptest"
 	"testing"
+	"time"
 
+	"gestao-financeira/backend/internal/identity/domain/entities"
+	"gestao-financeira/backend/internal/identity/domain/valueobjects"
 	"gestao-financeira/backend/internal/identity/infrastructure/services"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
+// mockUserRepository is a mock implementation of UserRepository for testing.
+type mockUserRepository struct {
+	users map[string]*entities.User
+}
+
+func newMockUserRepository() *mockUserRepository {
+	return &mockUserRepository{
+		users: make(map[string]*entities.User),
+	}
+}
+
+func (m *mockUserRepository) FindByID(id valueobjects.UserID) (*entities.User, error) {
+	user, ok := m.users[id.Value()]
+	if !ok {
+		return nil, nil
+	}
+	return user, nil
+}
+
+func (m *mockUserRepository) FindByEmail(email valueobjects.Email) (*entities.User, error) {
+	for _, user := range m.users {
+		if user.Email().Equals(email) {
+			return user, nil
+		}
+	}
+	return nil, nil
+}
+
+func (m *mockUserRepository) Save(user *entities.User) error {
+	m.users[user.ID().Value()] = user
+	return nil
+}
+
+func (m *mockUserRepository) Delete(id valueobjects.UserID) error {
+	delete(m.users, id.Value())
+	return nil
+}
+
+func (m *mockUserRepository) Exists(email valueobjects.Email) (bool, error) {
+	for _, user := range m.users {
+		if user.Email().Equals(email) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (m *mockUserRepository) Count() (int64, error) {
+	return int64(len(m.users)), nil
+}
+
 func TestAuthMiddleware(t *testing.T) {
 	jwtService := services.NewJWTService()
+	userRepository := newMockUserRepository()
+
+	// Create a test user
+	userID := "550e8400-e29b-41d4-a716-446655440000"
+	email, _ := valueobjects.NewEmail("test@example.com")
+	// Use a valid bcrypt hash (minimum 60 characters)
+	passwordHash, _ := valueobjects.NewPasswordHashFromHash("$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy")
+	name, _ := valueobjects.NewUserName("Test", "User")
+	userIDVO, _ := valueobjects.NewUserID(userID)
+	now := time.Now()
+	user, err := entities.FromPersistence(userIDVO, email, passwordHash, name, now, now, true)
+	if err != nil {
+		t.Fatalf("Failed to create user: %v", err)
+	}
+	if err := userRepository.Save(user); err != nil {
+		t.Fatalf("Failed to save user: %v", err)
+	}
 
 	// Generate a valid token
-	userID := "test-user-id"
-	email := "test@example.com"
-	token, err := jwtService.GenerateToken(userID, email)
+	token, err := jwtService.GenerateToken(userID, email.Value())
 	if err != nil {
 		t.Fatalf("Failed to generate token: %v", err)
 	}
 
 	app := fiber.New()
-	app.Use(AuthMiddleware(jwtService))
+	app.Use(AuthMiddleware(AuthMiddlewareConfig{
+		JWTService:     jwtService,
+		UserRepository: userRepository,
+		CacheService:   nil, // No cache for tests
+	}))
 
 	app.Get("/protected", func(c *fiber.Ctx) error {
 		userID := GetUserID(c)

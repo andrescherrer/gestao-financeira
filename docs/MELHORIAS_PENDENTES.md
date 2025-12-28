@@ -49,25 +49,30 @@
 
 ## ⚠️ Pendente - Prioridade Alta
 
-### 1. Validação de Existência de Usuário no Middleware
+### 1. Validação de Existência de Usuário no Middleware ✅
 
 **Problema:** JWT pode ser válido mas usuário não existe mais no banco  
 **Impacto:** Segurança - usuário deletado ainda pode acessar  
 **Esforço:** 2-4h  
 **Benefício:** Segurança aprimorada
 
-**Status Atual:**
-- `backend/pkg/middleware/auth.go` valida apenas o JWT
-- Não verifica se o usuário existe no banco de dados
-- Não há cache da verificação
+**Status:** ✅ **IMPLEMENTADO**
 
-**Ação Necessária:**
-- Modificar `AuthMiddleware` para verificar se usuário existe no banco
-- Adicionar `UserRepository` como dependência do middleware
-- Cachear verificação por alguns segundos para performance
-- Retornar 401 se usuário não existir
+**Implementação:**
+- ✅ `AuthMiddleware` modificado para aceitar `AuthMiddlewareConfig`
+- ✅ Verificação de existência de usuário no banco implementada
+- ✅ Cache da verificação implementado (TTL: 30 segundos)
+- ✅ Retorno de 401 se usuário não existir
+- ✅ Todas as rotas atualizadas
+- ✅ Testes atualizados e passando
 
-**Arquivo:** `backend/pkg/middleware/auth.go`
+**Arquivos:**
+- `backend/pkg/middleware/auth.go` (modificado)
+- `backend/internal/*/presentation/routes/*_routes.go` (atualizados)
+- `backend/cmd/api/main.go` (atualizado)
+- `backend/pkg/middleware/auth_test.go` (atualizado)
+
+**Documentação:** `docs/tarefas_concluidas/20251228_071900_SEC-001.md`
 
 ---
 

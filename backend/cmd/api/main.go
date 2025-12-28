@@ -317,19 +317,19 @@ func main() {
 		routes.SetupAuthRoutes(api, authHandler)
 
 		// Setup account routes (protected)
-		accountroutes.SetupAccountRoutes(api, accountHandler, jwtService)
+		accountroutes.SetupAccountRoutes(api, accountHandler, jwtService, userRepository, cacheService)
 
 		// Setup transaction routes (protected)
-		transactionroutes.SetupTransactionRoutes(api, transactionHandler, jwtService)
+		transactionroutes.SetupTransactionRoutes(api, transactionHandler, jwtService, userRepository, cacheService)
 
 		// Setup category routes (protected)
-		categoryroutes.SetupCategoryRoutes(api, categoryHandler, jwtService)
+		categoryroutes.SetupCategoryRoutes(api, categoryHandler, jwtService, userRepository, cacheService)
 
 		// Setup budget routes (protected)
-		budgetroutes.SetupBudgetRoutes(api, budgetHandler, jwtService)
+		budgetroutes.SetupBudgetRoutes(api, budgetHandler, jwtService, userRepository, cacheService)
 
 		// Setup report routes (protected)
-		reportroutes.SetupReportRoutes(api, reportHandler, jwtService)
+		reportroutes.SetupReportRoutes(api, reportHandler, jwtService, userRepository, cacheService)
 	}
 
 	// Get port from environment or use default
