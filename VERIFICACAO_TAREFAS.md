@@ -880,6 +880,118 @@ docker-compose --profile recurring run process-recurring
 
 ---
 
+## Sprint 3.7: Melhorias Gerais Frontend ✅
+
+### FE-GEN-001: Implementar dark mode (shadcn/ui) ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Criado composable useTheme
+- Toggle de tema no Header
+- Suporte a light, dark e system
+- Persistência no localStorage
+- Detecção automática de preferência do sistema
+
+**Arquivos:**
+- `frontend/src/composables/useTheme.ts`
+- `frontend/src/components/layout/Header.vue` (modificado)
+- `frontend/src/App.vue` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Dark mode funcional
+- ✅ Persistência funcionando
+
+---
+
+### FE-GEN-002: Melhorar responsividade mobile ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Menu mobile com toggle
+- Overlay quando sidebar está aberto
+- Tabelas convertidas para cards em mobile
+- Headers e botões responsivos
+- Padding e espaçamentos adaptativos
+
+**Arquivos:**
+- `frontend/src/components/layout/Layout.vue` (modificado)
+- `frontend/src/components/layout/Header.vue` (modificado)
+- `frontend/src/components/layout/Sidebar.vue` (modificado)
+- `frontend/src/components/TransactionTable.vue` (modificado)
+- `frontend/src/views/AccountsView.vue` (modificado)
+- `frontend/src/views/TransactionsView.vue` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Responsividade mobile funcionando
+- ✅ Menu mobile funcional
+
+---
+
+### FE-GEN-003: Implementar lazy loading de rotas ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Todas as rotas convertidas para lazy loading
+- Code splitting por módulo
+- Chunks nomeados com webpackChunkName
+- Redução do bundle inicial
+
+**Arquivos:**
+- `frontend/src/router/index.ts` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Lazy loading funcionando
+- ✅ Chunks organizados
+
+---
+
+### FE-GEN-004: Implementar code splitting ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Code splitting já implementado via lazy loading de rotas
+- Componentes pesados isolados (ApexCharts, jsPDF)
+- Chunks organizados por módulo
+
+**Validação:**
+- ✅ Code splitting funcionando
+- ✅ Bundle inicial reduzido
+
+---
+
+### FE-GEN-005: Adicionar ARIA labels para acessibilidade ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- aria-label em botões e elementos interativos
+- aria-hidden em ícones decorativos
+- aria-expanded e aria-controls para menus
+- role e tabindex para navegação por teclado
+- aria-sort em tabelas
+- Conformidade com WCAG 2.1
+
+**Arquivos:**
+- `frontend/src/components/layout/Header.vue` (modificado)
+- `frontend/src/components/layout/Sidebar.vue` (modificado)
+- `frontend/src/components/TransactionTable.vue` (modificado)
+- `frontend/src/components/AccountCard.vue` (modificado)
+- `frontend/src/views/ReportsView.vue` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ ARIA labels funcionando
+- ✅ Navegação por teclado funcional
+
+---
+
 ## 📝 Conclusão
 
 O projeto está **bem alinhado** com o TAREFAS.md. Todas as sprints marcadas como concluídas foram implementadas e validadas. As melhorias aplicadas incluem:
