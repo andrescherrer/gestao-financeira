@@ -17,6 +17,10 @@
             <Download class="h-4 w-4 mr-2" />
             Exportar CSV
           </Button>
+          <Button variant="outline" @click="handleExportPDF" :disabled="isExporting">
+            <Download class="h-4 w-4 mr-2" />
+            Exportar PDF
+          </Button>
         </div>
       </div>
 
@@ -169,6 +173,11 @@ import {
   exportAnnualReportToCSV,
   exportCategoryReportToCSV,
 } from '@/utils/csvExport'
+import {
+  exportMonthlyReportToPDF,
+  exportAnnualReportToPDF,
+  exportCategoryReportToPDF,
+} from '@/utils/pdfExport'
 
 const currentYear = new Date().getFullYear()
 const currentMonth = new Date().getMonth() + 1
@@ -224,6 +233,27 @@ async function handleExportCSV() {
     }
   } catch (error) {
     console.error('Erro ao exportar CSV:', error)
+  } finally {
+    isExporting.value = false
+  }
+}
+
+async function handleExportPDF() {
+  isExporting.value = true
+  try {
+    if (filters.value.period === 'monthly' && monthlyReport.value && filters.value.month) {
+      exportMonthlyReportToPDF(
+        monthlyReport.value,
+        filters.value.year || currentYear,
+        filters.value.month
+      )
+    } else if (filters.value.period === 'annual' && annualReport.value) {
+      exportAnnualReportToPDF(annualReport.value, filters.value.year || currentYear)
+    } else if (categoryReport.value) {
+      exportCategoryReportToPDF(categoryReport.value)
+    }
+  } catch (error) {
+    console.error('Erro ao exportar PDF:', error)
   } finally {
     isExporting.value = false
   }
