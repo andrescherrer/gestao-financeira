@@ -5,11 +5,19 @@
       <Breadcrumbs :items="[{ label: 'Relatórios' }]" />
 
       <!-- Header -->
-      <div class="mb-6">
-        <h1 class="text-4xl font-bold mb-2">Relatórios</h1>
-        <p class="text-muted-foreground">
-          Visualize seus dados financeiros com gráficos e análises
-        </p>
+      <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-4xl font-bold mb-2">Relatórios</h1>
+          <p class="text-muted-foreground">
+            Visualize seus dados financeiros com gráficos e análises
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <Button variant="outline" @click="handleExportCSV" :disabled="isExporting">
+            <Download class="h-4 w-4 mr-2" />
+            Exportar CSV
+          </Button>
+        </div>
       </div>
 
       <!-- Filters -->
@@ -138,13 +146,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import Layout from '@/components/layout/Layout.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import IncomeVsExpenseChart from '@/components/reports/IncomeVsExpenseChart.vue'
 import CategoryChart from '@/components/reports/CategoryChart.vue'
 import TrendsChart from '@/components/reports/TrendsChart.vue'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -153,6 +162,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Download } from 'lucide-vue-next'
+import { useReports } from '@/hooks/useReports'
+import {
+  exportMonthlyReportToCSV,
+  exportAnnualReportToCSV,
+  exportCategoryReportToCSV,
+} from '@/utils/csvExport'
 
 const currentYear = new Date().getFullYear()
 const currentMonth = new Date().getMonth() + 1
@@ -169,8 +185,48 @@ const filters = ref<{
   currency: 'BRL',
 })
 
+const isExporting = ref(false)
+const { useMonthlyReport, useAnnualReport, useCategoryReport } = useReports()
+
+// Queries para exportação
+const { data: monthlyReport } = useMonthlyReport({
+  year: filters.value.year || currentYear,
+  month: filters.value.month || currentMonth,
+  currency: filters.value.currency || 'BRL',
+})
+
+const { data: annualReport } = useAnnualReport({
+  year: filters.value.year || currentYear,
+  currency: filters.value.currency || 'BRL',
+})
+
+const { data: categoryReport } = useCategoryReport({
+  currency: filters.value.currency || 'BRL',
+})
+
 function handleFilterChange() {
   // Os componentes de gráfico vão reagir automaticamente às mudanças
+}
+
+async function handleExportCSV() {
+  isExporting.value = true
+  try {
+    if (filters.value.period === 'monthly' && monthlyReport.value && filters.value.month) {
+      exportMonthlyReportToCSV(
+        monthlyReport.value,
+        filters.value.year || currentYear,
+        filters.value.month
+      )
+    } else if (filters.value.period === 'annual' && annualReport.value) {
+      exportAnnualReportToCSV(annualReport.value, filters.value.year || currentYear)
+    } else if (categoryReport.value) {
+      exportCategoryReportToCSV(categoryReport.value)
+    }
+  } catch (error) {
+    console.error('Erro ao exportar CSV:', error)
+  } finally {
+    isExporting.value = false
+  }
 }
 </script>
 
