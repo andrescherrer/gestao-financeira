@@ -992,6 +992,29 @@ docker-compose --profile recurring run process-recurring
 
 ---
 
+### FE-GEN-006: Otimizar imagens (Vue 3) ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Componente OptimizedImage criado
+- Composable useImageOptimization para utilitários
+- Lazy loading nativo
+- Suporte a srcset e sizes
+- Placeholder durante carregamento
+- Tratamento de erros
+
+**Arquivos:**
+- `frontend/src/components/OptimizedImage.vue`
+- `frontend/src/composables/useImageOptimization.ts`
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Componente funcional
+- ✅ Lazy loading funcionando
+
+---
+
 ## 📝 Conclusão
 
 O projeto está **bem alinhado** com o TAREFAS.md. Todas as sprints marcadas como concluídas foram implementadas e validadas. As melhorias aplicadas incluem:
