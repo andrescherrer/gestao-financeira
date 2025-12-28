@@ -563,6 +563,143 @@ docker-compose --profile recurring run process-recurring
 
 ## Sprint 3.5: Módulo de Orçamento - Frontend
 
+### FE-BUD-001: Criar hook useBudgets (TanStack Query) ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Instalado @tanstack/vue-query
+- Configurado QueryClient no main.ts
+- Criado serviço de API budgets.ts
+- Adicionados tipos TypeScript para Budget
+- Criado hook useBudgets com queries e mutations
+- Suporte a list, get, create, update, delete, getProgress
+- Cache automático e invalidação
+
+**Arquivos:**
+- `frontend/src/api/budgets.ts`
+- `frontend/src/hooks/useBudgets.ts`
+- `frontend/src/api/types.ts` (modificado)
+- `frontend/src/main.ts` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Hook funcional com TanStack Query
+- ✅ Mutations com invalidação de cache
+
+---
+
+### FE-BUD-002: Criar página de dashboard de orçamentos (/budget) ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Criada página BudgetsView.vue
+- Filtros por período, ano, mês e contexto
+- Estatísticas (total, mensais, anuais)
+- Grid de cards com orçamentos
+- Integração com hook useBudgets
+- Rota configurada
+- Link no Sidebar
+
+**Arquivos:**
+- `frontend/src/views/BudgetsView.vue`
+- `frontend/src/router/index.ts` (modificado)
+- `frontend/src/components/layout/Sidebar.vue` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Página funcional
+- ✅ Filtros funcionando
+
+---
+
+### FE-BUD-003: Criar componente de progresso de orçamento ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Criado componente BudgetProgress.vue
+- Barra de progresso visual com cores dinâmicas
+- Exibição de valores (orçado, gasto, restante)
+- Badge de status (Dentro do Orçamento, Próximo do Limite, Excedido)
+- Integração com useBudgetProgress hook
+- Estados: loading, error, success
+
+**Arquivos:**
+- `frontend/src/components/BudgetProgress.vue`
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Componente funcional
+- ✅ Cores dinâmicas baseadas em progresso
+
+---
+
+### FE-BUD-004: Criar formulário de orçamento ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Criado schema de validação budget.ts
+- Criado componente BudgetForm.vue
+- Suporte para criação e edição
+- Validação condicional (mês obrigatório para MONTHLY)
+- Integração com CategorySelect
+- Estados: loading, error
+
+**Arquivos:**
+- `frontend/src/validations/budget.ts`
+- `frontend/src/components/BudgetForm.vue`
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Validação funcionando
+- ✅ Formulário funcional
+
+---
+
+### FE-BUD-005: Integrar com API de budgets ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Integração já realizada através do hook useBudgets
+- Serviço de API budgets.ts criado
+- Todas as operações CRUD integradas
+- Progresso de orçamento integrado
+
+**Validação:**
+- ✅ API integrada
+- ✅ Todas as operações funcionando
+
+---
+
+### FE-BUD-006: Implementar alertas de limite de orçamento ✅
+**Status:** Concluída  
+**Data:** 2025-12-27
+
+**Implementação:**
+- Criado composable useBudgetAlerts
+- Monitoramento automático de orçamentos ativos
+- Alertas via toast (Info, Warning, Error)
+- Três níveis de alerta (80%, 90%, 100%)
+- Prevenção de spam de alertas
+- Integração na página BudgetsView
+
+**Arquivos:**
+- `frontend/src/composables/useBudgetAlerts.ts`
+- `frontend/src/views/BudgetsView.vue` (modificado)
+
+**Validação:**
+- ✅ Type-check passou
+- ✅ Alertas funcionando
+- ✅ Prevenção de spam funcionando
+
+---
+
+## Sprint 3.6: Módulo de Relatórios - Frontend
+
 ### FE-REP-001: Instalar e configurar Recharts ✅
 **Status:** Concluída  
 **Data:** 2025-12-27
@@ -753,114 +890,6 @@ docker-compose --profile recurring run process-recurring
 **Validação:**
 - ✅ Type-check passou
 - ✅ Exportação funcionando
-
----
-
-**Status no TAREFAS.md:** ⏳ Em progresso (3/6 tarefas concluídas)  
-**Status Real:** ✅ **PARCIALMENTE IMPLEMENTADO**
-
-### Tarefas Implementadas
-
-#### PERF-001: Configurar Redis no backend ✅
-**Status:** ✅ **CONFIRMADO**
-
-**Evidências:**
-- ✅ `backend/pkg/cache/cache.go` - Serviço de cache genérico
-- ✅ `backend/pkg/cache/cache_test.go` - Testes unitários
-- ✅ `backend/pkg/health/health.go` - Verificação de Redis no health check
-- ✅ `backend/cmd/api/main.go` - Cache service inicializado
-- ✅ `docs/tarefas_concluidas/20251227_PERF-001.md` - Documentação
-
-**Funcionalidades:**
-- ✅ Serviço de cache genérico com Redis
-- ✅ Health check integrado
-- ✅ Tratamento de erros (graceful degradation)
-- ✅ Testes unitários passando
-
-#### PERF-002: Implementar cache em AccountRepository ✅
-**Status:** ✅ **CONFIRMADO**
-
-**Evidências:**
-- ✅ `backend/internal/account/infrastructure/persistence/cached_account_repository.go` - Decorator de cache
-- ✅ `backend/internal/account/infrastructure/persistence/cached_account_data.go` - Estrutura serializável
-- ✅ `backend/internal/account/infrastructure/persistence/cached_account_repository_test.go` - Testes unitários
-- ✅ `backend/cmd/api/main.go` - Integração do cached repository
-- ✅ `docs/tarefas_concluidas/20251227_PERF-002.md` - Documentação
-
-**Funcionalidades:**
-- ✅ Cache de FindByID, FindByUserID, FindByUserIDAndContext
-- ✅ Invalidação automática em Save e Delete
-- ✅ TTL de 15 minutos
-- ✅ Testes unitários passando
-
-#### PERF-003: Implementar cache em CategoryRepository ✅
-**Status:** ✅ **CONFIRMADO**
-
-**Evidências:**
-- ✅ `backend/internal/category/infrastructure/persistence/cached_category_repository.go` - Decorator de cache
-- ✅ `backend/internal/category/infrastructure/persistence/cached_category_data.go` - Estrutura serializável
-- ✅ `backend/internal/category/infrastructure/persistence/cached_category_repository_test.go` - Testes unitários
-- ✅ `backend/cmd/api/main.go` - Integração do cached repository
-- ✅ `docs/tarefas_concluidas/20251227_PERF-003.md` - Documentação
-
-**Funcionalidades:**
-- ✅ Cache de FindByID, FindByUserID, FindByUserIDAndActive, FindByUserIDAndSlug
-- ✅ Invalidação automática em Save e Delete
-- ✅ TTL de 15 minutos
-- ✅ Testes unitários passando
-
-#### PERF-004: Implementar paginação no backend ✅
-**Status:** ✅ **CONFIRMADO**
-
-**Evidências:**
-- ✅ `backend/pkg/pagination/pagination.go` - Pacote genérico de paginação
-- ✅ `backend/pkg/pagination/pagination_test.go` - Testes unitários
-- ✅ `backend/internal/transaction/` - Paginação implementada em Transactions
-- ✅ `docs/tarefas_concluidas/20251227_PERF-004.md` - Documentação
-
-**Funcionalidades:**
-- ✅ Paginação genérica reutilizável
-- ✅ Paginação em Transactions com filtros
-- ✅ Metadata de paginação na resposta
-- ✅ Compatibilidade retroativa
-- ✅ Testes unitários passando
-
-#### PERF-005: Implementar rate limiting ✅
-**Status:** ✅ **CONFIRMADO**
-
-**Evidências:**
-- ✅ `backend/pkg/middleware/ratelimit.go` - Middleware de rate limiting
-- ✅ `backend/pkg/middleware/ratelimit_test.go` - Testes unitários
-- ✅ `backend/cmd/api/main.go` - Rate limiting integrado
-- ✅ `docs/tarefas_concluidas/20251227_PERF-005.md` - Documentação
-
-**Funcionalidades:**
-- ✅ Rate limiting por IP (100 req/min)
-- ✅ Rate limiting por usuário autenticado
-- ✅ Headers de rate limit na resposta
-- ✅ Graceful degradation (funciona sem Redis)
-- ✅ Testes unitários passando
-
-#### PERF-006: Criar índices no banco de dados ✅
-**Status:** ✅ **CONFIRMADO**
-
-**Evidências:**
-- ✅ `migrations/009_add_performance_indexes.sql` - Migration com índices
-- ✅ `docs/tarefas_concluidas/20251227_PERF-006.md` - Documentação
-
-**Funcionalidades:**
-- ✅ Índices compostos para queries de relatórios
-- ✅ Índices parciais (com WHERE clause)
-- ✅ Índices para transações recorrentes
-- ✅ Índices para lookups otimizados
-- ✅ 15+ índices adicionais criados
-
-### Status da Sprint 3.4
-
-**Status no TAREFAS.md:** ✅ Completo  
-**Status Real:** ✅ **COMPLETO E INTEGRADO**
-
-**Tarefas Concluídas:** 6/6 (100%)
 
 ---
 
