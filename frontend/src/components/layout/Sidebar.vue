@@ -1,7 +1,10 @@
 <template>
   <aside
+    id="sidebar"
     class="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-background transition-transform md:translate-x-0"
     :class="{ '-translate-x-full': !isOpen, 'translate-x-0': isOpen }"
+    :aria-hidden="!isOpen"
+    aria-label="Menu de navegação principal"
   >
     <div class="flex h-full flex-col">
       <!-- Logo e Nome -->
@@ -15,8 +18,8 @@
       </div>
 
       <!-- Menu de Navegação -->
-      <nav class="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6">
-        <ul class="space-y-1">
+      <nav class="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6" aria-label="Navegação principal">
+        <ul class="space-y-1" role="list">
           <li>
             <RouterLink
               to="/"

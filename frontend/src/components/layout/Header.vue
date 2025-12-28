@@ -9,10 +9,12 @@
           size="icon"
           class="md:hidden"
           @click="$emit('toggle-sidebar')"
-          aria-label="Toggle menu"
+          :aria-label="sidebarOpen ? 'Fechar menu' : 'Abrir menu'"
+          :aria-expanded="sidebarOpen"
+          aria-controls="sidebar"
         >
-          <Menu v-if="!sidebarOpen" class="h-5 w-5" />
-          <X v-else class="h-5 w-5" />
+          <Menu v-if="!sidebarOpen" class="h-5 w-5" aria-hidden="true" />
+          <X v-else class="h-5 w-5" aria-hidden="true" />
         </Button>
         <span class="font-medium text-foreground text-sm sm:text-base">{{ pageTitle }}</span>
       </div>
@@ -25,9 +27,11 @@
           size="icon"
           @click="toggleTheme"
           :title="isDark ? 'Alternar para modo claro' : 'Alternar para modo escuro'"
+          :aria-label="isDark ? 'Alternar para modo claro' : 'Alternar para modo escuro'"
+          aria-pressed="false"
         >
-          <Sun v-if="isDark" class="h-5 w-5" />
-          <Moon v-else class="h-5 w-5" />
+          <Sun v-if="isDark" class="h-5 w-5" aria-hidden="true" />
+          <Moon v-else class="h-5 w-5" aria-hidden="true" />
         </Button>
 
         <!-- Ícone de Notificação -->
@@ -36,11 +40,15 @@
           size="icon"
           class="relative"
           title="Notificações"
+          aria-label="Notificações"
+          :aria-describedby="hasNotifications ? 'notification-badge' : undefined"
         >
-          <Bell class="h-5 w-5" />
+          <Bell class="h-5 w-5" aria-hidden="true" />
           <span
             v-if="hasNotifications"
+            id="notification-badge"
             class="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive"
+            aria-label="Você tem notificações não lidas"
           ></span>
         </Button>
 

@@ -2,6 +2,11 @@
   <Card
     class="group relative cursor-pointer overflow-hidden transition-all hover:border-primary hover:shadow-lg"
     @click="handleClick"
+    role="button"
+    :aria-label="`Conta ${account.name}, saldo ${formatCurrency(account.balance, account.currency)}`"
+    tabindex="0"
+    @keydown.enter="handleClick"
+    @keydown.space.prevent="handleClick"
   >
     <!-- Background gradient effect -->
     <div
