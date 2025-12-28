@@ -171,3 +171,16 @@ export interface BudgetProgress {
   month?: number
 }
 
+// Re-export report types from reports.ts
+export type {
+  MonthlyReport,
+  MonthlyCategorySummary,
+  AnnualReport,
+  MonthlyBreakdown,
+  MonthlySummary,
+  CategoryReport,
+  CategorySummary,
+  IncomeVsExpenseReport,
+  PeriodSummary,
+} from './reports'
+

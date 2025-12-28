@@ -28,6 +28,7 @@
     "pinia": "^3.0.4",
     "primeicons": "^7.0.0",
     "primevue": "^4.5.4",
+    "recharts": "^3.6.0",
     "reka-ui": "^2.7.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
