@@ -124,9 +124,11 @@ export function exportAnnualReportToCSV(report: any, year: number): void {
     ]
 
     report.monthly_breakdown.forEach((month: any) => {
-      const monthIndex = month.month ? month.month - 1 : 0
+      const monthNum = month.month && typeof month.month === 'number' ? month.month : 1
+      const monthIndex = Math.max(0, Math.min(11, monthNum - 1))
+      const monthName = monthNames[monthIndex] || 'Desconhecido'
       data.push({
-        'Ano': monthNames[monthIndex],
+        'Ano': monthName as any, // Permite string para meses
         'Moeda': report.currency,
         'Total Receitas': month.total_income,
         'Total Despesas': month.total_expense,
