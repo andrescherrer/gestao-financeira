@@ -9,9 +9,13 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { authService } from '@/api/auth'
 import { Toaster } from '@/components/ui/toast'
+import { useTheme } from '@/composables/useTheme'
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+// Inicializar tema
+useTheme()
 
 onMounted(async () => {
   // Inicializar token do localStorage

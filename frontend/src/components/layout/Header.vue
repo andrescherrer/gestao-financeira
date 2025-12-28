@@ -8,6 +8,17 @@
 
       <!-- Right: Notificações e Usuário -->
       <div class="flex items-center gap-4">
+        <!-- Toggle de Tema -->
+        <Button
+          variant="ghost"
+          size="icon"
+          @click="toggleTheme"
+          :title="isDark ? 'Alternar para modo claro' : 'Alternar para modo escuro'"
+        >
+          <Sun v-if="isDark" class="h-5 w-5" />
+          <Moon v-else class="h-5 w-5" />
+        </Button>
+
         <!-- Ícone de Notificação -->
         <Button
           variant="ghost"
@@ -85,11 +96,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Bell, ChevronDown, LogOut, User, Settings } from 'lucide-vue-next'
+import { Bell, ChevronDown, LogOut, User, Settings, Sun, Moon } from 'lucide-vue-next'
+import { useTheme } from '@/composables/useTheme'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+const { isDark, toggleTheme } = useTheme()
 
 const hasNotifications = ref(false)
 
