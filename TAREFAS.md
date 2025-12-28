@@ -522,7 +522,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | FE-GEN-003 | Implementar lazy loading de rotas | 🟣 | 🟡 | 2h | FE-001 | ✅ |
 | FE-GEN-004 | Implementar code splitting | 🟣 | 🟡 | 2h | FE-001 | ✅ |
 | FE-GEN-005 | Adicionar ARIA labels para acessibilidade | 🟣 | 🟡 | 4h | FE-003 | ✅ |
-| FE-GEN-006 | Otimizar imagens (Next.js Image) | 🟣 | 🟢 | 2h | FE-001 | ⏳ |
+| FE-GEN-006 | Otimizar imagens (Vue 3) | 🟣 | 🟢 | 2h | FE-001 | ✅ |
 
 **Entregável Sprint 3.7:** Interface otimizada e acessível
 
