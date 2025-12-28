@@ -106,6 +106,22 @@
               </div>
             </RouterLink>
           </li>
+          <li>
+            <RouterLink
+              to="/reports"
+              class="group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
+              :class="
+                $route.name === 'reports'
+                  ? 'bg-accent text-accent-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+              "
+            >
+              <div class="flex items-center gap-3">
+                <BarChart class="h-4 w-4" />
+                <span>Relatórios</span>
+              </div>
+            </RouterLink>
+          </li>
         </ul>
       </nav>
     </div>
@@ -113,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { Home, Wallet, List, Tag, Target } from 'lucide-vue-next'
+import { Home, Wallet, List, Tag, Target, BarChart } from 'lucide-vue-next'
 
 defineProps<{
   isOpen?: boolean
