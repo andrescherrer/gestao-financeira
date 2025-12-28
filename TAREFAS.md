@@ -504,9 +504,9 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | FE-REP-004 | Criar componente de gráfico receitas vs despesas | 🟣 | 🔴 | 4h | FE-REP-001 | ✅ |
 | FE-REP-005 | Criar componente de gráfico por categoria | 🟣 | 🔴 | 4h | FE-REP-001 | ✅ |
 | FE-REP-006 | Criar componente de gráfico de tendências temporais | 🟣 | 🔴 | 4h | FE-REP-001 | ✅ |
-| FE-REP-007 | Criar filtros de período (mensal, anual) | 🟣 | 🔴 | 4h | FE-REP-003 | ⏳ |
-| FE-REP-008 | Integrar com API de relatórios | 🟣 | 🔴 | 4h | FE-REP-003, REP-007 | ⏳ |
-| FE-REP-009 | Implementar exportação CSV | 🟣 | 🟡 | 4h | FE-REP-003 | ⏳ |
+| FE-REP-007 | Criar filtros de período (mensal, anual) | 🟣 | 🔴 | 4h | FE-REP-003 | ✅ |
+| FE-REP-008 | Integrar com API de relatórios | 🟣 | 🔴 | 4h | FE-REP-003, REP-007 | ✅ |
+| FE-REP-009 | Implementar exportação CSV | 🟣 | 🟡 | 4h | FE-REP-003 | ✅ |
 | FE-REP-010 | Implementar exportação PDF | 🟣 | 🟢 | 6h | FE-REP-003 | ⏳ |
 
 **Entregável Sprint 3.6:** Módulo de relatórios com gráficos funcionando
