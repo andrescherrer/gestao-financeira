@@ -1,21 +1,21 @@
 <template>
   <aside
-    class="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-background transition-transform"
+    class="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-background transition-transform md:translate-x-0"
     :class="{ '-translate-x-full': !isOpen, 'translate-x-0': isOpen }"
   >
     <div class="flex h-full flex-col">
       <!-- Logo e Nome -->
-      <div class="border-b border-border px-6 py-5">
-        <RouterLink to="/" class="flex items-center gap-3 transition-opacity hover:opacity-80">
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 shadow-sm">
-            <Wallet class="h-6 w-6 text-white" />
+      <div class="border-b border-border px-4 sm:px-6 py-4 sm:py-5">
+        <RouterLink to="/" class="flex items-center gap-2 sm:gap-3 transition-opacity hover:opacity-80">
+          <div class="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 shadow-sm">
+            <Wallet class="h-4 w-4 sm:h-6 sm:w-6 text-white" />
           </div>
-          <span class="text-lg font-bold text-foreground">Gestão Financeira</span>
+          <span class="text-base sm:text-lg font-bold text-foreground">Gestão Financeira</span>
         </RouterLink>
       </div>
 
       <!-- Menu de Navegação -->
-      <nav class="flex-1 overflow-y-auto px-4 py-6">
+      <nav class="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6">
         <ul class="space-y-1">
           <li>
             <RouterLink

@@ -1,13 +1,24 @@
 <template>
   <header class="sticky top-0 z-50 h-16 border-b border-border bg-background">
-    <div class="flex h-full items-center justify-between px-6">
-      <!-- Left: Breadcrumbs ou título da página -->
-      <div class="flex items-center gap-2 text-sm text-muted-foreground">
-        <span class="font-medium text-foreground">{{ pageTitle }}</span>
+    <div class="flex h-full items-center justify-between px-4 sm:px-6">
+      <!-- Left: Menu Mobile e Título -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <!-- Botão Menu Mobile -->
+        <Button
+          variant="ghost"
+          size="icon"
+          class="md:hidden"
+          @click="$emit('toggle-sidebar')"
+          aria-label="Toggle menu"
+        >
+          <Menu v-if="!sidebarOpen" class="h-5 w-5" />
+          <X v-else class="h-5 w-5" />
+        </Button>
+        <span class="font-medium text-foreground text-sm sm:text-base">{{ pageTitle }}</span>
       </div>
 
       <!-- Right: Notificações e Usuário -->
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2 sm:gap-4">
         <!-- Toggle de Tema -->
         <Button
           variant="ghost"
@@ -96,8 +107,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Bell, ChevronDown, LogOut, User, Settings, Sun, Moon } from 'lucide-vue-next'
+import { Bell, ChevronDown, LogOut, User, Settings, Sun, Moon, Menu, X } from 'lucide-vue-next'
 import { useTheme } from '@/composables/useTheme'
+
+interface Props {
+  sidebarOpen?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  sidebarOpen: false,
+})
+
+defineEmits<{
+  'toggle-sidebar': []
+}>()
 
 const router = useRouter()
 const route = useRoute()

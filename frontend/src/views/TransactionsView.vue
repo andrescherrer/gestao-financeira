@@ -7,12 +7,12 @@
       <!-- Header -->
       <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-4xl font-bold mb-2">Transações</h1>
-          <p class="text-muted-foreground">
+          <h1 class="text-2xl sm:text-4xl font-bold mb-2">Transações</h1>
+          <p class="text-sm sm:text-base text-muted-foreground">
             Gerencie suas receitas e despesas
           </p>
         </div>
-        <Button as-child>
+        <Button as-child class="w-full sm:w-auto">
           <router-link to="/transactions/new">
             <Plus class="h-4 w-4 mr-2" />
             Nova Transação
