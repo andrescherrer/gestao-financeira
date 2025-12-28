@@ -518,7 +518,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
 | FE-GEN-001 | Implementar dark mode (shadcn/ui) | 🟣 | 🟡 | 4h | FE-003 | ✅ |
-| FE-GEN-002 | Melhorar responsividade mobile | 🟣 | 🟡 | 8h | FE-006 | ⏳ |
+| FE-GEN-002 | Melhorar responsividade mobile | 🟣 | 🟡 | 8h | FE-006 | ✅ |
 | FE-GEN-003 | Implementar lazy loading de rotas | 🟣 | 🟡 | 2h | FE-001 | ⏳ |
 | FE-GEN-004 | Implementar code splitting | 🟣 | 🟡 | 2h | FE-001 | ⏳ |
 | FE-GEN-005 | Adicionar ARIA labels para acessibilidade | 🟣 | 🟡 | 4h | FE-003 | ⏳ |
