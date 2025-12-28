@@ -1,80 +1,205 @@
-# Binários
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-*.test
-*.out
-/bin/
-/dist/
+# ==========================================
+# Backend (Go)
+# ==========================================
 
-# Go
-*.mod.sum
-*.mod.cache
-*.test
-*.prof
-*.log
-go.work
-go.work.sum
+# Binários compilados
+backend/bin/
+backend/api
 
-# IDEs
+# Arquivos de cobertura de testes
+backend/*.out
+backend/coverage*.out
+
+# Dependências vendorizadas (use go.mod ao invés)
+backend/vendor/
+
+# Arquivos de ambiente
+backend/.env
+backend/.env.local
+backend/.env.*.local
+backend/.env.development
+backend/.env.production
+
+# Arquivos temporários do Go
+backend/*.exe
+backend/*.exe~
+backend/*.dll
+backend/*.so
+backend/*.dylib
+backend/*.test
+
+# ==========================================
+# Frontend (Vue3 + Node.js)
+# ==========================================
+
+# Dependências
+frontend/node_modules/
+
+# Build de produção
+frontend/dist/
+frontend/dist-ssr/
+frontend/.output/
+
+# Cache do Vite
+frontend/.vite/
+frontend/.cache/
+
+# Arquivos de ambiente
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/.env.development
+frontend/.env.production
+
+# Logs do NPM/Yarn/PNPM
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+
+# Testes
+frontend/coverage/
+frontend/.nyc_output/
+
+# ==========================================
+# IDEs e Editores
+# ==========================================
+
+# VSCode
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# JetBrains IDEs (IntelliJ, GoLand, WebStorm)
 .idea/
-.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Visual Studio
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
 *.swp
 *.swo
 *~
+.*.swp
+.*.swo
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ==========================================
+# Sistemas Operacionais
+# ==========================================
+
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
 
-# Environment
-.env
-.env.local
-.env.*.local
-*.env
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
 
-# Logs
+# Linux
+.directory
+.Trash-*
+
+# ==========================================
+# Logs e Arquivos Temporários
+# ==========================================
+
+# Logs gerais
 *.log
 logs/
 *.log.*
 
-# Database
+# Arquivos temporários
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*.swo
+.temp/
+temp/
+
+# ==========================================
+# Docker (se utilizado)
+# ==========================================
+
+# Não ignorar Dockerfiles, mas ignorar possíveis arquivos gerados
+docker-compose.override.yml
+.dockerignore
+
+# ==========================================
+# Banco de Dados Local
+# ==========================================
+
+# SQLite (se usado em desenvolvimento)
 *.db
 *.sqlite
 *.sqlite3
 
-# Docker
-docker-compose.override.yml
+# Dumps
+*.dump
+*.sql.gz
 
-# Node/Next.js (Frontend)
-node_modules/
-.next/
-out/
-build/
-dist/
-*.tsbuildinfo
-.npm
-.eslintcache
-.yarn/
-.pnp.*
+# ==========================================
+# Certificados e Chaves
+# ==========================================
 
-# Testes
-coverage/
-.nyc_output/
-*.coverage
+# Certificados SSL/TLS
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
 
-# Temporários
-tmp/
-temp/
-*.tmp
-*.bak
-*.swp
-*~
+# Chaves SSH
+id_rsa
+id_rsa.pub
+*.ppk
 
-# OS
-.DS_Store
-Thumbs.db
+# ==========================================
+# Outros
+# ==========================================
 
-# Backups
-*.backup
-*.old
+# Arquivos de ambiente genéricos na raiz
+.env
+.env.local
+.env.*.local
 
+# Scripts de setup locais
+setup.local.sh
+install.local.sh
+
+# Dados de teste locais
+test-data/
+sample-data/
+
+# Documentação gerada
+docs/generated/
