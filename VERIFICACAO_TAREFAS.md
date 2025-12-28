@@ -451,7 +451,117 @@ docker-compose --profile recurring run process-recurring
 
 ---
 
-## Sprint 3.6: Módulo de Relatórios - Frontend
+## Sprint 3.4: Cache e Performance - Backend (Parcial)
+
+**Status no TAREFAS.md:** ⏳ Em progresso (3/6 tarefas concluídas)  
+**Status Real:** ✅ **PARCIALMENTE IMPLEMENTADO**
+
+### Tarefas Implementadas
+
+#### PERF-001: Configurar Redis no backend ✅
+**Status:** ✅ **CONFIRMADO**
+
+**Evidências:**
+- ✅ `backend/pkg/cache/cache.go` - Serviço de cache genérico
+- ✅ `backend/pkg/cache/cache_test.go` - Testes unitários
+- ✅ `backend/pkg/health/health.go` - Verificação de Redis no health check
+- ✅ `backend/cmd/api/main.go` - Cache service inicializado
+- ✅ `docs/tarefas_concluidas/20251227_PERF-001.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Serviço de cache genérico com Redis
+- ✅ Health check integrado
+- ✅ Tratamento de erros (graceful degradation)
+- ✅ Testes unitários passando
+
+#### PERF-002: Implementar cache em AccountRepository ✅
+**Status:** ✅ **CONFIRMADO**
+
+**Evidências:**
+- ✅ `backend/internal/account/infrastructure/persistence/cached_account_repository.go` - Decorator de cache
+- ✅ `backend/internal/account/infrastructure/persistence/cached_account_data.go` - Estrutura serializável
+- ✅ `backend/internal/account/infrastructure/persistence/cached_account_repository_test.go` - Testes unitários
+- ✅ `backend/cmd/api/main.go` - Integração do cached repository
+- ✅ `docs/tarefas_concluidas/20251227_PERF-002.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Cache de FindByID, FindByUserID, FindByUserIDAndContext
+- ✅ Invalidação automática em Save e Delete
+- ✅ TTL de 15 minutos
+- ✅ Testes unitários passando
+
+#### PERF-003: Implementar cache em CategoryRepository ✅
+**Status:** ✅ **CONFIRMADO**
+
+**Evidências:**
+- ✅ `backend/internal/category/infrastructure/persistence/cached_category_repository.go` - Decorator de cache
+- ✅ `backend/internal/category/infrastructure/persistence/cached_category_data.go` - Estrutura serializável
+- ✅ `backend/internal/category/infrastructure/persistence/cached_category_repository_test.go` - Testes unitários
+- ✅ `backend/cmd/api/main.go` - Integração do cached repository
+- ✅ `docs/tarefas_concluidas/20251227_PERF-003.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Cache de FindByID, FindByUserID, FindByUserIDAndActive, FindByUserIDAndSlug
+- ✅ Invalidação automática em Save e Delete
+- ✅ TTL de 15 minutos
+- ✅ Testes unitários passando
+
+#### PERF-004: Implementar paginação no backend ✅
+**Status:** ✅ **CONFIRMADO**
+
+**Evidências:**
+- ✅ `backend/pkg/pagination/pagination.go` - Pacote genérico de paginação
+- ✅ `backend/pkg/pagination/pagination_test.go` - Testes unitários
+- ✅ `backend/internal/transaction/` - Paginação implementada em Transactions
+- ✅ `docs/tarefas_concluidas/20251227_PERF-004.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Paginação genérica reutilizável
+- ✅ Paginação em Transactions com filtros
+- ✅ Metadata de paginação na resposta
+- ✅ Compatibilidade retroativa
+- ✅ Testes unitários passando
+
+#### PERF-005: Implementar rate limiting ✅
+**Status:** ✅ **CONFIRMADO**
+
+**Evidências:**
+- ✅ `backend/pkg/middleware/ratelimit.go` - Middleware de rate limiting
+- ✅ `backend/pkg/middleware/ratelimit_test.go` - Testes unitários
+- ✅ `backend/cmd/api/main.go` - Rate limiting integrado
+- ✅ `docs/tarefas_concluidas/20251227_PERF-005.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Rate limiting por IP (100 req/min)
+- ✅ Rate limiting por usuário autenticado
+- ✅ Headers de rate limit na resposta
+- ✅ Graceful degradation (funciona sem Redis)
+- ✅ Testes unitários passando
+
+#### PERF-006: Criar índices no banco de dados ✅
+**Status:** ✅ **CONFIRMADO**
+
+**Evidências:**
+- ✅ `migrations/009_add_performance_indexes.sql` - Migration com índices
+- ✅ `docs/tarefas_concluidas/20251227_PERF-006.md` - Documentação
+
+**Funcionalidades:**
+- ✅ Índices compostos para queries de relatórios
+- ✅ Índices parciais (com WHERE clause)
+- ✅ Índices para transações recorrentes
+- ✅ Índices para lookups otimizados
+- ✅ 15+ índices adicionais criados
+
+### Status da Sprint 3.4
+
+**Status no TAREFAS.md:** ✅ Completo  
+**Status Real:** ✅ **COMPLETO E INTEGRADO**
+
+**Tarefas Concluídas:** 6/6 (100%)
+
+---
+
+## Sprint 3.5: Módulo de Orçamento - Frontend
 
 ### FE-REP-001: Instalar e configurar Recharts ✅
 **Status:** Concluída  
