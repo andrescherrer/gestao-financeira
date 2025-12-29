@@ -111,6 +111,48 @@ func (m *mockTransactionRepository) CountByAccountID(accountID accountvalueobjec
 	return count, nil
 }
 
+func (m *mockTransactionRepository) FindActiveRecurringTransactions() ([]*entities.Transaction, error) {
+	var result []*entities.Transaction
+	for _, transaction := range m.transactions {
+		// Simple mock: return all transactions (real implementation would check isRecurring flag)
+		result = append(result, transaction)
+	}
+	return result, nil
+}
+
+func (m *mockTransactionRepository) FindByParentIDAndDate(parentID transactionvalueobjects.TransactionID, date time.Time) (*entities.Transaction, error) {
+	// Simple mock: return nil (not found)
+	return nil, nil
+}
+
+func (m *mockTransactionRepository) FindByUserIDAndFiltersWithPagination(
+	userID identityvalueobjects.UserID,
+	accountID string,
+	transactionType string,
+	offset, limit int,
+) ([]*entities.Transaction, int64, error) {
+	var result []*entities.Transaction
+	var total int64
+
+	for _, transaction := range m.transactions {
+		if transaction.UserID().Value() != userID.Value() {
+			continue
+		}
+		if accountID != "" && transaction.AccountID().Value() != accountID {
+			continue
+		}
+		if transactionType != "" && transaction.TransactionType().Value() != transactionType {
+			continue
+		}
+		total++
+		if len(result) < limit && len(result) >= offset {
+			result = append(result, transaction)
+		}
+	}
+
+	return result, total, nil
+}
+
 func TestCreateTransactionUseCase_Execute(t *testing.T) {
 	userID := identityvalueobjects.GenerateUserID()
 	accountID := accountvalueobjects.GenerateAccountID()

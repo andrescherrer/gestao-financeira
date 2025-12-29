@@ -31,7 +31,13 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 3.2: Recurring Transactions - Backend** (REC-001 a REC-004): ✅ Completo e Integrado
 
 ### ⏳ Em Progresso / Pendente
+- **Sprint 4.1: Observabilidade Backend**: ⏳ Pendente
 - **Demais sprints**: ⏳ Não iniciadas
+
+### ✅ Implementações Recentes (2025-12-28)
+- **SOFT-DELETE-001**: ✅ Soft Delete Consistente - Completo
+- **MIGRATIONS-001**: ✅ Migrations Versionadas e Rollback - Completo
+- **CONFIG-001**: ✅ Configuração Centralizada - Completo
 
 ### 📈 Progresso
 - **Fase 1 (Fundação e MVP)**: ✅ 100% concluído
@@ -702,5 +708,58 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ---
 
-**Última atualização:** 2025-12-27 - Baseado no PLANEJAMENTO_GO.md e verificação de implementação (VERIFICACAO_TAREFAS.md)
+---
+
+## 🔧 Melhorias de Infraestrutura (2025-12-28)
+
+### Sprint INFRA-001: Soft Delete Consistente
+
+| ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
+|----|--------|------|------------|---------|--------------|--------|
+| SOFT-DELETE-001 | Implementar soft delete consistente | 🔵 | 🔴 | 6h | TX-012, AC-010, CAT-010 | ✅ |
+| SOFT-DELETE-002 | Criar endpoints para restaurar itens deletados | 🔵 | 🔴 | 4h | SOFT-DELETE-001 | ✅ |
+| SOFT-DELETE-003 | Criar endpoints para deletar permanentemente | 🔵 | 🟡 | 4h | SOFT-DELETE-001 | ✅ |
+| SOFT-DELETE-004 | Criar CLI tool para limpeza periódica | 🔵 | 🟡 | 4h | SOFT-DELETE-001 | ✅ |
+| SOFT-DELETE-005 | Testes para restore e permanent delete | 🟤 | 🔴 | 4h | SOFT-DELETE-002, SOFT-DELETE-003 | ✅ |
+
+**Entregável INFRA-001:** ✅ Sistema de soft delete completo com restore e limpeza periódica
+
+**Documentação:** `docs/tarefas_concluidas/20251228_220227_SOFT-DELETE-001.md`
+
+---
+
+### Sprint INFRA-002: Migrations Versionadas
+
+| ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
+|----|--------|------|------------|---------|--------------|--------|
+| MIGRATIONS-001 | Integrar golang-migrate/migrate | 🔵 | 🔴 | 4h | BE-004 | ✅ |
+| MIGRATIONS-002 | Converter migrations para formato up/down | 🔵 | 🔴 | 4h | MIGRATIONS-001 | ✅ |
+| MIGRATIONS-003 | Criar CLI tool para gerenciar migrations | 🔵 | 🔴 | 4h | MIGRATIONS-002 | ✅ |
+| MIGRATIONS-004 | Integrar execução automática no startup | 🔵 | 🔴 | 2h | MIGRATIONS-002 | ✅ |
+| MIGRATIONS-005 | Testes para funções de migration | 🟤 | 🟡 | 4h | MIGRATIONS-001 | ✅ |
+
+**Entregável INFRA-002:** ✅ Sistema de migrations versionadas com rollback completo
+
+**Documentação:** `docs/tarefas_concluidas/20251228_220227_MIGRATIONS-001.md`
+
+---
+
+### Sprint INFRA-003: Configuração Centralizada
+
+| ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
+|----|--------|------|------------|---------|--------------|--------|
+| CONFIG-001 | Criar struct de configuração centralizada | 🔵 | 🔴 | 4h | BE-002 | ✅ |
+| CONFIG-002 | Implementar validação de configuração | 🔵 | 🔴 | 2h | CONFIG-001 | ✅ |
+| CONFIG-003 | Refatorar main.go para usar configuração centralizada | 🔵 | 🔴 | 4h | CONFIG-001 | ✅ |
+| CONFIG-004 | Refatorar database, JWT e logger para usar config | 🔵 | 🔴 | 4h | CONFIG-001 | ✅ |
+| CONFIG-005 | Criar documentação completa de configuração | ⚪ | 🔴 | 2h | CONFIG-001 | ✅ |
+| CONFIG-006 | Testes para configuração centralizada | 🟤 | 🔴 | 4h | CONFIG-001 | ✅ |
+
+**Entregável INFRA-003:** ✅ Configuração centralizada com validação e documentação completa
+
+**Documentação:** `docs/tarefas_concluidas/20251228_220227_CONFIG-001.md`
+
+---
+
+**Última atualização:** 2025-12-28 - Adicionadas implementações de Soft Delete, Migrations e Configuração Centralizada
 
