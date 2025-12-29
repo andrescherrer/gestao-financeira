@@ -8,6 +8,7 @@ import (
 
 	"gestao-financeira/backend/internal/category/application/dtos"
 	"gestao-financeira/backend/internal/category/application/usecases"
+	apperrors "gestao-financeira/backend/pkg/errors"
 	"gestao-financeira/backend/pkg/middleware"
 	"gestao-financeira/backend/pkg/validator"
 )
@@ -284,37 +285,24 @@ func (h *CategoryHandler) Delete(c *fiber.Ctx) error {
 }
 
 // handleUseCaseError handles errors from use cases and returns appropriate HTTP responses.
+// Uses AppError for consistent error handling instead of string matching.
 func (h *CategoryHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
-	errMsg := err.Error()
-
-	// Check for specific error types
-	if strings.Contains(errMsg, "not found") {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": errMsg,
-			"code":  fiber.StatusNotFound,
-		})
+	if err == nil {
+		return nil
 	}
 
-	if strings.Contains(errMsg, "already exists") {
-		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-			"error": "Já existe uma categoria com este nome",
-			"code":  fiber.StatusConflict,
-		})
+	// Map domain errors to AppError
+	appErr := apperrors.MapDomainError(err)
+
+	// Log error with appropriate level
+	if appErr.Type == apperrors.ErrorTypeValidation || appErr.Type == apperrors.ErrorTypeNotFound || appErr.Type == apperrors.ErrorTypeConflict {
+		log.Warn().Err(err).Str("error_type", string(appErr.Type)).Msg("Category operation failed")
+	} else {
+		log.Error().Err(err).Str("error_type", string(appErr.Type)).Msg("Category operation failed")
 	}
 
-	if strings.Contains(errMsg, "invalid") || strings.Contains(errMsg, "cannot be empty") {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": errMsg,
-			"code":  fiber.StatusBadRequest,
-		})
-	}
-
-	// Default to 500 Internal Server Error
-	log.Error().Err(err).Msg("Use case error")
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "Internal server error",
-		"code":  fiber.StatusInternalServerError,
-	})
+	// Return error - the middleware will handle the response formatting
+	return appErr
 }
 
 // Restore handles category restoration requests.

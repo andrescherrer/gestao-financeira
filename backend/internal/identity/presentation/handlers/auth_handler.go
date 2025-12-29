@@ -1,13 +1,12 @@
 package handlers
 
 import (
-	"strings"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 
 	"gestao-financeira/backend/internal/identity/application/dtos"
 	"gestao-financeira/backend/internal/identity/application/usecases"
+	apperrors "gestao-financeira/backend/pkg/errors"
 	"gestao-financeira/backend/pkg/middleware"
 	"gestao-financeira/backend/pkg/validator"
 )
@@ -72,48 +71,24 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 }
 
 // handleUseCaseError handles errors from use cases and returns appropriate HTTP responses.
+// Uses AppError for consistent error handling instead of string matching.
 func (h *AuthHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
-	errMsg := err.Error()
-
-	// Check for specific error types
-	if strings.Contains(errMsg, "already exists") {
-		log.Warn().Err(err).Msg("User registration failed: email already exists")
-		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-			"error": "Já existe um usuário com este email",
-			"code":  fiber.StatusConflict,
-		})
+	if err == nil {
+		return nil
 	}
 
-	if strings.Contains(errMsg, "invalid email") {
-		log.Warn().Err(err).Msg("User registration failed: invalid email")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Formato de email inválido",
-			"code":  fiber.StatusBadRequest,
-		})
+	// Map domain errors to AppError
+	appErr := apperrors.MapDomainError(err)
+
+	// Log error with appropriate level
+	if appErr.Type == apperrors.ErrorTypeValidation || appErr.Type == apperrors.ErrorTypeConflict {
+		log.Warn().Err(err).Str("error_type", string(appErr.Type)).Msg("User registration failed")
+	} else {
+		log.Error().Err(err).Str("error_type", string(appErr.Type)).Msg("User registration failed")
 	}
 
-	if strings.Contains(errMsg, "invalid password") {
-		log.Warn().Err(err).Msg("User registration failed: invalid password")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "A senha deve ter no mínimo 8 caracteres",
-			"code":  fiber.StatusBadRequest,
-		})
-	}
-
-	if strings.Contains(errMsg, "invalid name") {
-		log.Warn().Err(err).Msg("User registration failed: invalid name")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Formato de nome inválido",
-			"code":  fiber.StatusBadRequest,
-		})
-	}
-
-	// Generic error handling
-	log.Error().Err(err).Msg("User registration failed: unexpected error")
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "Ocorreu um erro inesperado",
-		"code":  fiber.StatusInternalServerError,
-	})
+	// Return error - the middleware will handle the response formatting
+	return appErr
 }
 
 // Login handles user login requests.
@@ -161,38 +136,22 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 }
 
 // handleLoginError handles errors from login use case and returns appropriate HTTP responses.
+// Uses AppError for consistent error handling instead of string matching.
 func (h *AuthHandler) handleLoginError(c *fiber.Ctx, err error) error {
-	errMsg := err.Error()
-
-	// Check for specific error types
-	if strings.Contains(errMsg, "invalid email or password") {
-		log.Warn().Err(err).Msg("Login failed: invalid credentials")
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Email ou senha inválidos",
-			"code":  fiber.StatusUnauthorized,
-		})
+	if err == nil {
+		return nil
 	}
 
-	if strings.Contains(errMsg, "inactive") {
-		log.Warn().Err(err).Msg("Login failed: user account is inactive")
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"error": "Conta de usuário está inativa",
-			"code":  fiber.StatusForbidden,
-		})
+	// Map domain errors to AppError
+	appErr := apperrors.MapDomainError(err)
+
+	// Log error with appropriate level
+	if appErr.Type == apperrors.ErrorTypeValidation || appErr.Type == apperrors.ErrorTypeUnauthorized || appErr.Type == apperrors.ErrorTypeForbidden {
+		log.Warn().Err(err).Str("error_type", string(appErr.Type)).Msg("Login failed")
+	} else {
+		log.Error().Err(err).Str("error_type", string(appErr.Type)).Msg("Login failed")
 	}
 
-	if strings.Contains(errMsg, "invalid email") {
-		log.Warn().Err(err).Msg("Login failed: invalid email format")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Formato de email inválido",
-			"code":  fiber.StatusBadRequest,
-		})
-	}
-
-	// Generic error handling
-	log.Error().Err(err).Msg("Login failed: unexpected error")
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "Ocorreu um erro inesperado",
-		"code":  fiber.StatusInternalServerError,
-	})
+	// Return error - the middleware will handle the response formatting
+	return appErr
 }

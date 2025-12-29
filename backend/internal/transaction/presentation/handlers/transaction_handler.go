@@ -1,13 +1,12 @@
 package handlers
 
 import (
-	"strings"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 
 	"gestao-financeira/backend/internal/transaction/application/dtos"
 	"gestao-financeira/backend/internal/transaction/application/usecases"
+	apperrors "gestao-financeira/backend/pkg/errors"
 	"gestao-financeira/backend/pkg/middleware"
 	"gestao-financeira/backend/pkg/validator"
 )
@@ -337,135 +336,105 @@ func (h *TransactionHandler) Delete(c *fiber.Ctx) error {
 }
 
 // handleUseCaseError handles errors from use cases and returns appropriate HTTP responses.
+// Uses AppError for consistent error handling instead of string matching.
 func (h *TransactionHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
-	errMsg := err.Error()
-
-	// Check for specific error types
-	if strings.Contains(errMsg, "invalid user ID") {
-		log.Warn().Err(err).Msg("Transaction operation failed: invalid user ID")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid user ID",
-			"code":  fiber.StatusBadRequest,
-		})
+	if err == nil {
+		return nil
 	}
 
-	if strings.Contains(errMsg, "invalid transaction") {
-		log.Warn().Err(err).Msg("Transaction operation failed: invalid transaction data")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid transaction data",
-			"code":  fiber.StatusBadRequest,
-		})
+	// Map domain errors to AppError
+	appErr := apperrors.MapDomainError(err)
+
+	// Log error with appropriate level
+	if appErr.Type == apperrors.ErrorTypeValidation || appErr.Type == apperrors.ErrorTypeNotFound {
+		log.Warn().Err(err).Str("error_type", string(appErr.Type)).Msg("Transaction operation failed")
+	} else {
+		log.Error().Err(err).Str("error_type", string(appErr.Type)).Msg("Transaction operation failed")
 	}
 
-	if strings.Contains(errMsg, "account not found") {
-		log.Warn().Err(err).Msg("Transaction operation failed: account not found")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Account not found",
-			"code":  fiber.StatusBadRequest,
-		})
-	}
-
-	// Generic error handling
-	log.Error().Err(err).Msg("Transaction operation failed: unexpected error")
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "An unexpected error occurred",
-		"code":  fiber.StatusInternalServerError,
-	})
+	// Return error - the middleware will handle the response formatting
+	return appErr
 }
 
 // handleGetTransactionError handles errors from GetTransactionUseCase and returns appropriate HTTP responses.
+// Uses AppError for consistent error handling instead of string matching.
 func (h *TransactionHandler) handleGetTransactionError(c *fiber.Ctx, err error, transactionID string) error {
-	errMsg := err.Error()
-
-	// Check for specific error types
-	if strings.Contains(errMsg, "invalid transaction ID") {
-		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Get transaction failed: invalid transaction ID")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid transaction ID",
-			"code":  fiber.StatusBadRequest,
-		})
+	if err == nil {
+		return nil
 	}
 
-	if strings.Contains(errMsg, "transaction not found") {
-		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Get transaction failed: transaction not found")
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Transaction not found",
-			"code":  fiber.StatusNotFound,
-		})
+	// Map domain errors to AppError
+	appErr := apperrors.MapDomainError(err)
+
+	// Add transaction ID to error details if available
+	if appErr.Details == nil {
+		appErr.Details = make(map[string]interface{})
+	}
+	appErr.Details["transaction_id"] = transactionID
+
+	// Log error with appropriate level
+	if appErr.Type == apperrors.ErrorTypeValidation || appErr.Type == apperrors.ErrorTypeNotFound {
+		log.Warn().Err(err).Str("error_type", string(appErr.Type)).Str("transaction_id", transactionID).Msg("Get transaction failed")
+	} else {
+		log.Error().Err(err).Str("error_type", string(appErr.Type)).Str("transaction_id", transactionID).Msg("Get transaction failed")
 	}
 
-	// Generic error handling
-	log.Error().Err(err).Str("transaction_id", transactionID).Msg("Get transaction failed: unexpected error")
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "An unexpected error occurred",
-		"code":  fiber.StatusInternalServerError,
-	})
+	// Return error - the middleware will handle the response formatting
+	return appErr
 }
 
 // handleUpdateTransactionError handles errors from UpdateTransactionUseCase and returns appropriate HTTP responses.
+// Uses AppError for consistent error handling instead of string matching.
 func (h *TransactionHandler) handleUpdateTransactionError(c *fiber.Ctx, err error, transactionID string) error {
-	errMsg := err.Error()
-
-	// Check for specific error types
-	if strings.Contains(errMsg, "invalid transaction ID") {
-		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Update transaction failed: invalid transaction ID")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid transaction ID",
-			"code":  fiber.StatusBadRequest,
-		})
+	if err == nil {
+		return nil
 	}
 
-	if strings.Contains(errMsg, "transaction not found") {
-		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Update transaction failed: transaction not found")
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Transaction not found",
-			"code":  fiber.StatusNotFound,
-		})
+	// Map domain errors to AppError
+	appErr := apperrors.MapDomainError(err)
+
+	// Add transaction ID to error details if available
+	if appErr.Details == nil {
+		appErr.Details = make(map[string]interface{})
+	}
+	appErr.Details["transaction_id"] = transactionID
+
+	// Log error with appropriate level
+	if appErr.Type == apperrors.ErrorTypeValidation || appErr.Type == apperrors.ErrorTypeNotFound {
+		log.Warn().Err(err).Str("error_type", string(appErr.Type)).Str("transaction_id", transactionID).Msg("Update transaction failed")
+	} else {
+		log.Error().Err(err).Str("error_type", string(appErr.Type)).Str("transaction_id", transactionID).Msg("Update transaction failed")
 	}
 
-	if strings.Contains(errMsg, "invalid transaction") {
-		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Update transaction failed: invalid transaction data")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid transaction data",
-			"code":  fiber.StatusBadRequest,
-		})
-	}
-
-	// Generic error handling
-	log.Error().Err(err).Str("transaction_id", transactionID).Msg("Update transaction failed: unexpected error")
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "An unexpected error occurred",
-		"code":  fiber.StatusInternalServerError,
-	})
+	// Return error - the middleware will handle the response formatting
+	return appErr
 }
 
 // handleDeleteTransactionError handles errors from DeleteTransactionUseCase and returns appropriate HTTP responses.
+// Uses AppError for consistent error handling instead of string matching.
 func (h *TransactionHandler) handleDeleteTransactionError(c *fiber.Ctx, err error, transactionID string) error {
-	errMsg := err.Error()
-
-	// Check for specific error types
-	if strings.Contains(errMsg, "invalid transaction ID") {
-		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Delete transaction failed: invalid transaction ID")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid transaction ID",
-			"code":  fiber.StatusBadRequest,
-		})
+	if err == nil {
+		return nil
 	}
 
-	if strings.Contains(errMsg, "transaction not found") {
-		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Delete transaction failed: transaction not found")
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Transaction not found",
-			"code":  fiber.StatusNotFound,
-		})
+	// Map domain errors to AppError
+	appErr := apperrors.MapDomainError(err)
+
+	// Add transaction ID to error details if available
+	if appErr.Details == nil {
+		appErr.Details = make(map[string]interface{})
+	}
+	appErr.Details["transaction_id"] = transactionID
+
+	// Log error with appropriate level
+	if appErr.Type == apperrors.ErrorTypeValidation || appErr.Type == apperrors.ErrorTypeNotFound {
+		log.Warn().Err(err).Str("error_type", string(appErr.Type)).Str("transaction_id", transactionID).Msg("Delete transaction failed")
+	} else {
+		log.Error().Err(err).Str("error_type", string(appErr.Type)).Str("transaction_id", transactionID).Msg("Delete transaction failed")
 	}
 
-	// Generic error handling
-	log.Error().Err(err).Str("transaction_id", transactionID).Msg("Delete transaction failed: unexpected error")
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "An unexpected error occurred",
-		"code":  fiber.StatusInternalServerError,
-	})
+	// Return error - the middleware will handle the response formatting
+	return appErr
 }
 
 // Restore handles transaction restoration requests.
@@ -577,51 +546,55 @@ func (h *TransactionHandler) PermanentDelete(c *fiber.Ctx) error {
 }
 
 // handleRestoreTransactionError handles errors from RestoreTransactionUseCase.
+// Uses AppError for consistent error handling instead of string matching.
 func (h *TransactionHandler) handleRestoreTransactionError(c *fiber.Ctx, err error, transactionID string) error {
-	if strings.Contains(err.Error(), "invalid transaction ID") {
-		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Restore transaction failed: invalid transaction ID")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid transaction ID format",
-			"code":  fiber.StatusBadRequest,
-		})
+	if err == nil {
+		return nil
 	}
 
-	if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "is not deleted") {
-		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Restore transaction failed: transaction not found or not deleted")
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Transaction not found or is not deleted",
-			"code":  fiber.StatusNotFound,
-		})
+	// Map domain errors to AppError
+	appErr := apperrors.MapDomainError(err)
+
+	// Add transaction ID to error details if available
+	if appErr.Details == nil {
+		appErr.Details = make(map[string]interface{})
+	}
+	appErr.Details["transaction_id"] = transactionID
+
+	// Log error with appropriate level
+	if appErr.Type == apperrors.ErrorTypeValidation || appErr.Type == apperrors.ErrorTypeNotFound {
+		log.Warn().Err(err).Str("error_type", string(appErr.Type)).Str("transaction_id", transactionID).Msg("Restore transaction failed")
+	} else {
+		log.Error().Err(err).Str("error_type", string(appErr.Type)).Str("transaction_id", transactionID).Msg("Restore transaction failed")
 	}
 
-	log.Error().Err(err).Str("transaction_id", transactionID).Msg("Restore transaction failed: unexpected error")
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "Failed to restore transaction",
-		"code":  fiber.StatusInternalServerError,
-	})
+	// Return error - the middleware will handle the response formatting
+	return appErr
 }
 
 // handlePermanentDeleteTransactionError handles errors from PermanentDeleteTransactionUseCase.
+// Uses AppError for consistent error handling instead of string matching.
 func (h *TransactionHandler) handlePermanentDeleteTransactionError(c *fiber.Ctx, err error, transactionID string) error {
-	if strings.Contains(err.Error(), "invalid transaction ID") {
-		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Permanent delete transaction failed: invalid transaction ID")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid transaction ID format",
-			"code":  fiber.StatusBadRequest,
-		})
+	if err == nil {
+		return nil
 	}
 
-	if strings.Contains(err.Error(), "not found") {
-		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Permanent delete transaction failed: transaction not found")
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Transaction not found",
-			"code":  fiber.StatusNotFound,
-		})
+	// Map domain errors to AppError
+	appErr := apperrors.MapDomainError(err)
+
+	// Add transaction ID to error details if available
+	if appErr.Details == nil {
+		appErr.Details = make(map[string]interface{})
+	}
+	appErr.Details["transaction_id"] = transactionID
+
+	// Log error with appropriate level
+	if appErr.Type == apperrors.ErrorTypeValidation || appErr.Type == apperrors.ErrorTypeNotFound {
+		log.Warn().Err(err).Str("error_type", string(appErr.Type)).Str("transaction_id", transactionID).Msg("Permanent delete transaction failed")
+	} else {
+		log.Error().Err(err).Str("error_type", string(appErr.Type)).Str("transaction_id", transactionID).Msg("Permanent delete transaction failed")
 	}
 
-	log.Error().Err(err).Str("transaction_id", transactionID).Msg("Permanent delete transaction failed: unexpected error")
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "Failed to permanently delete transaction",
-		"code":  fiber.StatusInternalServerError,
-	})
+	// Return error - the middleware will handle the response formatting
+	return appErr
 }

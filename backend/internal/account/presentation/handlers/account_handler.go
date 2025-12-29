@@ -1,13 +1,12 @@
 package handlers
 
 import (
-	"strings"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 
 	"gestao-financeira/backend/internal/account/application/dtos"
 	"gestao-financeira/backend/internal/account/application/usecases"
+	apperrors "gestao-financeira/backend/pkg/errors"
 	"gestao-financeira/backend/pkg/middleware"
 	"gestao-financeira/backend/pkg/validator"
 )
@@ -197,67 +196,49 @@ func (h *AccountHandler) Get(c *fiber.Ctx) error {
 }
 
 // handleUseCaseError handles errors from use cases and returns appropriate HTTP responses.
+// Uses AppError for consistent error handling instead of string matching.
 func (h *AccountHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
-	errMsg := err.Error()
-
-	// Check for specific error types
-	if strings.Contains(errMsg, "invalid user ID") {
-		log.Warn().Err(err).Msg("Account operation failed: invalid user ID")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid user ID",
-			"code":  fiber.StatusBadRequest,
-		})
+	if err == nil {
+		return nil
 	}
 
-	if strings.Contains(errMsg, "invalid account") {
-		log.Warn().Err(err).Msg("Account operation failed: invalid account data")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid account data",
-			"code":  fiber.StatusBadRequest,
-		})
+	// Map domain errors to AppError
+	appErr := apperrors.MapDomainError(err)
+
+	// Log error with appropriate level
+	if appErr.Type == apperrors.ErrorTypeValidation || appErr.Type == apperrors.ErrorTypeNotFound || appErr.Type == apperrors.ErrorTypeConflict {
+		log.Warn().Err(err).Str("error_type", string(appErr.Type)).Msg("Account operation failed")
+	} else {
+		log.Error().Err(err).Str("error_type", string(appErr.Type)).Msg("Account operation failed")
 	}
 
-	if strings.Contains(errMsg, "already exists") {
-		log.Warn().Err(err).Msg("Account operation failed: account already exists")
-		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-			"error": "Account already exists",
-			"code":  fiber.StatusConflict,
-		})
-	}
-
-	// Generic error handling
-	log.Error().Err(err).Msg("Account operation failed: unexpected error")
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "An unexpected error occurred",
-		"code":  fiber.StatusInternalServerError,
-	})
+	// Return error - the middleware will handle the response formatting
+	return appErr
 }
 
 // handleGetAccountError handles errors from GetAccountUseCase and returns appropriate HTTP responses.
+// Uses AppError for consistent error handling instead of string matching.
 func (h *AccountHandler) handleGetAccountError(c *fiber.Ctx, err error, accountID string) error {
-	errMsg := err.Error()
-
-	// Check for specific error types
-	if strings.Contains(errMsg, "invalid account ID") {
-		log.Warn().Err(err).Str("account_id", accountID).Msg("Get account failed: invalid account ID")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid account ID",
-			"code":  fiber.StatusBadRequest,
-		})
+	if err == nil {
+		return nil
 	}
 
-	if strings.Contains(errMsg, "account not found") {
-		log.Warn().Err(err).Str("account_id", accountID).Msg("Get account failed: account not found")
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Account not found",
-			"code":  fiber.StatusNotFound,
-		})
+	// Map domain errors to AppError
+	appErr := apperrors.MapDomainError(err)
+
+	// Add account ID to error details if available
+	if appErr.Details == nil {
+		appErr.Details = make(map[string]interface{})
+	}
+	appErr.Details["account_id"] = accountID
+
+	// Log error with appropriate level
+	if appErr.Type == apperrors.ErrorTypeValidation || appErr.Type == apperrors.ErrorTypeNotFound {
+		log.Warn().Err(err).Str("error_type", string(appErr.Type)).Str("account_id", accountID).Msg("Get account failed")
+	} else {
+		log.Error().Err(err).Str("error_type", string(appErr.Type)).Str("account_id", accountID).Msg("Get account failed")
 	}
 
-	// Generic error handling
-	log.Error().Err(err).Str("account_id", accountID).Msg("Get account failed: unexpected error")
-	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		"error": "An unexpected error occurred",
-		"code":  fiber.StatusInternalServerError,
-	})
+	// Return error - the middleware will handle the response formatting
+	return appErr
 }
