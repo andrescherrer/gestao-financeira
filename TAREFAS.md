@@ -39,7 +39,10 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **MIGRATIONS-001** (2025-12-28): ✅ Migrations Versionadas e Rollback - Completo
 - **CONFIG-001** (2025-12-28): ✅ Configuração Centralizada - Completo
 - **UNIT-OF-WORK-001** (2025-12-29): ✅ Gerenciamento de Transações de Banco de Dados - Completo
-- **UNIT-OF-WORK-002** (2025-12-29): ✅ UpdateTransactionUseCase e DeleteTransactionUseCase com UnitOfWork - Completo (testes de integração com problema conhecido)
+- **UNIT-OF-WORK-002** (2025-12-29): ✅ UpdateTransactionUseCase e DeleteTransactionUseCase com UnitOfWork - Completo
+- **ERROR-HANDLING-001** (2025-12-29): ✅ Tratamento de Erros Consistente - Completo
+- **PAGINATION-001** (2025-12-29): ✅ Paginação Consistente - Completo
+- **API-DOC-001** (2025-12-29): ✅ Melhoria Completa da Documentação da API - Completo
 
 ### 📈 Progresso
 - **Fase 1 (Fundação e MVP)**: ✅ 100% concluído
