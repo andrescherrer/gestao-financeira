@@ -847,3 +847,41 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 **Última atualização:** 2025-12-29 - Adicionada implementação de paginação consistente
 
+---
+
+### API-DOC-001: Melhoria Completa da Documentação da API
+
+**Data:** 2025-12-29  
+**Status:** ✅ Completo
+
+**Objetivo:** Melhorar a documentação da API seguindo as melhores práticas de engenharia de software.
+
+**Implementação:**
+- Melhorada documentação geral da API no main.go
+  - Descrição completa com funcionalidades e características técnicas
+  - Guia de autenticação, paginação e códigos de resposta
+  - Informações sobre rate limiting
+- Melhorados 14 endpoints com documentação detalhada
+  - Transaction: Create, List, Get, Update, Delete
+  - Account: Create, List, Get
+  - Category: Create, List
+  - Budget: Create, List
+  - Auth: Register, Login
+- Adicionados exemplos detalhados de request/response
+- Documentados parâmetros de paginação
+- Adicionados códigos de resposta HTTP (422, 403, 404, 409)
+- Documentadas informações técnicas (atomicidade, segurança, validações)
+- Corrigidos cached repositories para suportar paginação
+
+**Arquivos Modificados:**
+- `backend/cmd/api/main.go`
+- `backend/internal/*/presentation/handlers/*_handler.go` (6 arquivos)
+- `backend/internal/*/infrastructure/persistence/cached_*_repository.go` (2 arquivos)
+
+**Estatísticas:**
+- 14 endpoints melhorados
+- 28+ exemplos adicionados
+- 500+ linhas de documentação adicionadas
+- 8 arquivos modificados
+
+**Documentação:** `docs/tarefas_concluidas/20251229_064634_API-DOC-001.md`
