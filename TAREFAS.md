@@ -795,5 +795,26 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ---
 
-**Última atualização:** 2025-12-29 - Adicionada implementação de Unit of Work para gerenciamento de transações
+---
+
+## 🔧 Melhorias de Qualidade de Código (2025-12-29)
+
+### Sprint QUAL-001: Tratamento de Erros Consistente
+
+| ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
+|----|--------|------|------------|---------|--------------|--------|
+| ERROR-HANDLING-001 | Implementar tratamento de erros consistente | 🔵 | 🔴 | 4h | - | ✅ |
+
+**Entregável QUAL-001:** ✅ Tratamento de erros consistente implementado com AppError
+
+**Documentação:** `docs/tarefas_concluidas/20251229_061500_ERROR-HANDLING-001.md`
+
+**Benefícios:**
+- ✅ Consistência: todos os handlers tratam erros da mesma forma
+- ✅ Manutenibilidade: mudanças em mensagens não quebram tratamento
+- ✅ Type safety: uso de tipos de erro customizados
+- ✅ Observabilidade: logging estruturado com tipo de erro
+- ✅ ~200 linhas de código duplicado removidas
+
+**Última atualização:** 2025-12-29 - Adicionada implementação de tratamento de erros consistente
 
