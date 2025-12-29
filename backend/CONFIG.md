@@ -160,6 +160,26 @@ Em produção, certifique-se de:
 
 A configuração é validada no startup da aplicação. Se alguma configuração obrigatória estiver faltando ou inválida, a aplicação não iniciará e mostrará uma mensagem de erro clara.
 
+## Segurança
+
+### Proteção contra SQL Injection
+
+A API utiliza **GORM** que automaticamente protege contra SQL Injection através de **Prepared Statements**. Todos os parâmetros são escapados automaticamente antes de serem inseridos nas queries.
+
+**Não é necessário** configurar nada adicional - a proteção é automática.
+
+Para mais detalhes, consulte `backend/docs/SECURITY.md`.
+
+### Rate Limiting
+
+A API implementa rate limiting granular por endpoint:
+
+- **Auth endpoints** (`/auth/login`, `/auth/register`): 10 req/min (login), 5 req/min (register)
+- **Write operations** (POST, PUT, DELETE): 30 req/min
+- **Read operations** (GET): 100 req/min (padrão)
+
+Rate limiting requer Redis. Se Redis não estiver disponível, o rate limiting é desabilitado (graceful degradation).
+
 ## Notas
 
 - Todos os valores de duração suportam: `s` (segundos), `m` (minutos), `h` (horas), `d` (dias)
