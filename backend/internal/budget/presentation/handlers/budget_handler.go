@@ -43,19 +43,39 @@ func NewBudgetHandler(
 }
 
 // Create handles budget creation requests.
+// Create handles budget creation requests.
 // @Summary Create a new budget
 // @Description Creates a new budget for the authenticated user. Supports MONTHLY and YEARLY period types.
+//
+// **Tipos de Período**:
+// - `MONTHLY`: Orçamento mensal (requer `year` e `month`)
+// - `YEARLY`: Orçamento anual (requer apenas `year`)
+//
+// **Validações**:
+// - Category ID deve existir e pertencer ao usuário
+// - Amount deve ser maior que zero
+// - Currency deve ser válida (ex: BRL, USD, EUR)
+// - Year deve estar entre 1900 e 3000
+// - Month deve estar entre 1 e 12 (apenas para MONTHLY)
+// - Não pode existir outro orçamento para a mesma categoria e período
+//
+// **Contextos**:
+// - `PERSONAL`: Orçamento pessoal
+// - `BUSINESS`: Orçamento empresarial
+//
 // @Tags budgets
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param request body dtos.CreateBudgetInput true "Budget creation data (category_id, amount, currency, period_type, year, month, context)"
-// @Success 201 {object} map[string]interface{} "Budget created successfully"
-// @Success 201 {object} dtos.CreateBudgetOutput "Budget data"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 409 {object} map[string]interface{} "Conflict - budget already exists for this category and period"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param request body dtos.CreateBudgetInput true "Budget creation data" example({"category_id":"550e8400-e29b-41d4-a716-446655440000","amount":1000.00,"currency":"BRL","period_type":"MONTHLY","year":2025,"month":12,"context":"PERSONAL"})
+// @Success 201 {object} map[string]interface{} "Budget created successfully" example({"message":"Budget created successfully","data":{"budget_id":"550e8400-e29b-41d4-a716-446655440000","user_id":"550e8400-e29b-41d4-a716-446655440000","category_id":"550e8400-e29b-41d4-a716-446655440000","amount":1000.00,"currency":"BRL","period_type":"MONTHLY","year":2025,"month":12,"context":"PERSONAL","is_active":true,"created_at":"2025-12-29T10:00:00Z"}})
+// @Success 201 {object} dtos.CreateBudgetOutput "Budget data with all fields"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data or validation failed" example({"error":"Invalid budget data","error_type":"VALIDATION_ERROR","code":400,"details":{"field":"amount","message":"amount must be greater than 0"}})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 404 {object} map[string]interface{} "Not found - category does not exist" example({"error":"Category not found","error_type":"NOT_FOUND","code":404})
+// @Failure 409 {object} map[string]interface{} "Conflict - budget already exists for this category and period" example({"error":"Budget already exists for this category and period","error_type":"CONFLICT","code":409})
+// @Failure 422 {object} map[string]interface{} "Unprocessable entity - domain validation failed" example({"error":"Invalid period type","error_type":"DOMAIN_ERROR","code":422})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /budgets [post]
 func (h *BudgetHandler) Create(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
@@ -101,24 +121,41 @@ func (h *BudgetHandler) Create(c *fiber.Ctx) error {
 
 // List handles budget listing requests.
 // @Summary List budgets
-// @Description Lists all budgets for the authenticated user. Optionally filter by category_id, period_type, year, month, context, or is_active. Supports pagination with page and limit query parameters.
+// @Description Lists all budgets for the authenticated user. Supports multiple filters and pagination. Filters are applied in memory, then pagination is applied to the filtered results.
+//
+// **Filtros Disponíveis**:
+// - `category_id`: Filtra por categoria específica (UUID)
+// - `period_type`: Filtra por tipo de período (`MONTHLY` ou `YEARLY`)
+// - `year`: Filtra por ano (ex: 2025)
+// - `month`: Filtra por mês (1-12, apenas para orçamentos mensais)
+// - `context`: Filtra por contexto (`PERSONAL` ou `BUSINESS`)
+// - `is_active`: Filtra por status ativo/inativo (`true` ou `false`)
+//
+// **Paginação**:
+// - `page`: Número da página (1-based, padrão: 1)
+// - `limit`: Itens por página (padrão: 10, máximo: 100)
+//
+// **Nota**: Filtros são aplicados em memória após buscar todos os orçamentos do usuário. Para melhor performance com muitos orçamentos, considere usar filtros específicos.
+//
+// **Exemplo com filtros e paginação**: `GET /budgets?year=2025&period_type=MONTHLY&page=1&limit=20`
+//
 // @Tags budgets
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param category_id query string false "Filter by category ID (UUID)"
-// @Param period_type query string false "Filter by period type (MONTHLY or YEARLY)"
-// @Param year query int false "Filter by year"
-// @Param month query int false "Filter by month (1-12)"
-// @Param context query string false "Filter by context (PERSONAL or BUSINESS)"
-// @Param is_active query bool false "Filter by active status (true or false)"
-// @Param page query string false "Page number (1-based, default: 1)"
-// @Param limit query string false "Items per page (default: 10, max: 100)"
-// @Success 200 {object} map[string]interface{} "Budgets retrieved successfully"
-// @Success 200 {object} dtos.ListBudgetsOutput "List of budgets with count and pagination"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID or filters"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param category_id query string false "Filter by category ID (UUID)" example(550e8400-e29b-41d4-a716-446655440000)
+// @Param period_type query string false "Filter by period type (MONTHLY or YEARLY)" Enums(MONTHLY, YEARLY) example(MONTHLY)
+// @Param year query int false "Filter by year" example(2025)
+// @Param month query int false "Filter by month (1-12)" example(12)
+// @Param context query string false "Filter by context (PERSONAL or BUSINESS)" Enums(PERSONAL, BUSINESS) example(PERSONAL)
+// @Param is_active query bool false "Filter by active status (true or false)" example(true)
+// @Param page query string false "Page number (1-based, default: 1)" example(1)
+// @Param limit query string false "Items per page (default: 10, max: 100)" example(20)
+// @Success 200 {object} map[string]interface{} "Budgets retrieved successfully" example({"message":"Budgets retrieved successfully","data":{"budgets":[{"budget_id":"550e8400-e29b-41d4-a716-446655440000","category_id":"550e8400-e29b-41d4-a716-446655440000","amount":1000.00,"currency":"BRL","period_type":"MONTHLY","year":2025,"month":12}],"total":12,"pagination":{"page":1,"limit":20,"total":12,"total_pages":1,"has_next":false,"has_prev":false}}})
+// @Success 200 {object} dtos.ListBudgetsOutput "List of budgets with count and pagination metadata"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID, filters, or pagination parameters" example({"error":"Invalid year value","error_type":"VALIDATION_ERROR","code":400})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /budgets [get]
 func (h *BudgetHandler) List(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)

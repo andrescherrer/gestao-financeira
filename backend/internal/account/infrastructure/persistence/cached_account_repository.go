@@ -190,3 +190,13 @@ func (r *CachedAccountRepository) Exists(id valueobjects.AccountID) (bool, error
 func (r *CachedAccountRepository) Count(userID identityvalueobjects.UserID) (int64, error) {
 	return r.repository.Count(userID)
 }
+
+// FindByUserIDWithPagination finds accounts with pagination (no caching for paginated results).
+func (r *CachedAccountRepository) FindByUserIDWithPagination(
+	userID identityvalueobjects.UserID,
+	context string,
+	offset, limit int,
+) ([]*entities.Account, int64, error) {
+	// Paginated results are not cached to avoid cache complexity
+	return r.repository.FindByUserIDWithPagination(userID, context, offset, limit)
+}

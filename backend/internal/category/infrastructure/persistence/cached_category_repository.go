@@ -228,3 +228,13 @@ func (r *CachedCategoryRepository) Exists(id valueobjects.CategoryID) (bool, err
 func (r *CachedCategoryRepository) Count(userID identityvalueobjects.UserID) (int64, error) {
 	return r.repository.Count(userID)
 }
+
+// FindByUserIDWithPagination finds categories with pagination (no caching for paginated results).
+func (r *CachedCategoryRepository) FindByUserIDWithPagination(
+	userID identityvalueobjects.UserID,
+	isActive *bool,
+	offset, limit int,
+) ([]*entities.Category, int64, error) {
+	// Paginated results are not cached to avoid cache complexity
+	return r.repository.FindByUserIDWithPagination(userID, isActive, offset, limit)
+}

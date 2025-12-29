@@ -47,17 +47,30 @@ func NewCategoryHandler(
 
 // Create handles category creation requests.
 // @Summary Create a new category
-// @Description Creates a new category for the authenticated user.
+// @Description Creates a new category for the authenticated user. Categories are used to organize transactions.
+//
+// **Validações**:
+// - Nome da categoria é obrigatório e deve ser único para o usuário
+// - Slug é gerado automaticamente a partir do nome
+// - Descrição é opcional
+//
+// **Comportamento**:
+// - Categoria é criada como ativa por padrão (`is_active: true`)
+// - Slug é gerado automaticamente (ex: "Alimentação" → "alimentacao")
+// - Nome deve ser único para o usuário (case-insensitive)
+//
 // @Tags categories
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param request body dtos.CreateCategoryInput true "Category creation data (name, description)"
-// @Success 201 {object} map[string]interface{} "Category created successfully"
-// @Success 201 {object} dtos.CreateCategoryOutput "Category data"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param request body dtos.CreateCategoryInput true "Category creation data" example({"name":"Alimentação","description":"Gastos com alimentação"})
+// @Success 201 {object} map[string]interface{} "Category created successfully" example({"message":"Category created successfully","data":{"category_id":"550e8400-e29b-41d4-a716-446655440000","user_id":"550e8400-e29b-41d4-a716-446655440000","name":"Alimentação","slug":"alimentacao","description":"Gastos com alimentação","is_active":true,"created_at":"2025-12-29T10:00:00Z"}})
+// @Success 201 {object} dtos.CreateCategoryOutput "Category data with all fields"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data or validation failed" example({"error":"Invalid category data","error_type":"VALIDATION_ERROR","code":400,"details":{"field":"name","message":"name cannot be empty"}})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 409 {object} map[string]interface{} "Conflict - category with this name already exists" example({"error":"Já existe uma categoria com este nome","error_type":"CONFLICT","code":409})
+// @Failure 422 {object} map[string]interface{} "Unprocessable entity - domain validation failed" example({"error":"Invalid category name","error_type":"DOMAIN_ERROR","code":422})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /categories [post]
 func (h *CategoryHandler) Create(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
@@ -103,19 +116,32 @@ func (h *CategoryHandler) Create(c *fiber.Ctx) error {
 
 // List handles category listing requests.
 // @Summary List categories
-// @Description Lists all categories for the authenticated user. Optionally filter by active status. Supports pagination with page and limit query parameters.
+// @Description Lists all categories for the authenticated user. Supports filtering by active status and pagination.
+//
+// **Filtros Disponíveis**:
+// - `is_active`: Filtra por status ativo/inativo (`true` ou `false`)
+//
+// **Paginação**:
+// - `page`: Número da página (1-based, padrão: 1)
+// - `limit`: Itens por página (padrão: 10, máximo: 100)
+//
+// **Ordenação**: Categorias são ordenadas por data de criação (mais recentes primeiro).
+//
+// **Exemplo sem paginação**: Retorna todas as categorias (compatibilidade retroativa)
+// **Exemplo com paginação**: `GET /categories?page=1&limit=20&is_active=true`
+//
 // @Tags categories
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param is_active query bool false "Filter by active status (true or false)"
-// @Param page query string false "Page number (1-based, default: 1)"
-// @Param limit query string false "Items per page (default: 10, max: 100)"
-// @Success 200 {object} map[string]interface{} "Categories retrieved successfully"
-// @Success 200 {object} dtos.ListCategoriesOutput "List of categories with count and pagination"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param is_active query bool false "Filter by active status (true or false)" example(true)
+// @Param page query string false "Page number (1-based, default: 1)" example(1)
+// @Param limit query string false "Items per page (default: 10, max: 100)" example(20)
+// @Success 200 {object} map[string]interface{} "Categories retrieved successfully" example({"message":"Categories retrieved successfully","data":{"categories":[{"category_id":"550e8400-e29b-41d4-a716-446655440000","name":"Alimentação","slug":"alimentacao","is_active":true}],"count":20,"pagination":{"page":1,"limit":20,"total":45,"total_pages":3,"has_next":true,"has_prev":false}}})
+// @Success 200 {object} dtos.ListCategoriesOutput "List of categories with count and pagination metadata"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID or pagination parameters" example({"error":"Invalid user ID","error_type":"VALIDATION_ERROR","code":400})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /categories [get]
 func (h *CategoryHandler) List(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)

@@ -33,18 +33,35 @@ func NewAccountHandler(
 
 // Create handles account creation requests.
 // @Summary Create a new account
-// @Description Creates a new account for the authenticated user. Supports BANK, WALLET, INVESTMENT, and CREDIT_CARD account types.
+// @Description Creates a new account for the authenticated user. Supports multiple account types and contexts.
+//
+// **Tipos de Conta Suportados**:
+// - `BANK`: Conta bancária tradicional
+// - `WALLET`: Carteira digital (ex: PayPal, Mercado Pago)
+// - `INVESTMENT`: Conta de investimentos
+// - `CREDIT_CARD`: Cartão de crédito
+//
+// **Contextos**:
+// - `PERSONAL`: Conta pessoal
+// - `BUSINESS`: Conta empresarial
+//
+// **Validações**:
+// - Nome da conta é obrigatório e deve ser único para o usuário
+// - Saldo inicial pode ser zero ou positivo
+// - Moeda deve ser válida (ex: BRL, USD, EUR)
+//
 // @Tags accounts
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param request body dtos.CreateAccountInput true "Account creation data (name, type, initial_balance, currency, context)"
-// @Success 201 {object} map[string]interface{} "Account created successfully"
-// @Success 201 {object} dtos.CreateAccountOutput "Account data"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 409 {object} map[string]interface{} "Conflict - account already exists"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param request body dtos.CreateAccountInput true "Account creation data" example({"name":"Conta Corrente","type":"BANK","initial_balance":1000.00,"currency":"BRL","context":"PERSONAL"})
+// @Success 201 {object} map[string]interface{} "Account created successfully" example({"message":"Account created successfully","data":{"account_id":"550e8400-e29b-41d4-a716-446655440000","user_id":"550e8400-e29b-41d4-a716-446655440000","name":"Conta Corrente","type":"BANK","balance":1000.00,"currency":"BRL","context":"PERSONAL","is_active":true,"created_at":"2025-12-29T10:00:00Z"}})
+// @Success 201 {object} dtos.CreateAccountOutput "Account data with all fields"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data or validation failed" example({"error":"Invalid account data","error_type":"VALIDATION_ERROR","code":400,"details":{"field":"name","message":"name cannot be empty"}})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 409 {object} map[string]interface{} "Conflict - account with this name already exists" example({"error":"Account already exists","error_type":"CONFLICT","code":409})
+// @Failure 422 {object} map[string]interface{} "Unprocessable entity - domain validation failed" example({"error":"Invalid account type","error_type":"DOMAIN_ERROR","code":422})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /accounts [post]
 func (h *AccountHandler) Create(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
@@ -90,19 +107,32 @@ func (h *AccountHandler) Create(c *fiber.Ctx) error {
 
 // List handles account listing requests.
 // @Summary List accounts
-// @Description Lists all accounts for the authenticated user. Optionally filter by context (PERSONAL or BUSINESS). Supports pagination with page and limit query parameters.
+// @Description Lists all accounts for the authenticated user. Supports filtering by context and pagination.
+//
+// **Filtros Disponíveis**:
+// - `context`: Filtra por contexto (`PERSONAL` ou `BUSINESS`)
+//
+// **Paginação**:
+// - `page`: Número da página (1-based, padrão: 1)
+// - `limit`: Itens por página (padrão: 10, máximo: 100)
+//
+// **Ordenação**: Contas são ordenadas por data de criação (mais recentes primeiro).
+//
+// **Exemplo sem paginação**: Retorna todas as contas (compatibilidade retroativa)
+// **Exemplo com paginação**: `GET /accounts?page=1&limit=20&context=PERSONAL`
+//
 // @Tags accounts
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param context query string false "Filter by context (PERSONAL or BUSINESS)"
-// @Param page query string false "Page number (1-based, default: 1)"
-// @Param limit query string false "Items per page (default: 10, max: 100)"
-// @Success 200 {object} map[string]interface{} "Accounts retrieved successfully"
-// @Success 200 {object} dtos.ListAccountsOutput "List of accounts with count and pagination"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID or context"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param context query string false "Filter by context (PERSONAL or BUSINESS)" Enums(PERSONAL, BUSINESS) example(PERSONAL)
+// @Param page query string false "Page number (1-based, default: 1)" example(1)
+// @Param limit query string false "Items per page (default: 10, max: 100)" example(20)
+// @Success 200 {object} map[string]interface{} "Accounts retrieved successfully" example({"message":"Accounts retrieved successfully","data":{"accounts":[{"account_id":"550e8400-e29b-41d4-a716-446655440000","name":"Conta Corrente","type":"BANK","balance":1000.00,"currency":"BRL","context":"PERSONAL"}],"count":20,"pagination":{"page":1,"limit":20,"total":45,"total_pages":3,"has_next":true,"has_prev":false}}})
+// @Success 200 {object} dtos.ListAccountsOutput "List of accounts with count and pagination metadata"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID, context, or pagination parameters" example({"error":"Invalid context value","error_type":"VALIDATION_ERROR","code":400})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /accounts [get]
 func (h *AccountHandler) List(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
@@ -144,18 +174,20 @@ func (h *AccountHandler) List(c *fiber.Ctx) error {
 // Get handles account retrieval requests.
 // @Summary Get account by ID
 // @Description Retrieves a specific account by its ID. Only returns accounts that belong to the authenticated user.
+//
+// **Segurança**: O endpoint valida que a conta pertence ao usuário autenticado. Tentativas de acessar contas de outros usuários retornam 404 (não 403) para evitar vazamento de informação.
+//
 // @Tags accounts
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param id path string true "Account ID (UUID)"
-// @Success 200 {object} map[string]interface{} "Account retrieved successfully"
-// @Success 200 {object} dtos.GetAccountOutput "Account data"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid account ID format"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 403 {object} map[string]interface{} "Forbidden - account does not belong to user"
-// @Failure 404 {object} map[string]interface{} "Not found - account does not exist"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param id path string true "Account ID (UUID)" example(550e8400-e29b-41d4-a716-446655440000)
+// @Success 200 {object} map[string]interface{} "Account retrieved successfully" example({"message":"Account retrieved successfully","data":{"account_id":"550e8400-e29b-41d4-a716-446655440000","user_id":"550e8400-e29b-41d4-a716-446655440000","name":"Conta Corrente","type":"BANK","balance":1000.00,"currency":"BRL","context":"PERSONAL","is_active":true,"created_at":"2025-12-29T10:00:00Z","updated_at":"2025-12-29T10:00:00Z"}})
+// @Success 200 {object} dtos.GetAccountOutput "Account data with all fields"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid account ID format" example({"error":"Invalid account ID format","error_type":"VALIDATION_ERROR","code":400})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 404 {object} map[string]interface{} "Not found - account does not exist or does not belong to user" example({"error":"Account not found","error_type":"NOT_FOUND","code":404,"details":{"resource":"Account","identifier":"550e8400-e29b-41d4-a716-446655440000"}})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /accounts/{id} [get]
 func (h *AccountHandler) Get(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)

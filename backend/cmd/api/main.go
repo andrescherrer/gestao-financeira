@@ -58,10 +58,66 @@ import (
 
 // @title Gestão Financeira API
 // @version 1.0
-// @description API REST para gestão financeira pessoal e profissional. Gerencia usuários, contas e transações financeiras.
+// @description API REST completa para gestão financeira pessoal e profissional.
+//
+// ## Funcionalidades Principais
+//
+// - **Autenticação e Autorização**: Sistema de autenticação JWT com refresh tokens
+// - **Gerenciamento de Contas**: Criação e gestão de contas bancárias, carteiras e investimentos
+// - **Transações Financeiras**: Registro de receitas e despesas com suporte a recorrência
+// - **Categorias**: Organização de transações por categorias customizáveis
+// - **Orçamentos**: Controle de orçamentos mensais e anuais por categoria
+// - **Relatórios**: Análises financeiras e relatórios personalizados
+//
+// ## Características Técnicas
+//
+// - **Arquitetura**: Domain-Driven Design (DDD) com Clean Architecture
+// - **Atomicidade**: Operações críticas garantidas por Unit of Work pattern
+// - **Paginação**: Todos os endpoints de listagem suportam paginação
+// - **Soft Delete**: Exclusão lógica com possibilidade de restauração
+// - **Validação**: Validação em múltiplas camadas (frontend, backend, domain)
+// - **Tratamento de Erros**: Erros tipados e consistentes em toda a API
+//
+// ## Autenticação
+//
+// A API utiliza autenticação JWT (JSON Web Tokens). Para acessar endpoints protegidos:
+//
+// 1. Faça login em `/auth/login` para obter um token
+// 2. Inclua o token no header `Authorization: Bearer <token>`
+// 3. O token expira após o tempo configurado (padrão: 24h)
+//
+// ## Paginação
+//
+// Endpoints de listagem suportam paginação via query parameters:
+//
+// - `page`: Número da página (1-based, padrão: 1)
+// - `limit`: Itens por página (padrão: 10, máximo: 100)
+//
+// Exemplo: `GET /api/v1/transactions?page=2&limit=20`
+//
+// ## Códigos de Resposta HTTP
+//
+// - `200 OK`: Operação bem-sucedida
+// - `201 Created`: Recurso criado com sucesso
+// - `400 Bad Request`: Dados inválidos ou validação falhou
+// - `401 Unauthorized`: Token ausente ou inválido
+// - `403 Forbidden`: Acesso negado (sem permissão)
+// - `404 Not Found`: Recurso não encontrado
+// - `409 Conflict`: Conflito (ex: recurso já existe)
+// - `422 Unprocessable Entity`: Erro de validação de domínio
+// - `500 Internal Server Error`: Erro interno do servidor
+//
+// ## Rate Limiting
+//
+// A API implementa rate limiting para proteger contra abuso:
+//
+// - Limite padrão: 100 requisições por minuto por IP
+// - Headers de resposta incluem informações sobre limites
+//
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
 // @contact.email support@gestaofinanceira.com
+// @contact.url https://github.com/gestao-financeira
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8080
@@ -70,7 +126,7 @@ import (
 // @securityDefinitions.apikey Bearer
 // @in header
 // @name Authorization
-// @description Type "Bearer" followed by a space and JWT token.
+// @description Type "Bearer" followed by a space and JWT token. Example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
 func main() {
 	// Load configuration

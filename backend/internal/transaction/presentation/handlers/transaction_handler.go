@@ -45,17 +45,32 @@ func NewTransactionHandler(
 
 // Create handles transaction creation requests.
 // @Summary Create a new transaction
-// @Description Creates a new transaction (INCOME or EXPENSE) for the authenticated user. Links transaction to an account.
+// @Description Creates a new transaction (INCOME or EXPENSE) for the authenticated user. Links transaction to an account and automatically updates the account balance atomically using Unit of Work pattern.
+//
+// **Operação Atômica**: A criação da transação e atualização do saldo da conta são executadas em uma única transação de banco de dados. Se qualquer operação falhar, todas são revertidas (rollback).
+//
+// **Tipos de Transação**:
+// - `INCOME`: Receita - aumenta o saldo da conta
+// - `EXPENSE`: Despesa - diminui o saldo da conta
+//
+// **Validações**:
+// - Account ID deve existir e pertencer ao usuário autenticado
+// - Amount deve ser maior que zero
+// - Currency deve ser válida (ex: BRL, USD, EUR)
+// - Date deve estar no formato YYYY-MM-DD
+//
 // @Tags transactions
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param request body dtos.CreateTransactionInput true "Transaction creation data (account_id, type, amount, currency, description, date)"
-// @Success 201 {object} map[string]interface{} "Transaction created successfully"
-// @Success 201 {object} dtos.CreateTransactionOutput "Transaction data"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data or account not found"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param request body dtos.CreateTransactionInput true "Transaction creation data" example({"account_id":"550e8400-e29b-41d4-a716-446655440000","type":"INCOME","amount":150.50,"currency":"BRL","description":"Salário","date":"2025-12-29"})
+// @Success 201 {object} map[string]interface{} "Transaction created successfully" example({"message":"Transaction created successfully","data":{"transaction_id":"550e8400-e29b-41d4-a716-446655440001","user_id":"550e8400-e29b-41d4-a716-446655440000","account_id":"550e8400-e29b-41d4-a716-446655440000","type":"INCOME","amount":150.50,"currency":"BRL","description":"Salário","date":"2025-12-29","created_at":"2025-12-29T10:00:00Z","updated_at":"2025-12-29T10:00:00Z"}})
+// @Success 201 {object} dtos.CreateTransactionOutput "Transaction data with all fields"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data, validation failed, or account not found" example({"error":"Invalid transaction data","error_type":"VALIDATION_ERROR","code":400,"details":{"field":"amount","message":"amount must be greater than 0"}})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 404 {object} map[string]interface{} "Not found - account does not exist" example({"error":"Account not found","error_type":"NOT_FOUND","code":404,"details":{"resource":"Account","identifier":"550e8400-e29b-41d4-a716-446655440000"}})
+// @Failure 422 {object} map[string]interface{} "Unprocessable entity - domain validation failed" example({"error":"Account balance would become negative","error_type":"DOMAIN_ERROR","code":422})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /transactions [post]
 func (h *TransactionHandler) Create(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
@@ -101,18 +116,34 @@ func (h *TransactionHandler) Create(c *fiber.Ctx) error {
 
 // List handles transaction listing requests.
 // @Summary List transactions
-// @Description Lists all transactions for the authenticated user. Optionally filter by account_id and/or type (INCOME or EXPENSE).
+// @Description Lists all transactions for the authenticated user. Supports filtering by account_id and/or type, and pagination.
+//
+// **Filtros Disponíveis**:
+// - `account_id`: Filtra transações por conta específica (UUID)
+// - `type`: Filtra por tipo de transação (`INCOME` ou `EXPENSE`)
+//
+// **Paginação**:
+// - `page`: Número da página (1-based, padrão: 1)
+// - `limit`: Itens por página (padrão: 10, máximo: 100)
+//
+// **Ordenação**: Transações são ordenadas por data (mais recentes primeiro) e depois por data de criação.
+//
+// **Exemplo sem paginação**: Retorna todas as transações (compatibilidade retroativa)
+// **Exemplo com paginação**: `GET /transactions?page=2&limit=20&type=INCOME`
+//
 // @Tags transactions
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param account_id query string false "Filter by account ID (UUID)"
-// @Param type query string false "Filter by transaction type (INCOME or EXPENSE)"
-// @Success 200 {object} map[string]interface{} "Transactions retrieved successfully"
-// @Success 200 {object} dtos.ListTransactionsOutput "List of transactions with count"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID, account ID or type"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param account_id query string false "Filter by account ID (UUID)" example(550e8400-e29b-41d4-a716-446655440000)
+// @Param type query string false "Filter by transaction type (INCOME or EXPENSE)" Enums(INCOME, EXPENSE) example(INCOME)
+// @Param page query string false "Page number (1-based, default: 1)" example(1)
+// @Param limit query string false "Items per page (default: 10, max: 100)" example(20)
+// @Success 200 {object} map[string]interface{} "Transactions retrieved successfully" example({"message":"Transactions retrieved successfully","data":{"transactions":[{"transaction_id":"550e8400-e29b-41d4-a716-446655440001","type":"INCOME","amount":150.50,"currency":"BRL","description":"Salário","date":"2025-12-29"}],"count":20,"pagination":{"page":1,"limit":20,"total":45,"total_pages":3,"has_next":true,"has_prev":false}}})
+// @Success 200 {object} dtos.ListTransactionsOutput "List of transactions with count and pagination metadata"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID, account ID, type, or pagination parameters" example({"error":"Invalid account ID format","error_type":"VALIDATION_ERROR","code":400})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /transactions [get]
 func (h *TransactionHandler) List(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
@@ -155,18 +186,20 @@ func (h *TransactionHandler) List(c *fiber.Ctx) error {
 // Get handles transaction retrieval requests.
 // @Summary Get transaction by ID
 // @Description Retrieves a specific transaction by its ID. Only returns transactions that belong to the authenticated user.
+//
+// **Segurança**: O endpoint valida que a transação pertence ao usuário autenticado. Tentativas de acessar transações de outros usuários retornam 404 (não 403) para evitar vazamento de informação.
+//
 // @Tags transactions
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param id path string true "Transaction ID (UUID)"
-// @Success 200 {object} map[string]interface{} "Transaction retrieved successfully"
-// @Success 200 {object} dtos.GetTransactionOutput "Transaction data"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid transaction ID format"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 403 {object} map[string]interface{} "Forbidden - transaction does not belong to user"
-// @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param id path string true "Transaction ID (UUID)" example(550e8400-e29b-41d4-a716-446655440001)
+// @Success 200 {object} map[string]interface{} "Transaction retrieved successfully" example({"message":"Transaction retrieved successfully","data":{"transaction_id":"550e8400-e29b-41d4-a716-446655440001","user_id":"550e8400-e29b-41d4-a716-446655440000","account_id":"550e8400-e29b-41d4-a716-446655440000","type":"INCOME","amount":150.50,"currency":"BRL","description":"Salário","date":"2025-12-29","created_at":"2025-12-29T10:00:00Z","updated_at":"2025-12-29T10:00:00Z"}})
+// @Success 200 {object} dtos.GetTransactionOutput "Transaction data with all fields"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid transaction ID format" example({"error":"Invalid transaction ID format","error_type":"VALIDATION_ERROR","code":400})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist or does not belong to user" example({"error":"Transaction not found","error_type":"NOT_FOUND","code":404,"details":{"resource":"Transaction","identifier":"550e8400-e29b-41d4-a716-446655440001"}})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /transactions/{id} [get]
 func (h *TransactionHandler) Get(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
@@ -215,20 +248,35 @@ func (h *TransactionHandler) Get(c *fiber.Ctx) error {
 
 // Update handles transaction update requests.
 // @Summary Update a transaction
-// @Description Updates an existing transaction. Supports partial updates - only provided fields will be updated. At least one field must be provided.
+// @Description Updates an existing transaction using Unit of Work pattern for atomicity. Supports partial updates - only provided fields will be updated. At least one field must be provided.
+//
+// **Operação Atômica**: A atualização da transação e ajuste do saldo da conta são executados em uma única transação de banco de dados. Se qualquer operação falhar, todas são revertidas (rollback).
+//
+// **Comportamento**:
+// - Campos não fornecidos permanecem inalterados
+// - Se `amount` ou `type` mudarem, o saldo da conta é ajustado automaticamente
+// - O efeito antigo é revertido e o novo efeito é aplicado
+//
+// **Campos Atualizáveis**:
+// - `type`: INCOME ou EXPENSE (atualiza saldo da conta)
+// - `amount`: Valor da transação (atualiza saldo da conta)
+// - `currency`: Moeda (BRL, USD, EUR, etc.)
+// - `description`: Descrição da transação
+// - `date`: Data da transação (formato YYYY-MM-DD)
+//
 // @Tags transactions
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param id path string true "Transaction ID (UUID)"
-// @Param request body dtos.UpdateTransactionInput true "Transaction update data (all fields optional: type, amount, currency, description, date)"
-// @Success 200 {object} map[string]interface{} "Transaction updated successfully"
-// @Success 200 {object} dtos.UpdateTransactionOutput "Updated transaction data"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid transaction ID, invalid data, or no fields provided"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 403 {object} map[string]interface{} "Forbidden - transaction does not belong to user"
-// @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param id path string true "Transaction ID (UUID)" example(550e8400-e29b-41d4-a716-446655440001)
+// @Param request body dtos.UpdateTransactionInput true "Transaction update data (all fields optional)" example({"type":"EXPENSE","amount":75.25,"description":"Atualizado"})
+// @Success 200 {object} map[string]interface{} "Transaction updated successfully" example({"message":"Transaction updated successfully","data":{"transaction_id":"550e8400-e29b-41d4-a716-446655440001","type":"EXPENSE","amount":75.25,"currency":"BRL","description":"Atualizado","updated_at":"2025-12-29T11:00:00Z"}})
+// @Success 200 {object} dtos.UpdateTransactionOutput "Updated transaction data with all fields"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid transaction ID, invalid data, or no fields provided" example({"error":"At least one field must be provided for update","error_type":"VALIDATION_ERROR","code":400})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist" example({"error":"Transaction not found","error_type":"NOT_FOUND","code":404})
+// @Failure 422 {object} map[string]interface{} "Unprocessable entity - domain validation failed" example({"error":"Account balance would become negative","error_type":"DOMAIN_ERROR","code":422})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /transactions/{id} [put]
 func (h *TransactionHandler) Update(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)
@@ -284,19 +332,33 @@ func (h *TransactionHandler) Update(c *fiber.Ctx) error {
 }
 
 // Delete handles transaction deletion requests.
+// Delete handles transaction deletion requests.
 // @Summary Delete a transaction
-// @Description Deletes a transaction by its ID (soft delete). The transaction is marked as deleted but not permanently removed from the database.
+// @Description Deletes a transaction by its ID using Unit of Work pattern for atomicity. Performs soft delete - the transaction is marked as deleted but not permanently removed from the database. The account balance is automatically reversed.
+//
+// **Operação Atômica**: A exclusão da transação e reversão do saldo da conta são executados em uma única transação de banco de dados. Se qualquer operação falhar, todas são revertidas (rollback).
+//
+// **Comportamento**:
+// - Transação é marcada como deletada (soft delete)
+// - Saldo da conta é revertido automaticamente
+// - Transação pode ser restaurada usando o endpoint `/transactions/{id}/restore`
+// - Transação pode ser permanentemente deletada usando o endpoint `/transactions/{id}/permanent` (admin only)
+//
+// **Reversão de Saldo**:
+// - Se era INCOME: valor é subtraído do saldo
+// - Se era EXPENSE: valor é adicionado ao saldo
+//
 // @Tags transactions
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param id path string true "Transaction ID (UUID)"
-// @Success 200 {object} map[string]interface{} "Transaction deleted successfully"
-// @Success 200 {object} dtos.DeleteTransactionOutput "Deletion confirmation"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid transaction ID format"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
-// @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Param id path string true "Transaction ID (UUID)" example(550e8400-e29b-41d4-a716-446655440001)
+// @Success 200 {object} map[string]interface{} "Transaction deleted successfully" example({"message":"Transaction deleted successfully","data":{"transaction_id":"550e8400-e29b-41d4-a716-446655440001"}})
+// @Success 200 {object} dtos.DeleteTransactionOutput "Deletion confirmation with transaction ID"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid transaction ID format" example({"error":"Invalid transaction ID format","error_type":"VALIDATION_ERROR","code":400})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+// @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist" example({"error":"Transaction not found","error_type":"NOT_FOUND","code":404})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /transactions/{id} [delete]
 func (h *TransactionHandler) Delete(c *fiber.Ctx) error {
 	// Get user ID from context (set by auth middleware)

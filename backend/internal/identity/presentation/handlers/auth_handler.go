@@ -30,15 +30,26 @@ func NewAuthHandler(
 
 // Register handles user registration requests.
 // @Summary Register a new user
-// @Description Creates a new user account with the provided email, password, first name, and last name.
+// @Description Creates a new user account with the provided email, password, first name, and last name. The password is hashed using bcrypt before storage.
+//
+// **Validações**:
+// - Email deve ser válido e único no sistema
+// - Senha deve ter no mínimo 8 caracteres
+// - Nome e sobrenome são obrigatórios
+//
+// **Segurança**:
+// - Senha é hasheada com bcrypt antes de ser armazenada
+// - Email é convertido para lowercase antes de ser armazenado
+//
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param request body dtos.RegisterUserInput true "User registration data"
-// @Success 201 {object} map[string]interface{} "User registered successfully" "Example: {\"message\": \"User registered successfully\", \"data\": {\"user_id\": \"uuid\", \"email\": \"user@example.com\", \"first_name\": \"John\", \"last_name\": \"Doe\", \"full_name\": \"John Doe\"}}"
-// @Failure 400 {object} map[string]interface{} "Bad request - Invalid input data (e.g., invalid email format, password too short, missing fields)"
-// @Failure 409 {object} map[string]interface{} "Conflict - User with this email already exists"
-// @Failure 500 {object} map[string]interface{} "Internal server error - An unexpected error occurred"
+// @Param request body dtos.RegisterUserInput true "User registration data" example({"email":"user@example.com","password":"SecurePass123","first_name":"John","last_name":"Doe"})
+// @Success 201 {object} map[string]interface{} "User registered successfully" example({"message":"Usuário registrado com sucesso","data":{"user_id":"550e8400-e29b-41d4-a716-446655440000","email":"user@example.com","first_name":"John","last_name":"Doe","full_name":"John Doe"}})
+// @Failure 400 {object} map[string]interface{} "Bad request - Invalid input data (e.g., invalid email format, password too short, missing fields)" example({"error":"Invalid email format","error_type":"VALIDATION_ERROR","code":400,"details":{"field":"email","message":"email must be a valid email address"}})
+// @Failure 409 {object} map[string]interface{} "Conflict - User with this email already exists" example({"error":"Já existe um usuário com este email","error_type":"CONFLICT","code":409})
+// @Failure 422 {object} map[string]interface{} "Unprocessable entity - domain validation failed" example({"error":"Password does not meet security requirements","error_type":"DOMAIN_ERROR","code":422})
+// @Failure 500 {object} map[string]interface{} "Internal server error - An unexpected error occurred" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /auth/register [post]
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	// Parse request body
@@ -92,18 +103,36 @@ func (h *AuthHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
 }
 
 // Login handles user login requests.
+// Login handles user login requests.
 // @Summary Login user
-// @Description Authenticates a user with email and password, returns a JWT token for API access
+// @Description Authenticates a user with email and password, returns a JWT token for API access. The token should be included in subsequent requests in the Authorization header.
+//
+// **Autenticação**:
+// - Email e senha são validados
+// - Senha é verificada usando bcrypt
+// - Token JWT é gerado com informações do usuário
+// - Token expira após o tempo configurado (padrão: 24h)
+//
+// **Uso do Token**:
+// - Inclua o token no header: `Authorization: Bearer <token>`
+// - Token é válido para todos os endpoints protegidos
+// - Token expirado retorna 401 Unauthorized
+//
+// **Segurança**:
+// - Tentativas de login falhadas não revelam se o email existe
+// - Senha nunca é retornada na resposta
+// - Contas inativas não podem fazer login
+//
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param request body dtos.LoginInput true "User login credentials (email and password)"
-// @Success 200 {object} map[string]interface{} "Login successful"
+// @Param request body dtos.LoginInput true "User login credentials" example({"email":"user@example.com","password":"SecurePass123"})
+// @Success 200 {object} map[string]interface{} "Login successful" example({"message":"Login realizado com sucesso","data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...","user":{"user_id":"550e8400-e29b-41d4-a716-446655440000","email":"user@example.com","first_name":"John","last_name":"Doe","full_name":"John Doe"}})
 // @Success 200 {object} dtos.LoginOutput "JWT token and user data"
-// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data"
-// @Failure 401 {object} map[string]interface{} "Unauthorized - invalid email or password"
-// @Failure 403 {object} map[string]interface{} "Forbidden - user account is inactive"
-// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid input data" example({"error":"Invalid email format","error_type":"VALIDATION_ERROR","code":400})
+// @Failure 401 {object} map[string]interface{} "Unauthorized - invalid email or password" example({"error":"Email ou senha inválidos","error_type":"UNAUTHORIZED","code":401})
+// @Failure 403 {object} map[string]interface{} "Forbidden - user account is inactive" example({"error":"Conta de usuário está inativa","error_type":"FORBIDDEN","code":403})
+// @Failure 500 {object} map[string]interface{} "Internal server error" example({"error":"An unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
 // @Router /auth/login [post]
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	// Parse request body
