@@ -5,43 +5,63 @@ import (
 	"fmt"
 	"time"
 
+	sharedrepositories "gestao-financeira/backend/internal/shared/domain/repositories"
 	sharedvalueobjects "gestao-financeira/backend/internal/shared/domain/valueobjects"
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
 	"gestao-financeira/backend/internal/transaction/application/dtos"
 	transactionevents "gestao-financeira/backend/internal/transaction/domain/events"
-	"gestao-financeira/backend/internal/transaction/domain/repositories"
 	transactionvalueobjects "gestao-financeira/backend/internal/transaction/domain/valueobjects"
 )
 
 // UpdateTransactionUseCase handles transaction updates.
+// It uses UnitOfWork to ensure atomicity when updating a transaction and updating account balance.
 type UpdateTransactionUseCase struct {
-	transactionRepository repositories.TransactionRepository
-	eventBus              *eventbus.EventBus
+	unitOfWork sharedrepositories.UnitOfWork
+	eventBus   *eventbus.EventBus
 }
 
 // NewUpdateTransactionUseCase creates a new UpdateTransactionUseCase instance.
 func NewUpdateTransactionUseCase(
-	transactionRepository repositories.TransactionRepository,
+	unitOfWork sharedrepositories.UnitOfWork,
 	eventBus *eventbus.EventBus,
 ) *UpdateTransactionUseCase {
 	return &UpdateTransactionUseCase{
-		transactionRepository: transactionRepository,
-		eventBus:              eventBus,
+		unitOfWork: unitOfWork,
+		eventBus:   eventBus,
 	}
 }
 
 // Execute performs the transaction update.
 // It validates the input, retrieves the transaction, updates the specified fields,
-// saves it to the repository, and publishes domain events.
+// saves it to the repository, updates account balance atomically, and publishes domain events.
 func (uc *UpdateTransactionUseCase) Execute(input dtos.UpdateTransactionInput) (*dtos.UpdateTransactionOutput, error) {
+	// Get repositories from UnitOfWork
+	transactionRepository := uc.unitOfWork.TransactionRepository()
+	accountRepository := uc.unitOfWork.AccountRepository()
+
 	// Create transaction ID value object
 	transactionID, err := transactionvalueobjects.NewTransactionID(input.TransactionID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid transaction ID: %w", err)
 	}
 
-	// Find transaction by ID
-	transaction, err := uc.transactionRepository.FindByID(transactionID)
+	// Begin transaction to ensure atomicity
+	if err := uc.unitOfWork.Begin(); err != nil {
+		return nil, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	// Ensure rollback on error
+	defer func() {
+		if uc.unitOfWork.IsInTransaction() {
+			if rollbackErr := uc.unitOfWork.Rollback(); rollbackErr != nil {
+				// Log rollback error but don't fail the function
+				_ = rollbackErr
+			}
+		}
+	}()
+
+	// Find transaction by ID (within transaction)
+	transaction, err := transactionRepository.FindByID(transactionID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find transaction: %w", err)
 	}
@@ -51,9 +71,10 @@ func (uc *UpdateTransactionUseCase) Execute(input dtos.UpdateTransactionInput) (
 		return nil, errors.New("transaction not found")
 	}
 
-	// Store old values BEFORE any updates (needed for TransactionUpdated event)
+	// Store old values BEFORE any updates (needed for balance reversal and TransactionUpdated event)
 	oldType := transaction.TransactionType().Value()
 	oldAmount := transaction.Amount()
+	accountID := transaction.AccountID()
 
 	// Update type if provided
 	if input.Type != nil {
@@ -119,11 +140,6 @@ func (uc *UpdateTransactionUseCase) Execute(input dtos.UpdateTransactionInput) (
 		return nil, errors.New("at least one field must be provided for update")
 	}
 
-	// Save transaction to repository
-	if err := uc.transactionRepository.Save(transaction); err != nil {
-		return nil, fmt.Errorf("failed to save transaction: %w", err)
-	}
-
 	// Get new values after update
 	newType := transaction.TransactionType().Value()
 	newAmount := transaction.Amount()
@@ -132,7 +148,61 @@ func (uc *UpdateTransactionUseCase) Execute(input dtos.UpdateTransactionInput) (
 	amountChanged := !oldAmount.Equals(newAmount)
 	typeChanged := oldType != newType
 
-	// Publish domain events from entity
+	// If amount or type changed, update account balance atomically
+	if amountChanged || typeChanged {
+		// Find account (within transaction)
+		account, err := accountRepository.FindByID(accountID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find account: %w", err)
+		}
+		if account == nil {
+			return nil, fmt.Errorf("account not found: %s", accountID.Value())
+		}
+
+		// Reverse old transaction effect
+		if oldType == "INCOME" {
+			// Reverse: debit (subtract) what was previously credited
+			if err := account.Debit(oldAmount); err != nil {
+				return nil, fmt.Errorf("failed to reverse old income transaction: %w", err)
+			}
+		} else if oldType == "EXPENSE" {
+			// Reverse: credit (add) what was previously debited
+			if err := account.Credit(oldAmount); err != nil {
+				return nil, fmt.Errorf("failed to reverse old expense transaction: %w", err)
+			}
+		}
+
+		// Apply new transaction effect
+		if newType == "INCOME" {
+			// Apply: credit (add) new income
+			if err := account.Credit(newAmount); err != nil {
+				return nil, fmt.Errorf("failed to apply new income transaction: %w", err)
+			}
+		} else if newType == "EXPENSE" {
+			// Apply: debit (subtract) new expense
+			if err := account.Debit(newAmount); err != nil {
+				return nil, fmt.Errorf("failed to apply new expense transaction: %w", err)
+			}
+		}
+
+		// Save updated account (within transaction)
+		if err := accountRepository.Save(account); err != nil {
+			return nil, fmt.Errorf("failed to save updated account: %w", err)
+		}
+	}
+
+	// Save transaction to repository (within transaction)
+	if err := transactionRepository.Save(transaction); err != nil {
+		return nil, fmt.Errorf("failed to save transaction: %w", err)
+	}
+
+	// Commit transaction (all operations succeed)
+	if err := uc.unitOfWork.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	// Publish domain events (after successful commit)
+	// Events are published outside the transaction to avoid blocking the commit
 	domainEvents := transaction.GetEvents()
 	for _, event := range domainEvents {
 		if err := uc.eventBus.Publish(event); err != nil {
@@ -144,7 +214,7 @@ func (uc *UpdateTransactionUseCase) Execute(input dtos.UpdateTransactionInput) (
 	}
 	transaction.ClearEvents()
 
-	// If amount or type changed, publish TransactionUpdated event for balance update
+	// If amount or type changed, publish TransactionUpdated event for other subscribers
 	if amountChanged || typeChanged {
 		updateEvent := transactionevents.NewTransactionUpdated(
 			transaction.ID().Value(),

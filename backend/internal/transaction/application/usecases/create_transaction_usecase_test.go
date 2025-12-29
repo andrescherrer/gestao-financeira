@@ -7,6 +7,7 @@ import (
 
 	accountvalueobjects "gestao-financeira/backend/internal/account/domain/valueobjects"
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
+	sharedvalueobjects "gestao-financeira/backend/internal/shared/domain/valueobjects"
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
 	"gestao-financeira/backend/internal/transaction/application/dtos"
 	"gestao-financeira/backend/internal/transaction/domain/entities"
@@ -306,10 +307,25 @@ func TestCreateTransactionUseCase_Execute(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := newMockTransactionRepository()
-			tt.setupMock(mockRepo)
+			mockTransactionRepo := newMockTransactionRepository()
+			mockAccountRepo := newMockAccountRepository()
+			tt.setupMock(mockTransactionRepo)
 
-			useCase := NewCreateTransactionUseCase(mockRepo, eventBus)
+			// Create a test account for the test cases that need it
+			// The account must have the same ID as in the input
+			if !tt.wantError || tt.name == "repository save error" {
+				userID, _ := identityvalueobjects.NewUserID(tt.input.UserID)
+				accountID, _ := accountvalueobjects.NewAccountID(tt.input.AccountID)
+				currency, _ := sharedvalueobjects.NewCurrency(tt.input.Currency)
+				initialBalance, _ := sharedvalueobjects.NewMoney(0, currency)
+				account, err := createTestAccountWithID(userID, accountID, initialBalance)
+				if err == nil && account != nil {
+					_ = mockAccountRepo.Save(account)
+				}
+			}
+
+			mockUOW := newMockUnitOfWork(mockTransactionRepo, mockAccountRepo)
+			useCase := NewCreateTransactionUseCase(mockUOW, eventBus)
 			output, err := useCase.Execute(tt.input)
 
 			if (err != nil) != tt.wantError {

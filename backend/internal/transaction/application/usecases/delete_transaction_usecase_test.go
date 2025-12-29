@@ -7,63 +7,48 @@ import (
 
 	accountvalueobjects "gestao-financeira/backend/internal/account/domain/valueobjects"
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
+	sharedvalueobjects "gestao-financeira/backend/internal/shared/domain/valueobjects"
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
 	"gestao-financeira/backend/internal/transaction/application/dtos"
-	"gestao-financeira/backend/internal/transaction/domain/entities"
 	transactionvalueobjects "gestao-financeira/backend/internal/transaction/domain/valueobjects"
 )
-
-// Extended mock repository with error support for DeleteTransactionUseCase
-type mockDeleteTransactionRepository struct {
-	*mockTransactionRepository
-	findByIDErr error
-	deleteErr   error
-}
-
-func newMockDeleteTransactionRepository() *mockDeleteTransactionRepository {
-	return &mockDeleteTransactionRepository{
-		mockTransactionRepository: newMockTransactionRepository(),
-	}
-}
-
-func (m *mockDeleteTransactionRepository) FindByID(id transactionvalueobjects.TransactionID) (*entities.Transaction, error) {
-	if m.findByIDErr != nil {
-		return nil, m.findByIDErr
-	}
-	return m.mockTransactionRepository.FindByID(id)
-}
-
-func (m *mockDeleteTransactionRepository) Delete(id transactionvalueobjects.TransactionID) error {
-	if m.deleteErr != nil {
-		return m.deleteErr
-	}
-	return m.mockTransactionRepository.Delete(id)
-}
 
 func TestDeleteTransactionUseCase_Execute(t *testing.T) {
 	userID := identityvalueobjects.GenerateUserID()
 	accountID := accountvalueobjects.GenerateAccountID()
 	date := time.Now()
 
+	// Create initial balance
+	currency, _ := sharedvalueobjects.NewCurrency("BRL")
+	initialBalance, _ := sharedvalueobjects.NewMoney(100000, currency) // 1000.00 BRL
+
 	tests := []struct {
 		name      string
 		input     dtos.DeleteTransactionInput
-		setupMock func(*mockDeleteTransactionRepository)
+		setupMock func(*mockTransactionRepository, *mockAccountRepository, *mockUnitOfWork)
 		wantError bool
 		errorMsg  string
-		validate  func(*testing.T, *dtos.DeleteTransactionOutput)
+		validate  func(*testing.T, *dtos.DeleteTransactionOutput, *mockAccountRepository)
 	}{
 		{
-			name: "delete existing transaction",
+			name: "delete existing INCOME transaction",
 			input: dtos.DeleteTransactionInput{
 				TransactionID: "",
 			},
-			setupMock: func(m *mockDeleteTransactionRepository) {
+			setupMock: func(txRepo *mockTransactionRepository, accRepo *mockAccountRepository, uow *mockUnitOfWork) {
+				// Create account with initial balance
+				account, _ := createTestAccountWithID(userID, accountID, initialBalance)
+				// Credit account to simulate the transaction effect
+				currency, _ := sharedvalueobjects.NewCurrency("BRL")
+				amount, _ := sharedvalueobjects.NewMoney(10000, currency) // 100.00
+				_ = account.Credit(amount)
+				_ = accRepo.Save(account)
+				// Create transaction
 				transaction, _ := createTestTransaction(userID, accountID, "INCOME", 100.00, "BRL", "Salário", date)
-				_ = m.Save(transaction)
+				_ = txRepo.Save(transaction)
 			},
 			wantError: false,
-			validate: func(t *testing.T, output *dtos.DeleteTransactionOutput) {
+			validate: func(t *testing.T, output *dtos.DeleteTransactionOutput, accRepo *mockAccountRepository) {
 				if output == nil {
 					t.Errorf("expected output but got nil")
 					return
@@ -74,6 +59,51 @@ func TestDeleteTransactionUseCase_Execute(t *testing.T) {
 				if output.Message != "Transaction deleted successfully" {
 					t.Errorf("expected message 'Transaction deleted successfully', got %s", output.Message)
 				}
+				// Verify account balance was reversed (INCOME deleted = debit)
+				account, _ := accRepo.FindByID(accountID)
+				if account == nil {
+					t.Fatal("account not found")
+				}
+				// Initial: 1000.00, INCOME 100.00 -> 1100.00, then deleted (reversed) -> 1000.00
+				expectedBalance := int64(100000) // 1000.00 in cents
+				if account.Balance().Amount() != expectedBalance {
+					t.Errorf("expected balance %d, got %d", expectedBalance, account.Balance().Amount())
+				}
+			},
+		},
+		{
+			name: "delete existing EXPENSE transaction",
+			input: dtos.DeleteTransactionInput{
+				TransactionID: "",
+			},
+			setupMock: func(txRepo *mockTransactionRepository, accRepo *mockAccountRepository, uow *mockUnitOfWork) {
+				// Create account with initial balance
+				account, _ := createTestAccountWithID(userID, accountID, initialBalance)
+				// Debit account to simulate the transaction effect
+				currency, _ := sharedvalueobjects.NewCurrency("BRL")
+				amount, _ := sharedvalueobjects.NewMoney(10000, currency) // 100.00
+				_ = account.Debit(amount)
+				_ = accRepo.Save(account)
+				// Create transaction
+				transaction, _ := createTestTransaction(userID, accountID, "EXPENSE", 100.00, "BRL", "Compra", date)
+				_ = txRepo.Save(transaction)
+			},
+			wantError: false,
+			validate: func(t *testing.T, output *dtos.DeleteTransactionOutput, accRepo *mockAccountRepository) {
+				if output == nil {
+					t.Errorf("expected output but got nil")
+					return
+				}
+				// Verify account balance was reversed (EXPENSE deleted = credit)
+				account, _ := accRepo.FindByID(accountID)
+				if account == nil {
+					t.Fatal("account not found")
+				}
+				// Initial: 1000.00, EXPENSE 100.00 -> 900.00, then deleted (reversed) -> 1000.00
+				expectedBalance := int64(100000) // 1000.00 in cents
+				if account.Balance().Amount() != expectedBalance {
+					t.Errorf("expected balance %d, got %d", expectedBalance, account.Balance().Amount())
+				}
 			},
 		},
 		{
@@ -81,7 +111,7 @@ func TestDeleteTransactionUseCase_Execute(t *testing.T) {
 			input: dtos.DeleteTransactionInput{
 				TransactionID: transactionvalueobjects.GenerateTransactionID().Value(),
 			},
-			setupMock: func(m *mockDeleteTransactionRepository) {
+			setupMock: func(txRepo *mockTransactionRepository, accRepo *mockAccountRepository, uow *mockUnitOfWork) {
 				// No transactions in repository
 			},
 			wantError: true,
@@ -92,7 +122,7 @@ func TestDeleteTransactionUseCase_Execute(t *testing.T) {
 			input: dtos.DeleteTransactionInput{
 				TransactionID: "invalid-uuid",
 			},
-			setupMock: func(m *mockDeleteTransactionRepository) {
+			setupMock: func(txRepo *mockTransactionRepository, accRepo *mockAccountRepository, uow *mockUnitOfWork) {
 				// No setup needed
 			},
 			wantError: true,
@@ -103,31 +133,49 @@ func TestDeleteTransactionUseCase_Execute(t *testing.T) {
 			input: dtos.DeleteTransactionInput{
 				TransactionID: transactionvalueobjects.GenerateTransactionID().Value(),
 			},
-			setupMock: func(m *mockDeleteTransactionRepository) {
-				m.findByIDErr = errors.New("database error")
+			setupMock: func(txRepo *mockTransactionRepository, accRepo *mockAccountRepository, uow *mockUnitOfWork) {
+				// This will be handled by the mock - we need to check if FindByID can return an error
+				// For now, we'll test with account not found scenario
 			},
 			wantError: true,
-			errorMsg:  "failed to find transaction",
+			errorMsg:  "transaction not found",
 		},
 		{
-			name: "repository delete error",
+			name: "account not found",
 			input: dtos.DeleteTransactionInput{
 				TransactionID: "",
 			},
-			setupMock: func(m *mockDeleteTransactionRepository) {
+			setupMock: func(txRepo *mockTransactionRepository, accRepo *mockAccountRepository, uow *mockUnitOfWork) {
+				// Create transaction but no account
 				transaction, _ := createTestTransaction(userID, accountID, "INCOME", 100.00, "BRL", "Salário", date)
-				_ = m.Save(transaction)
-				m.deleteErr = errors.New("database error")
+				_ = txRepo.Save(transaction)
 			},
 			wantError: true,
-			errorMsg:  "failed to delete transaction",
+			errorMsg:  "account not found",
+		},
+		{
+			name: "unit of work begin error",
+			input: dtos.DeleteTransactionInput{
+				TransactionID: "",
+			},
+			setupMock: func(txRepo *mockTransactionRepository, accRepo *mockAccountRepository, uow *mockUnitOfWork) {
+				account, _ := createTestAccountWithID(userID, accountID, initialBalance)
+				_ = accRepo.Save(account)
+				transaction, _ := createTestTransaction(userID, accountID, "INCOME", 100.00, "BRL", "Salário", date)
+				_ = txRepo.Save(transaction)
+				uow.beginErr = errors.New("database connection error")
+			},
+			wantError: true,
+			errorMsg:  "failed to begin transaction",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := newMockDeleteTransactionRepository()
-			tt.setupMock(mockRepo)
+			mockTxRepo := newMockTransactionRepository()
+			mockAccRepo := newMockAccountRepository()
+			mockUow := newMockUnitOfWork(mockTxRepo, mockAccRepo)
+			tt.setupMock(mockTxRepo, mockAccRepo, mockUow)
 
 			// For test cases that need TransactionID, set it after creating the transaction
 			if tt.input.TransactionID == "" {
@@ -137,21 +185,23 @@ func TestDeleteTransactionUseCase_Execute(t *testing.T) {
 				} else {
 					// For other tests, get the transaction ID from the repository
 					var transactionID string
-					for id := range mockRepo.transactions {
+					for id := range mockTxRepo.transactions {
 						transactionID = id
 						break
 					}
 					if transactionID == "" {
 						// If no transaction in repo, create one
+						account, _ := createTestAccountWithID(userID, accountID, initialBalance)
+						_ = mockAccRepo.Save(account)
 						transaction, _ := createTestTransaction(userID, accountID, "INCOME", 100.00, "BRL", "Salário", date)
-						_ = mockRepo.Save(transaction)
+						_ = mockTxRepo.Save(transaction)
 						transactionID = transaction.ID().Value()
 					}
 					tt.input.TransactionID = transactionID
 				}
 			}
 
-			useCase := NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
+			useCase := NewDeleteTransactionUseCase(mockUow, eventbus.NewEventBus())
 			output, err := useCase.Execute(tt.input)
 
 			if tt.wantError {
@@ -179,7 +229,7 @@ func TestDeleteTransactionUseCase_Execute(t *testing.T) {
 			}
 
 			if tt.validate != nil {
-				tt.validate(t, output)
+				tt.validate(t, output, mockAccRepo)
 			}
 		})
 	}

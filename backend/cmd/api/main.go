@@ -196,12 +196,13 @@ func main() {
 	unitOfWork := sharedpersistence.NewGormUnitOfWork(db)
 
 	// Initialize transaction use cases
-	// CreateTransactionUseCase now uses UnitOfWork to ensure atomicity
+	// CreateTransactionUseCase, UpdateTransactionUseCase, and DeleteTransactionUseCase
+	// now use UnitOfWork to ensure atomicity
 	createTransactionUseCase := transactionusecases.NewCreateTransactionUseCase(unitOfWork, eventBus)
 	listTransactionsUseCase := transactionusecases.NewListTransactionsUseCase(transactionRepository)
 	getTransactionUseCase := transactionusecases.NewGetTransactionUseCase(transactionRepository)
-	updateTransactionUseCase := transactionusecases.NewUpdateTransactionUseCase(transactionRepository, eventBus)
-	deleteTransactionUseCase := transactionusecases.NewDeleteTransactionUseCase(transactionRepository, eventBus)
+	updateTransactionUseCase := transactionusecases.NewUpdateTransactionUseCase(unitOfWork, eventBus)
+	deleteTransactionUseCase := transactionusecases.NewDeleteTransactionUseCase(unitOfWork, eventBus)
 	restoreTransactionUseCase := transactionusecases.NewRestoreTransactionUseCase(transactionRepository)
 	permanentDeleteTransactionUseCase := transactionusecases.NewPermanentDeleteTransactionUseCase(transactionRepository)
 
