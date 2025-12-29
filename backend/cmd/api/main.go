@@ -37,10 +37,12 @@ import (
 	transactionhandlers "gestao-financeira/backend/internal/transaction/presentation/handlers"
 	transactionroutes "gestao-financeira/backend/internal/transaction/presentation/routes"
 	"gestao-financeira/backend/pkg/cache"
+	"gestao-financeira/backend/pkg/config"
 	"gestao-financeira/backend/pkg/database"
 	"gestao-financeira/backend/pkg/health"
 	"gestao-financeira/backend/pkg/logger"
 	"gestao-financeira/backend/pkg/middleware"
+	"gestao-financeira/backend/pkg/migrations"
 	"gestao-financeira/backend/pkg/validator"
 
 	"github.com/gofiber/fiber/v2"
@@ -70,23 +72,37 @@ import (
 // @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
-	// Initialize structured logger
-	logLevel := os.Getenv("LOG_LEVEL")
-	if logLevel == "" {
-		logLevel = "info"
+	// Load configuration
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to load configuration")
 	}
-	logger.InitLogger(logLevel)
 
-	log.Info().Msg("Starting Gestão Financeira API")
+	// Initialize structured logger
+	logger.InitLoggerWithConfig(cfg.Logging.Level, cfg.Logging.Format, cfg.IsProduction())
 
-	// Initialize database connection
-	db, err := database.NewDatabase()
+	log.Info().
+		Str("environment", cfg.Environment).
+		Str("port", cfg.Server.Port).
+		Msg("Starting Gestão Financeira API")
+
+	// Initialize database connection with configuration
+	db, err := database.NewDatabaseWithConfig(cfg.Database)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to connect to database")
 	}
 	defer database.Close()
 
 	log.Info().Msg("Database connection established")
+
+	// Run database migrations
+	if err := migrations.RunMigrations(db, cfg.Migrations.Path); err != nil {
+		log.Warn().Err(err).Msg("Failed to run migrations (continuing anyway)")
+		// Don't fail startup if migrations fail - might be intentional in some cases
+		// In production, you might want to fail here
+	} else {
+		log.Info().Msg("Database migrations completed")
+	}
 
 	// Initialize validator
 	validator.Init()
@@ -116,14 +132,13 @@ func main() {
 	// Initialize cache service (optional - continues without cache if Redis is unavailable)
 	var cacheService *cache.CacheService
 	var reportCacheService *reportingservices.ReportCacheService
-	redisURL := os.Getenv("REDIS_URL")
-	if redisURL != "" {
-		cacheSvc, err := cache.NewCacheService(redisURL)
+	if cfg.Redis.Enabled {
+		cacheSvc, err := cache.NewCacheService(cfg.Redis.URL)
 		if err != nil {
 			log.Warn().Err(err).Msg("Failed to initialize cache service, continuing without cache")
 		} else {
 			cacheService = cacheSvc
-			reportCacheService = reportingservices.NewReportCacheService(cacheService, 1*time.Hour)
+			reportCacheService = reportingservices.NewReportCacheService(cacheService, cfg.Redis.TTL)
 		}
 	}
 
@@ -151,7 +166,11 @@ func main() {
 	budgetRepository := budgetpersistence.NewGormBudgetRepository(db)
 
 	// Initialize services
-	jwtService := services.NewJWTService()
+	jwtService := services.NewJWTServiceWithConfig(
+		cfg.JWT.SecretKey,
+		cfg.JWT.Expiration,
+		cfg.JWT.Issuer,
+	)
 
 	// Initialize use cases
 	registerUserUseCase := usecases.NewRegisterUserUseCase(userRepository, eventBus)
@@ -176,6 +195,8 @@ func main() {
 	getTransactionUseCase := transactionusecases.NewGetTransactionUseCase(transactionRepository)
 	updateTransactionUseCase := transactionusecases.NewUpdateTransactionUseCase(transactionRepository, eventBus)
 	deleteTransactionUseCase := transactionusecases.NewDeleteTransactionUseCase(transactionRepository, eventBus)
+	restoreTransactionUseCase := transactionusecases.NewRestoreTransactionUseCase(transactionRepository)
+	permanentDeleteTransactionUseCase := transactionusecases.NewPermanentDeleteTransactionUseCase(transactionRepository)
 
 	// Initialize category use cases
 	createCategoryUseCase := categoryusecases.NewCreateCategoryUseCase(categoryRepository, eventBus)
@@ -183,6 +204,8 @@ func main() {
 	getCategoryUseCase := categoryusecases.NewGetCategoryUseCase(categoryRepository)
 	updateCategoryUseCase := categoryusecases.NewUpdateCategoryUseCase(categoryRepository, eventBus)
 	deleteCategoryUseCase := categoryusecases.NewDeleteCategoryUseCase(categoryRepository)
+	restoreCategoryUseCase := categoryusecases.NewRestoreCategoryUseCase(categoryRepository)
+	permanentDeleteCategoryUseCase := categoryusecases.NewPermanentDeleteCategoryUseCase(categoryRepository)
 
 	// Initialize budget use cases
 	createBudgetUseCase := budgetusecases.NewCreateBudgetUseCase(budgetRepository, eventBus)
@@ -207,6 +230,8 @@ func main() {
 		getTransactionUseCase,
 		updateTransactionUseCase,
 		deleteTransactionUseCase,
+		restoreTransactionUseCase,
+		permanentDeleteTransactionUseCase,
 	)
 	categoryHandler := categoryhandlers.NewCategoryHandler(
 		createCategoryUseCase,
@@ -214,6 +239,8 @@ func main() {
 		getCategoryUseCase,
 		updateCategoryUseCase,
 		deleteCategoryUseCase,
+		restoreCategoryUseCase,
+		permanentDeleteCategoryUseCase,
 	)
 	budgetHandler := budgethandlers.NewBudgetHandler(
 		createBudgetUseCase,
@@ -235,20 +262,20 @@ func main() {
 		AppName:      "Gestão Financeira API",
 		ServerHeader: "Fiber",
 		ErrorHandler: customErrorHandler,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  120 * time.Second,
+		ReadTimeout:  cfg.Server.ReadTimeout,
+		WriteTimeout: cfg.Server.WriteTimeout,
+		IdleTimeout:  cfg.Server.IdleTimeout,
 		// Increase header size limit to prevent 431 errors
 		// Default is 4096 bytes, increasing to 16384 bytes (16KB)
 		ReadBufferSize:  16384,
 		WriteBufferSize: 16384,
-		// Body size limit (default is 4MB, increasing to 10MB)
-		BodyLimit: 10 * 1024 * 1024,
+		// Body size limit
+		BodyLimit: int(cfg.Server.BodyLimit),
 	})
 
 	// Store environment in locals for error handler
 	app.Use(func(c *fiber.Ctx) error {
-		c.Locals("env", os.Getenv("ENV"))
+		c.Locals("env", cfg.Environment)
 		return c.Next()
 	})
 
@@ -276,17 +303,12 @@ func main() {
 	}))
 
 	// CORS middleware
-	allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
-	if allowedOrigins == "" {
-		allowedOrigins = "http://localhost:3000"
-	}
-
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     allowedOrigins,
+		AllowOrigins:     cfg.CORS.AllowedOrigins,
 		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
 		AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Request-ID",
 		AllowCredentials: true,
-		MaxAge:           86400, // 24 horas
+		MaxAge:           cfg.CORS.MaxAge,
 	}))
 
 	// Error handler middleware (must be after all other middlewares)
@@ -332,11 +354,8 @@ func main() {
 		reportroutes.SetupReportRoutes(api, reportHandler, jwtService, userRepository, cacheService)
 	}
 
-	// Get port from environment or use default
-	port := os.Getenv("API_PORT")
-	if port == "" {
-		port = "8080"
-	}
+	// Get port from configuration
+	port := cfg.Server.Port
 
 	// Start server in a goroutine
 	go func() {
