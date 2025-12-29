@@ -777,15 +777,15 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | UNIT-OF-WORK-004 | Criar testes de atomicidade | 🟤 | 🔴 | 4h | UNIT-OF-WORK-002 | ✅ |
 | UNIT-OF-WORK-005 | Atualizar UpdateTransactionUseCase para usar UnitOfWork | 🔵 | 🔴 | 4h | UNIT-OF-WORK-001 | ✅ |
 | UNIT-OF-WORK-006 | Atualizar DeleteTransactionUseCase para usar UnitOfWork | 🔵 | 🔴 | 4h | UNIT-OF-WORK-001 | ✅ |
-| UNIT-OF-WORK-007 | Criar testes de integração com banco real | 🟤 | 🔴 | 4h | UNIT-OF-WORK-005, UNIT-OF-WORK-006 | ⚠️ |
+| UNIT-OF-WORK-007 | Criar testes de integração com banco real | 🟤 | 🔴 | 4h | UNIT-OF-WORK-005, UNIT-OF-WORK-006 | ✅ |
 
 **Entregável INFRA-004:** ✅ Gerenciamento de transações de banco de dados implementado com Unit of Work
 
 **Documentação:**
 - `docs/tarefas_concluidas/20251229_055029_UNIT-OF-WORK-001.md` - Implementação inicial
-- `docs/tarefas_concluidas/20251229_060442_UNIT-OF-WORK-002.md` - Update e Delete com UnitOfWork
+- `docs/tarefas_concluidas/20251229_060442_UNIT-OF-WORK-002.md` - Update e Delete com UnitOfWork (corrigido)
 
-**Nota:** UNIT-OF-WORK-007 tem problema conhecido com SQLite em memória (tabelas não visíveis em transações)
+**Nota:** ✅ UNIT-OF-WORK-007 corrigido - problema com SQLite em memória resolvido usando arquivo temporário
 
 **Benefícios:**
 - ✅ Atomicidade garantida em operações críticas
