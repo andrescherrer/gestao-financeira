@@ -12,13 +12,20 @@ var Logger zerolog.Logger
 
 // InitLogger initializes the structured logger
 func InitLogger(level string) {
+	InitLoggerWithConfig(level, "", false)
+}
+
+// InitLoggerWithConfig initializes the structured logger with full configuration
+func InitLoggerWithConfig(level, format string, isProduction bool) {
 	zerolog.TimeFieldFormat = time.RFC3339Nano
 	zerolog.SetGlobalLevel(parseLevel(level))
 
-	// Configure console writer with colors in development
+	// Configure output format
 	output := os.Stdout
-	if os.Getenv("ENV") == "production" {
-		// In production, use JSON format
+	useJSON := format == "json" || isProduction
+
+	if useJSON {
+		// In production or when format is json, use JSON format
 		Logger = zerolog.New(output).
 			With().
 			Timestamp().

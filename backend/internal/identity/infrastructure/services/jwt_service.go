@@ -10,7 +10,9 @@ import (
 
 // JWTService handles JWT token generation and validation.
 type JWTService struct {
-	secretKey []byte
+	secretKey  []byte
+	expiration time.Duration
+	issuer     string
 }
 
 // Claims represents JWT claims.
@@ -20,22 +22,34 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// NewJWTService creates a new JWT service instance.
+// NewJWTService creates a new JWT service instance using environment variables.
 func NewJWTService() *JWTService {
 	secretKey := os.Getenv("JWT_SECRET")
 	if secretKey == "" {
 		secretKey = "your-secret-key-change-in-production" // Default for development
 	}
 
+	return NewJWTServiceWithConfig(secretKey, 24*time.Hour, "gestao-financeira-api")
+}
+
+// NewJWTServiceWithConfig creates a new JWT service instance with provided configuration.
+func NewJWTServiceWithConfig(secretKey string, expiration time.Duration, issuer string) *JWTService {
 	return &JWTService{
-		secretKey: []byte(secretKey),
+		secretKey:  []byte(secretKey),
+		expiration: expiration,
+		issuer:     issuer,
 	}
 }
 
 // GenerateToken generates a new JWT token for a user.
 func (s *JWTService) GenerateToken(userID, email string) (string, error) {
-	// Token expiration time (24 hours)
-	expirationTime := time.Now().Add(24 * time.Hour)
+	// Token expiration time
+	expirationTime := time.Now().Add(s.expiration)
+
+	issuer := s.issuer
+	if issuer == "" {
+		issuer = "gestao-financeira-api"
+	}
 
 	claims := &Claims{
 		UserID: userID,
@@ -44,7 +58,7 @@ func (s *JWTService) GenerateToken(userID, email string) (string, error) {
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
-			Issuer:    "gestao-financeira-api",
+			Issuer:    issuer,
 			Subject:   userID,
 		},
 	}

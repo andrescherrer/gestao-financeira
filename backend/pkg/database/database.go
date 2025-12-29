@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"gestao-financeira/backend/pkg/config"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -12,28 +14,22 @@ import (
 
 var DB *gorm.DB
 
-// Config holds database configuration
-type Config struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	DBName   string
-	SSLMode  string
+// NewDatabase creates a new database connection using environment variables
+func NewDatabase() (*gorm.DB, error) {
+	dbConfig := getConfig()
+	return NewDatabaseWithConfig(dbConfig)
 }
 
-// NewDatabase creates a new database connection
-func NewDatabase() (*gorm.DB, error) {
-	config := getConfig()
-
+// NewDatabaseWithConfig creates a new database connection using provided configuration
+func NewDatabaseWithConfig(dbConfig config.DatabaseConfig) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		config.Host,
-		config.Port,
-		config.User,
-		config.Password,
-		config.DBName,
-		config.SSLMode,
+		dbConfig.Host,
+		dbConfig.Port,
+		dbConfig.User,
+		dbConfig.Password,
+		dbConfig.DBName,
+		dbConfig.SSLMode,
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -53,10 +49,10 @@ func NewDatabase() (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to get sql.DB: %w", err)
 	}
 
-	// Set connection pool settings
-	sqlDB.SetMaxOpenConns(25)
-	sqlDB.SetMaxIdleConns(5)
-	sqlDB.SetConnMaxLifetime(5 * time.Minute)
+	// Set connection pool settings from configuration
+	sqlDB.SetMaxOpenConns(dbConfig.MaxOpenConns)
+	sqlDB.SetMaxIdleConns(dbConfig.MaxIdleConns)
+	sqlDB.SetConnMaxLifetime(dbConfig.ConnMaxLifetime)
 
 	// Test connection
 	if err := sqlDB.Ping(); err != nil {
@@ -68,14 +64,18 @@ func NewDatabase() (*gorm.DB, error) {
 }
 
 // getConfig reads database configuration from environment variables
-func getConfig() Config {
-	return Config{
-		Host:     getEnv("POSTGRES_HOST", "localhost"),
-		Port:     getEnv("POSTGRES_PORT", "5432"),
-		User:     getEnv("POSTGRES_USER", "postgres"),
-		Password: getEnv("POSTGRES_PASSWORD", "postgres"),
-		DBName:   getEnv("POSTGRES_DB", "gestao_financeira"),
-		SSLMode:  getEnv("POSTGRES_SSLMODE", "disable"),
+// This is kept for backward compatibility
+func getConfig() config.DatabaseConfig {
+	return config.DatabaseConfig{
+		Host:            getEnv("POSTGRES_HOST", "localhost"),
+		Port:            getEnv("POSTGRES_PORT", "5432"),
+		User:            getEnv("POSTGRES_USER", "postgres"),
+		Password:        getEnv("POSTGRES_PASSWORD", "postgres"),
+		DBName:          getEnv("POSTGRES_DB", "gestao_financeira"),
+		SSLMode:         getEnv("POSTGRES_SSLMODE", "disable"),
+		MaxOpenConns:    25,
+		MaxIdleConns:    5,
+		ConnMaxLifetime: 5 * time.Minute,
 	}
 }
 
