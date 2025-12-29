@@ -303,10 +303,21 @@ func TestCreateTransactionUseCase_Execute(t *testing.T) {
 
 **Pontuação:** 8.5/10
 
-**Melhorias Sugeridas:**
-- ⚠️ Adicionar validação de SQL injection (já protegido pelo GORM, mas documentar)
-- ⚠️ Adicionar validação de XSS no frontend
-- ⚠️ Rate limiting mais granular por endpoint
+**Melhorias Implementadas (2025-12-29):**
+- ✅ **SQL Injection**: Documentação completa criada (`backend/docs/SECURITY.md`)
+  - Explicação de Prepared Statements do GORM
+  - Exemplos de uso seguro
+  - Validações adicionais documentadas
+- ✅ **XSS no Frontend**: Funções de sanitização implementadas
+  - `sanitizeHtml()`: Remove tags perigosas
+  - `escapeHtml()`: Escapa caracteres especiais
+  - `sanitizeUrl()`: Sanitiza URLs
+  - Documentação e testes unitários
+- ✅ **Rate Limiting Granular**: Implementado por endpoint
+  - Auth endpoints: 10 req/min (login), 5 req/min (register)
+  - Write operations: 20-30 req/min
+  - Read operations: 100 req/min (padrão)
+  - Headers informativos nas respostas
 
 ---
 
