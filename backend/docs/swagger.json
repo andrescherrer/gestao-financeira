@@ -5,11 +5,12 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "API REST para gestão financeira pessoal e profissional. Gerencia usuários, contas e transações financeiras.",
+        "description": "API REST completa para gestão financeira pessoal e profissional.",
         "title": "Gestão Financeira API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
+            "url": "https://github.com/gestao-financeira",
             "email": "support@gestaofinanceira.com"
         },
         "license": {
@@ -28,7 +29,7 @@
                         "Bearer": []
                     }
                 ],
-                "description": "Lists all accounts for the authenticated user. Optionally filter by context (PERSONAL or BUSINESS).",
+                "description": "Lists all accounts for the authenticated user. Supports filtering by context and pagination.",
                 "consumes": [
                     "application/json"
                 ],
@@ -41,35 +42,54 @@
                 "summary": "List accounts",
                 "parameters": [
                     {
+                        "enum": [
+                            "PERSONAL",
+                            "BUSINESS"
+                        ],
                         "type": "string",
+                        "example": "PERSONAL",
                         "description": "Filter by context (PERSONAL or BUSINESS)",
                         "name": "context",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "Page number (1-based, default: 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "20",
+                        "description": "Items per page (default: 10, max: 100)",
+                        "name": "limit",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of accounts with count",
+                        "description": "List of accounts with count and pagination metadata",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_account_application_dtos.ListAccountsOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request - invalid user ID or context",
+                        "description": "Bad request - invalid user ID, context, or pagination parameters\" example({\"error\":\"Invalid context value\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - missing or invalid JWT token",
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -83,7 +103,7 @@
                         "Bearer": []
                     }
                 ],
-                "description": "Creates a new account for the authenticated user. Supports BANK, WALLET, INVESTMENT, and CREDIT_CARD account types.",
+                "description": "Creates a new account for the authenticated user. Supports multiple account types and contexts.",
                 "consumes": [
                     "application/json"
                 ],
@@ -96,7 +116,7 @@
                 "summary": "Create a new account",
                 "parameters": [
                     {
-                        "description": "Account creation data (name, type, initial_balance, currency, context)",
+                        "description": "Account creation data",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -107,34 +127,41 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Account data",
+                        "description": "Account data with all fields",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_account_application_dtos.CreateAccountOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request - invalid input data",
+                        "description": "Bad request - invalid input data or validation failed\" example({\"error\":\"Invalid account data\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400,\"details\":{\"field\":\"name\",\"message\":\"name cannot be empty\"}})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - missing or invalid JWT token",
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "409": {
-                        "description": "Conflict - account already exists",
+                        "description": "Conflict - account with this name already exists\" example({\"error\":\"Account already exists\",\"error_type\":\"CONFLICT\",\"code\":409})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - domain validation failed\" example({\"error\":\"Invalid account type\",\"error_type\":\"DOMAIN_ERROR\",\"code\":422})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -164,6 +191,7 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "example": "550e8400-e29b-41d4-a716-446655440000",
                         "description": "Account ID (UUID)",
                         "name": "id",
                         "in": "path",
@@ -172,41 +200,34 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Account data",
+                        "description": "Account data with all fields",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_account_application_dtos.GetAccountOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request - invalid account ID format",
+                        "description": "Bad request - invalid account ID format\" example({\"error\":\"Invalid account ID format\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - missing or invalid JWT token",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden - account does not belong to user",
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Not found - account does not exist",
+                        "description": "Not found - account does not exist or does not belong to user\" example({\"error\":\"Account not found\",\"error_type\":\"NOT_FOUND\",\"code\":404,\"details\":{\"resource\":\"Account\",\"identifier\":\"550e8400-e29b-41d4-a716-446655440000\"}})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -217,7 +238,7 @@
         },
         "/auth/login": {
             "post": {
-                "description": "Authenticates a user with email and password, returns a JWT token for API access",
+                "description": "Authenticates a user with email and password, returns a JWT token for API access. The token should be included in subsequent requests in the Authorization header.",
                 "consumes": [
                     "application/json"
                 ],
@@ -230,7 +251,7 @@
                 "summary": "Login user",
                 "parameters": [
                     {
-                        "description": "User login credentials (email and password)",
+                        "description": "User login credentials",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -247,28 +268,28 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - invalid input data",
+                        "description": "Bad request - invalid input data\" example({\"error\":\"Invalid email format\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - invalid email or password",
+                        "description": "Unauthorized - invalid email or password\" example({\"error\":\"Email ou senha inválidos\",\"error_type\":\"UNAUTHORIZED\",\"code\":401})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "403": {
-                        "description": "Forbidden - user account is inactive",
+                        "description": "Forbidden - user account is inactive\" example({\"error\":\"Conta de usuário está inativa\",\"error_type\":\"FORBIDDEN\",\"code\":403})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -279,7 +300,7 @@
         },
         "/auth/register": {
             "post": {
-                "description": "Creates a new user account with the provided email, password, first name, and last name.",
+                "description": "Creates a new user account with the provided email, password, first name, and last name. The password is hashed using bcrypt before storage.",
                 "consumes": [
                     "application/json"
                 ],
@@ -303,28 +324,1268 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "User registered successfully\" \"Example: {\\\"message\\\": \\\"User registered successfully\\\", \\\"data\\\": {\\\"user_id\\\": \\\"uuid\\\", \\\"email\\\": \\\"user@example.com\\\", \\\"first_name\\\": \\\"John\\\", \\\"last_name\\\": \\\"Doe\\\", \\\"full_name\\\": \\\"John Doe\\\"}}",
+                        "description": "User registered successfully\" example({\"message\":\"Usuário registrado com sucesso\",\"data\":{\"user_id\":\"550e8400-e29b-41d4-a716-446655440000\",\"email\":\"user@example.com\",\"first_name\":\"John\",\"last_name\":\"Doe\",\"full_name\":\"John Doe\"}})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Bad request - Invalid input data (e.g., invalid email format, password too short, missing fields)",
+                        "description": "Bad request - Invalid input data (e.g., invalid email format, password too short, missing fields)\" example({\"error\":\"Invalid email format\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400,\"details\":{\"field\":\"email\",\"message\":\"email must be a valid email address\"}})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "409": {
-                        "description": "Conflict - User with this email already exists",
+                        "description": "Conflict - User with this email already exists\" example({\"error\":\"Já existe um usuário com este email\",\"error_type\":\"CONFLICT\",\"code\":409})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - domain validation failed\" example({\"error\":\"Password does not meet security requirements\",\"error_type\":\"DOMAIN_ERROR\",\"code\":422})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal server error - An unexpected error occurred",
+                        "description": "Internal server error - An unexpected error occurred\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/budgets": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Lists all budgets for the authenticated user. Supports multiple filters and pagination. Filters are applied in memory, then pagination is applied to the filtered results.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budgets"
+                ],
+                "summary": "List budgets",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "550e8400-e29b-41d4-a716-446655440000",
+                        "description": "Filter by category ID (UUID)",
+                        "name": "category_id",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "MONTHLY",
+                            "YEARLY"
+                        ],
+                        "type": "string",
+                        "example": "MONTHLY",
+                        "description": "Filter by period type (MONTHLY or YEARLY)",
+                        "name": "period_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 2025,
+                        "description": "Filter by year",
+                        "name": "year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 12,
+                        "description": "Filter by month (1-12)",
+                        "name": "month",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "PERSONAL",
+                            "BUSINESS"
+                        ],
+                        "type": "string",
+                        "example": "PERSONAL",
+                        "description": "Filter by context (PERSONAL or BUSINESS)",
+                        "name": "context",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Filter by active status (true or false)",
+                        "name": "is_active",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "Page number (1-based, default: 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "20",
+                        "description": "Items per page (default: 10, max: 100)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of budgets with count and pagination metadata",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_budget_application_dtos.ListBudgetsOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid user ID, filters, or pagination parameters\" example({\"error\":\"Invalid year value\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Creates a new budget for the authenticated user. Supports MONTHLY and YEARLY period types.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budgets"
+                ],
+                "summary": "Create a new budget",
+                "parameters": [
+                    {
+                        "description": "Budget creation data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_budget_application_dtos.CreateBudgetInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Budget data with all fields",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_budget_application_dtos.CreateBudgetOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid input data or validation failed\" example({\"error\":\"Invalid budget data\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400,\"details\":{\"field\":\"amount\",\"message\":\"amount must be greater than 0\"}})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - category does not exist\" example({\"error\":\"Category not found\",\"error_type\":\"NOT_FOUND\",\"code\":404})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - budget already exists for this category and period\" example({\"error\":\"Budget already exists for this category and period\",\"error_type\":\"CONFLICT\",\"code\":409})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - domain validation failed\" example({\"error\":\"Invalid period type\",\"error_type\":\"DOMAIN_ERROR\",\"code\":422})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/budgets/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieves a specific budget by its ID. Only returns budgets that belong to the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budgets"
+                ],
+                "summary": "Get budget by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Budget ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Budget data",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_budget_application_dtos.GetBudgetOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid budget ID format",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - budget does not belong to user",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - budget does not exist",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Updates a budget. Only provided fields will be updated.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budgets"
+                ],
+                "summary": "Update budget",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Budget ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Budget update data (amount, period_type, year, month, is_active - at least one required)",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_budget_application_dtos.UpdateBudgetInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated budget data",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_budget_application_dtos.UpdateBudgetOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid input data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - budget does not exist",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Deletes a budget.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budgets"
+                ],
+                "summary": "Delete budget",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Budget ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Budget deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid budget ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - budget does not exist",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/budgets/{id}/progress": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Calculates the progress of a budget, including spent amount, remaining amount, and percentage used.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budgets"
+                ],
+                "summary": "Get budget progress",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Budget ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Budget progress data",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_budget_application_dtos.GetBudgetProgressOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid budget ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - budget does not exist",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/categories": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Lists all categories for the authenticated user. Supports filtering by active status and pagination.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "List categories",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Filter by active status (true or false)",
+                        "name": "is_active",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "Page number (1-based, default: 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "20",
+                        "description": "Items per page (default: 10, max: 100)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of categories with count and pagination metadata",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_category_application_dtos.ListCategoriesOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid user ID or pagination parameters\" example({\"error\":\"Invalid user ID\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Creates a new category for the authenticated user. Categories are used to organize transactions.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Create a new category",
+                "parameters": [
+                    {
+                        "description": "Category creation data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_category_application_dtos.CreateCategoryInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Category data with all fields",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_category_application_dtos.CreateCategoryOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid input data or validation failed\" example({\"error\":\"Invalid category data\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400,\"details\":{\"field\":\"name\",\"message\":\"name cannot be empty\"}})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - category with this name already exists\" example({\"error\":\"Já existe uma categoria com este nome\",\"error_type\":\"CONFLICT\",\"code\":409})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - domain validation failed\" example({\"error\":\"Invalid category name\",\"error_type\":\"DOMAIN_ERROR\",\"code\":422})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/categories/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieves a specific category by its ID for the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Get category by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category data",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_category_application_dtos.GetCategoryOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid category ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - category does not exist",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Updates a category. Only provided fields will be updated.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Update category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Category update data (name, description - at least one required)",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_category_application_dtos.UpdateCategoryInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated category data",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_category_application_dtos.UpdateCategoryOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid input data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - category does not exist",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Deletes a category (soft delete).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Delete category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deletion confirmation",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_category_application_dtos.DeleteCategoryOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid category ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - category does not exist",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/categories/{id}/permanent": {
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Permanently deletes a category from the database (hard delete). This action cannot be undone.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Permanently delete a category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deletion confirmation",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_category_application_dtos.PermanentDeleteCategoryOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid category ID format",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - admin access required",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - category does not exist",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/categories/{id}/restore": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Restores a soft-deleted category by setting deleted_at to NULL.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Restore a soft-deleted category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restoration confirmation",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_category_application_dtos.RestoreCategoryOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid category ID format",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - category does not exist or is not deleted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/annual": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Generates an annual financial report for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reports"
+                ],
+                "summary": "Get annual report",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Year (e.g., 2025)",
+                        "name": "year",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Currency filter (BRL, USD, EUR)",
+                        "name": "currency",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Annual report data",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.AnnualReportOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid input data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/category": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Generates a category-based financial report for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reports"
+                ],
+                "summary": "Get category report",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID filter (UUID)",
+                        "name": "category_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start date filter (YYYY-MM-DD)",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date filter (YYYY-MM-DD)",
+                        "name": "end_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Currency filter (BRL, USD, EUR)",
+                        "name": "currency",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category report data",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.CategoryReportOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid input data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/income-vs-expense": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Generates an income vs expense comparison report for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reports"
+                ],
+                "summary": "Get income vs expense report",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date filter (YYYY-MM-DD)",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date filter (YYYY-MM-DD)",
+                        "name": "end_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Currency filter (BRL, USD, EUR)",
+                        "name": "currency",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Group by period (day, week, month, year)",
+                        "name": "group_by",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Income vs expense report data",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.IncomeVsExpenseOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid input data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/monthly": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Generates a monthly financial report for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reports"
+                ],
+                "summary": "Get monthly report",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Year (e.g., 2025)",
+                        "name": "year",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Month (1-12)",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Currency filter (BRL, USD, EUR)",
+                        "name": "currency",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Monthly report data",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.MonthlyReportOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid input data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -340,7 +1601,7 @@
                         "Bearer": []
                     }
                 ],
-                "description": "Lists all transactions for the authenticated user. Optionally filter by account_id and/or type (INCOME or EXPENSE).",
+                "description": "Lists all transactions for the authenticated user. Supports filtering by account_id and/or type, and pagination.",
                 "consumes": [
                     "application/json"
                 ],
@@ -354,40 +1615,60 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "example": "550e8400-e29b-41d4-a716-446655440000",
                         "description": "Filter by account ID (UUID)",
                         "name": "account_id",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "INCOME",
+                            "EXPENSE"
+                        ],
                         "type": "string",
+                        "example": "INCOME",
                         "description": "Filter by transaction type (INCOME or EXPENSE)",
                         "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1",
+                        "description": "Page number (1-based, default: 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "20",
+                        "description": "Items per page (default: 10, max: 100)",
+                        "name": "limit",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of transactions with count",
+                        "description": "List of transactions with count and pagination metadata",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.ListTransactionsOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request - invalid user ID, account ID or type",
+                        "description": "Bad request - invalid user ID, account ID, type, or pagination parameters\" example({\"error\":\"Invalid account ID format\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - missing or invalid JWT token",
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -401,7 +1682,7 @@
                         "Bearer": []
                     }
                 ],
-                "description": "Creates a new transaction (INCOME or EXPENSE) for the authenticated user. Links transaction to an account.",
+                "description": "Creates a new transaction (INCOME or EXPENSE) for the authenticated user. Links transaction to an account and automatically updates the account balance atomically using Unit of Work pattern.",
                 "consumes": [
                     "application/json"
                 ],
@@ -414,7 +1695,7 @@
                 "summary": "Create a new transaction",
                 "parameters": [
                     {
-                        "description": "Transaction creation data (account_id, type, amount, currency, description, date)",
+                        "description": "Transaction creation data",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -425,27 +1706,41 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Transaction data",
+                        "description": "Transaction data with all fields",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.CreateTransactionOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request - invalid input data or account not found",
+                        "description": "Bad request - invalid input data, validation failed, or account not found\" example({\"error\":\"Invalid transaction data\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400,\"details\":{\"field\":\"amount\",\"message\":\"amount must be greater than 0\"}})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - missing or invalid JWT token",
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - account does not exist\" example({\"error\":\"Account not found\",\"error_type\":\"NOT_FOUND\",\"code\":404,\"details\":{\"resource\":\"Account\",\"identifier\":\"550e8400-e29b-41d4-a716-446655440000\"}})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - domain validation failed\" example({\"error\":\"Account balance would become negative\",\"error_type\":\"DOMAIN_ERROR\",\"code\":422})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -475,6 +1770,7 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "example": "550e8400-e29b-41d4-a716-446655440001",
                         "description": "Transaction ID (UUID)",
                         "name": "id",
                         "in": "path",
@@ -483,41 +1779,34 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Transaction data",
+                        "description": "Transaction data with all fields",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.GetTransactionOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request - invalid transaction ID format",
+                        "description": "Bad request - invalid transaction ID format\" example({\"error\":\"Invalid transaction ID format\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - missing or invalid JWT token",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden - transaction does not belong to user",
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Not found - transaction does not exist",
+                        "description": "Not found - transaction does not exist or does not belong to user\" example({\"error\":\"Transaction not found\",\"error_type\":\"NOT_FOUND\",\"code\":404,\"details\":{\"resource\":\"Transaction\",\"identifier\":\"550e8400-e29b-41d4-a716-446655440001\"}})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -531,7 +1820,7 @@
                         "Bearer": []
                     }
                 ],
-                "description": "Updates an existing transaction. Supports partial updates - only provided fields will be updated. At least one field must be provided.",
+                "description": "Updates an existing transaction using Unit of Work pattern for atomicity. Supports partial updates - only provided fields will be updated. At least one field must be provided.",
                 "consumes": [
                     "application/json"
                 ],
@@ -545,13 +1834,14 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "example": "550e8400-e29b-41d4-a716-446655440001",
                         "description": "Transaction ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Transaction update data (all fields optional: type, amount, currency, description, date)",
+                        "description": "Transaction update data (all fields optional)",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -562,13 +1852,149 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Updated transaction data",
+                        "description": "Updated transaction data with all fields",
                         "schema": {
                             "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.UpdateTransactionOutput"
                         }
                     },
                     "400": {
-                        "description": "Bad request - invalid transaction ID, invalid data, or no fields provided",
+                        "description": "Bad request - invalid transaction ID, invalid data, or no fields provided\" example({\"error\":\"At least one field must be provided for update\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - transaction does not exist\" example({\"error\":\"Transaction not found\",\"error_type\":\"NOT_FOUND\",\"code\":404})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - domain validation failed\" example({\"error\":\"Account balance would become negative\",\"error_type\":\"DOMAIN_ERROR\",\"code\":422})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Deletes a transaction by its ID using Unit of Work pattern for atomicity. Performs soft delete - the transaction is marked as deleted but not permanently removed from the database. The account balance is automatically reversed.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Delete a transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "550e8400-e29b-41d4-a716-446655440001",
+                        "description": "Transaction ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deletion confirmation with transaction ID",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.DeleteTransactionOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid transaction ID format\" example({\"error\":\"Invalid transaction ID format\",\"error_type\":\"VALIDATION_ERROR\",\"code\":400})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid JWT token\" example({\"error\":\"Unauthorized\",\"code\":401})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - transaction does not exist\" example({\"error\":\"Transaction not found\",\"error_type\":\"NOT_FOUND\",\"code\":404})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error\" example({\"error\":\"An unexpected error occurred\",\"error_type\":\"INTERNAL_ERROR\",\"code\":500,\"request_id\":\"req-123\"})",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions/{id}/permanent": {
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Permanently deletes a transaction from the database (hard delete). This action cannot be undone.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Permanently delete a transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Transaction ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deletion confirmation",
+                        "schema": {
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.PermanentDeleteTransactionOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid transaction ID format",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -582,7 +2008,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - transaction does not belong to user",
+                        "description": "Forbidden - admin access required",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -603,14 +2029,16 @@
                         }
                     }
                 }
-            },
-            "delete": {
+            }
+        },
+        "/transactions/{id}/restore": {
+            "post": {
                 "security": [
                     {
                         "Bearer": []
                     }
                 ],
-                "description": "Deletes a transaction by its ID (soft delete). The transaction is marked as deleted but not permanently removed from the database.",
+                "description": "Restores a soft-deleted transaction by setting deleted_at to NULL.",
                 "consumes": [
                     "application/json"
                 ],
@@ -620,7 +2048,7 @@
                 "tags": [
                     "transactions"
                 ],
-                "summary": "Delete a transaction",
+                "summary": "Restore a soft-deleted transaction",
                 "parameters": [
                     {
                         "type": "string",
@@ -632,9 +2060,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Deletion confirmation",
+                        "description": "Restoration confirmation",
                         "schema": {
-                            "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.DeleteTransactionOutput"
+                            "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.RestoreTransactionOutput"
                         }
                     },
                     "400": {
@@ -652,7 +2080,7 @@
                         }
                     },
                     "404": {
-                        "description": "Not found - transaction does not exist",
+                        "description": "Not found - transaction does not exist or is not deleted",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -831,6 +2259,474 @@
                 },
                 "count": {
                     "type": "integer"
+                },
+                "pagination": {
+                    "$ref": "#/definitions/gestao-financeira_backend_pkg_pagination.PaginationResult"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_budget_application_dtos.BudgetOutput": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "budget_id": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "context": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "period_type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_budget_application_dtos.CreateBudgetInput": {
+            "type": "object",
+            "required": [
+                "amount",
+                "category_id",
+                "context",
+                "currency",
+                "period_type",
+                "user_id",
+                "year"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "context": {
+                    "type": "string",
+                    "enum": [
+                        "PERSONAL",
+                        "BUSINESS"
+                    ]
+                },
+                "currency": {
+                    "type": "string",
+                    "enum": [
+                        "BRL",
+                        "USD",
+                        "EUR"
+                    ]
+                },
+                "month": {
+                    "type": "integer",
+                    "maximum": 12,
+                    "minimum": 1
+                },
+                "period_type": {
+                    "type": "string",
+                    "enum": [
+                        "MONTHLY",
+                        "YEARLY"
+                    ]
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer",
+                    "maximum": 3000,
+                    "minimum": 1900
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_budget_application_dtos.CreateBudgetOutput": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "budget_id": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "context": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "period_type": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_budget_application_dtos.GetBudgetOutput": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "budget_id": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "context": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "period_type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_budget_application_dtos.GetBudgetProgressOutput": {
+            "type": "object",
+            "properties": {
+                "budget_id": {
+                    "type": "string"
+                },
+                "budgeted": {
+                    "type": "number"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "is_exceeded": {
+                    "type": "boolean"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "percentage_used": {
+                    "type": "number"
+                },
+                "period_type": {
+                    "type": "string"
+                },
+                "remaining": {
+                    "type": "number"
+                },
+                "spent": {
+                    "type": "number"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_budget_application_dtos.ListBudgetsOutput": {
+            "type": "object",
+            "properties": {
+                "budgets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/gestao-financeira_backend_internal_budget_application_dtos.BudgetOutput"
+                    }
+                },
+                "pagination": {
+                    "$ref": "#/definitions/gestao-financeira_backend_pkg_pagination.PaginationResult"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_budget_application_dtos.UpdateBudgetInput": {
+            "type": "object",
+            "required": [
+                "budget_id",
+                "user_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "budget_id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "month": {
+                    "type": "integer",
+                    "maximum": 12,
+                    "minimum": 1
+                },
+                "period_type": {
+                    "type": "string",
+                    "enum": [
+                        "MONTHLY",
+                        "YEARLY"
+                    ]
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer",
+                    "maximum": 3000,
+                    "minimum": 1900
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_budget_application_dtos.UpdateBudgetOutput": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "budget_id": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "context": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "period_type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_category_application_dtos.CreateCategoryInput": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_category_application_dtos.CreateCategoryOutput": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_category_application_dtos.DeleteCategoryOutput": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_category_application_dtos.GetCategoryOutput": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_category_application_dtos.ListCategoriesOutput": {
+            "type": "object",
+            "properties": {
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/gestao-financeira_backend_internal_category_application_dtos.GetCategoryOutput"
+                    }
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "pagination": {
+                    "$ref": "#/definitions/gestao-financeira_backend_pkg_pagination.PaginationResult"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_category_application_dtos.PermanentDeleteCategoryOutput": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_category_application_dtos.RestoreCategoryOutput": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_category_application_dtos.UpdateCategoryInput": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_category_application_dtos.UpdateCategoryOutput": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
@@ -908,6 +2804,260 @@
                     "type": "string",
                     "minLength": 8,
                     "example": "SecurePass123"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_reporting_application_dtos.AnnualReportOutput": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "expense_count": {
+                    "type": "integer"
+                },
+                "income_count": {
+                    "description": "Transaction counts",
+                    "type": "integer"
+                },
+                "monthly_breakdown": {
+                    "description": "Monthly breakdown",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.MonthlySummary"
+                    }
+                },
+                "total_count": {
+                    "type": "integer"
+                },
+                "total_expense": {
+                    "type": "number"
+                },
+                "total_income": {
+                    "description": "Summary",
+                    "type": "number"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_reporting_application_dtos.CategoryReportOutput": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number"
+                },
+                "category_breakdown": {
+                    "description": "Summary by category",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.CategorySummary"
+                    }
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "total_count": {
+                    "description": "Counts",
+                    "type": "integer"
+                },
+                "total_expense": {
+                    "type": "number"
+                },
+                "total_income": {
+                    "description": "Totals",
+                    "type": "number"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_reporting_application_dtos.CategorySummary": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "description": "Will be populated when category_id is added to transactions",
+                    "type": "string"
+                },
+                "category_name": {
+                    "description": "Will be populated when category_id is added to transactions",
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "percentage": {
+                    "description": "Percentage of total (income or expense)",
+                    "type": "number"
+                },
+                "total_amount": {
+                    "type": "number"
+                },
+                "type": {
+                    "description": "INCOME or EXPENSE",
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_reporting_application_dtos.IncomeVsExpenseOutput": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "difference": {
+                    "description": "Income - Expense",
+                    "type": "number"
+                },
+                "expense_count": {
+                    "type": "integer"
+                },
+                "income_count": {
+                    "description": "Counts",
+                    "type": "integer"
+                },
+                "period_breakdown": {
+                    "description": "Period breakdown (if group_by is specified)",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.PeriodSummary"
+                    }
+                },
+                "total_count": {
+                    "type": "integer"
+                },
+                "total_expense": {
+                    "type": "number"
+                },
+                "total_income": {
+                    "description": "Overall summary",
+                    "type": "number"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_reporting_application_dtos.MonthlyCategorySummary": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "category_name": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "total_amount": {
+                    "type": "number"
+                },
+                "type": {
+                    "description": "INCOME or EXPENSE",
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_reporting_application_dtos.MonthlyReportOutput": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number"
+                },
+                "category_breakdown": {
+                    "description": "Category breakdown (optional, can be added later)",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.MonthlyCategorySummary"
+                    }
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "expense_count": {
+                    "type": "integer"
+                },
+                "income_count": {
+                    "description": "Transaction counts",
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "total_count": {
+                    "type": "integer"
+                },
+                "total_expense": {
+                    "type": "number"
+                },
+                "total_income": {
+                    "description": "Summary",
+                    "type": "number"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_reporting_application_dtos.MonthlySummary": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number"
+                },
+                "expense_count": {
+                    "type": "integer"
+                },
+                "income_count": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "total_expense": {
+                    "type": "number"
+                },
+                "total_income": {
+                    "type": "number"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_reporting_application_dtos.PeriodSummary": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number"
+                },
+                "expense_count": {
+                    "type": "integer"
+                },
+                "income_count": {
+                    "type": "integer"
+                },
+                "period": {
+                    "description": "Date or period identifier",
+                    "type": "string"
+                },
+                "total_expense": {
+                    "type": "number"
+                },
+                "total_income": {
+                    "type": "number"
                 }
             }
         },
@@ -1042,11 +3192,36 @@
                 "count": {
                     "type": "integer"
                 },
+                "pagination": {
+                    "$ref": "#/definitions/gestao-financeira_backend_pkg_pagination.PaginationResult"
+                },
                 "transactions": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.TransactionOutput"
                     }
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_transaction_application_dtos.PermanentDeleteTransactionOutput": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "transaction_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "gestao-financeira_backend_internal_transaction_application_dtos.RestoreTransactionOutput": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "transaction_id": {
+                    "type": "string"
                 }
             }
         },
@@ -1154,11 +3329,34 @@
                     "type": "string"
                 }
             }
+        },
+        "gestao-financeira_backend_pkg_pagination.PaginationResult": {
+            "type": "object",
+            "properties": {
+                "has_next": {
+                    "type": "boolean"
+                },
+                "has_prev": {
+                    "type": "boolean"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
         }
     },
     "securityDefinitions": {
         "Bearer": {
-            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "description": "Type \"Bearer\" followed by a space and JWT token. Example: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

@@ -111,6 +111,319 @@ definitions:
         type: array
       count:
         type: integer
+      pagination:
+        $ref: '#/definitions/gestao-financeira_backend_pkg_pagination.PaginationResult'
+    type: object
+  gestao-financeira_backend_internal_budget_application_dtos.BudgetOutput:
+    properties:
+      amount:
+        type: number
+      budget_id:
+        type: string
+      category_id:
+        type: string
+      context:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      is_active:
+        type: boolean
+      month:
+        type: integer
+      period_type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      year:
+        type: integer
+    type: object
+  gestao-financeira_backend_internal_budget_application_dtos.CreateBudgetInput:
+    properties:
+      amount:
+        type: number
+      category_id:
+        type: string
+      context:
+        enum:
+        - PERSONAL
+        - BUSINESS
+        type: string
+      currency:
+        enum:
+        - BRL
+        - USD
+        - EUR
+        type: string
+      month:
+        maximum: 12
+        minimum: 1
+        type: integer
+      period_type:
+        enum:
+        - MONTHLY
+        - YEARLY
+        type: string
+      user_id:
+        type: string
+      year:
+        maximum: 3000
+        minimum: 1900
+        type: integer
+    required:
+    - amount
+    - category_id
+    - context
+    - currency
+    - period_type
+    - user_id
+    - year
+    type: object
+  gestao-financeira_backend_internal_budget_application_dtos.CreateBudgetOutput:
+    properties:
+      amount:
+        type: number
+      budget_id:
+        type: string
+      category_id:
+        type: string
+      context:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      is_active:
+        type: boolean
+      month:
+        type: integer
+      period_type:
+        type: string
+      user_id:
+        type: string
+      year:
+        type: integer
+    type: object
+  gestao-financeira_backend_internal_budget_application_dtos.GetBudgetOutput:
+    properties:
+      amount:
+        type: number
+      budget_id:
+        type: string
+      category_id:
+        type: string
+      context:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      is_active:
+        type: boolean
+      month:
+        type: integer
+      period_type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      year:
+        type: integer
+    type: object
+  gestao-financeira_backend_internal_budget_application_dtos.GetBudgetProgressOutput:
+    properties:
+      budget_id:
+        type: string
+      budgeted:
+        type: number
+      category_id:
+        type: string
+      currency:
+        type: string
+      is_exceeded:
+        type: boolean
+      month:
+        type: integer
+      percentage_used:
+        type: number
+      period_type:
+        type: string
+      remaining:
+        type: number
+      spent:
+        type: number
+      year:
+        type: integer
+    type: object
+  gestao-financeira_backend_internal_budget_application_dtos.ListBudgetsOutput:
+    properties:
+      budgets:
+        items:
+          $ref: '#/definitions/gestao-financeira_backend_internal_budget_application_dtos.BudgetOutput'
+        type: array
+      pagination:
+        $ref: '#/definitions/gestao-financeira_backend_pkg_pagination.PaginationResult'
+      total:
+        type: integer
+    type: object
+  gestao-financeira_backend_internal_budget_application_dtos.UpdateBudgetInput:
+    properties:
+      amount:
+        type: number
+      budget_id:
+        type: string
+      is_active:
+        type: boolean
+      month:
+        maximum: 12
+        minimum: 1
+        type: integer
+      period_type:
+        enum:
+        - MONTHLY
+        - YEARLY
+        type: string
+      user_id:
+        type: string
+      year:
+        maximum: 3000
+        minimum: 1900
+        type: integer
+    required:
+    - budget_id
+    - user_id
+    type: object
+  gestao-financeira_backend_internal_budget_application_dtos.UpdateBudgetOutput:
+    properties:
+      amount:
+        type: number
+      budget_id:
+        type: string
+      category_id:
+        type: string
+      context:
+        type: string
+      currency:
+        type: string
+      is_active:
+        type: boolean
+      month:
+        type: integer
+      period_type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      year:
+        type: integer
+    type: object
+  gestao-financeira_backend_internal_category_application_dtos.CreateCategoryInput:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      userID:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_category_application_dtos.CreateCategoryOutput:
+    properties:
+      category_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      slug:
+        type: string
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_category_application_dtos.DeleteCategoryOutput:
+    properties:
+      categoryID:
+        type: string
+      message:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_category_application_dtos.GetCategoryOutput:
+    properties:
+      category_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      slug:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_category_application_dtos.ListCategoriesOutput:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/gestao-financeira_backend_internal_category_application_dtos.GetCategoryOutput'
+        type: array
+      count:
+        type: integer
+      pagination:
+        $ref: '#/definitions/gestao-financeira_backend_pkg_pagination.PaginationResult'
+    type: object
+  gestao-financeira_backend_internal_category_application_dtos.PermanentDeleteCategoryOutput:
+    properties:
+      category_id:
+        type: string
+      message:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_category_application_dtos.RestoreCategoryOutput:
+    properties:
+      category_id:
+        type: string
+      message:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_category_application_dtos.UpdateCategoryInput:
+    properties:
+      categoryID:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_category_application_dtos.UpdateCategoryOutput:
+    properties:
+      category_id:
+        type: string
+      description:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      slug:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
     type: object
   gestao-financeira_backend_internal_identity_application_dtos.LoginInput:
     properties:
@@ -168,6 +481,179 @@ definitions:
     - first_name
     - last_name
     - password
+    type: object
+  gestao-financeira_backend_internal_reporting_application_dtos.AnnualReportOutput:
+    properties:
+      balance:
+        type: number
+      currency:
+        type: string
+      expense_count:
+        type: integer
+      income_count:
+        description: Transaction counts
+        type: integer
+      monthly_breakdown:
+        description: Monthly breakdown
+        items:
+          $ref: '#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.MonthlySummary'
+        type: array
+      total_count:
+        type: integer
+      total_expense:
+        type: number
+      total_income:
+        description: Summary
+        type: number
+      user_id:
+        type: string
+      year:
+        type: integer
+    type: object
+  gestao-financeira_backend_internal_reporting_application_dtos.CategoryReportOutput:
+    properties:
+      balance:
+        type: number
+      category_breakdown:
+        description: Summary by category
+        items:
+          $ref: '#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.CategorySummary'
+        type: array
+      currency:
+        type: string
+      total_count:
+        description: Counts
+        type: integer
+      total_expense:
+        type: number
+      total_income:
+        description: Totals
+        type: number
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_reporting_application_dtos.CategorySummary:
+    properties:
+      category_id:
+        description: Will be populated when category_id is added to transactions
+        type: string
+      category_name:
+        description: Will be populated when category_id is added to transactions
+        type: string
+      count:
+        type: integer
+      percentage:
+        description: Percentage of total (income or expense)
+        type: number
+      total_amount:
+        type: number
+      type:
+        description: INCOME or EXPENSE
+        type: string
+    type: object
+  gestao-financeira_backend_internal_reporting_application_dtos.IncomeVsExpenseOutput:
+    properties:
+      balance:
+        type: number
+      currency:
+        type: string
+      difference:
+        description: Income - Expense
+        type: number
+      expense_count:
+        type: integer
+      income_count:
+        description: Counts
+        type: integer
+      period_breakdown:
+        description: Period breakdown (if group_by is specified)
+        items:
+          $ref: '#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.PeriodSummary'
+        type: array
+      total_count:
+        type: integer
+      total_expense:
+        type: number
+      total_income:
+        description: Overall summary
+        type: number
+      user_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_reporting_application_dtos.MonthlyCategorySummary:
+    properties:
+      category_id:
+        type: string
+      category_name:
+        type: string
+      count:
+        type: integer
+      total_amount:
+        type: number
+      type:
+        description: INCOME or EXPENSE
+        type: string
+    type: object
+  gestao-financeira_backend_internal_reporting_application_dtos.MonthlyReportOutput:
+    properties:
+      balance:
+        type: number
+      category_breakdown:
+        description: Category breakdown (optional, can be added later)
+        items:
+          $ref: '#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.MonthlyCategorySummary'
+        type: array
+      currency:
+        type: string
+      expense_count:
+        type: integer
+      income_count:
+        description: Transaction counts
+        type: integer
+      month:
+        type: integer
+      total_count:
+        type: integer
+      total_expense:
+        type: number
+      total_income:
+        description: Summary
+        type: number
+      user_id:
+        type: string
+      year:
+        type: integer
+    type: object
+  gestao-financeira_backend_internal_reporting_application_dtos.MonthlySummary:
+    properties:
+      balance:
+        type: number
+      expense_count:
+        type: integer
+      income_count:
+        type: integer
+      month:
+        type: integer
+      total_expense:
+        type: number
+      total_income:
+        type: number
+    type: object
+  gestao-financeira_backend_internal_reporting_application_dtos.PeriodSummary:
+    properties:
+      balance:
+        type: number
+      expense_count:
+        type: integer
+      income_count:
+        type: integer
+      period:
+        description: Date or period identifier
+        type: string
+      total_expense:
+        type: number
+      total_income:
+        type: number
     type: object
   gestao-financeira_backend_internal_transaction_application_dtos.CreateTransactionInput:
     properties:
@@ -259,10 +745,26 @@ definitions:
     properties:
       count:
         type: integer
+      pagination:
+        $ref: '#/definitions/gestao-financeira_backend_pkg_pagination.PaginationResult'
       transactions:
         items:
           $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.TransactionOutput'
         type: array
+    type: object
+  gestao-financeira_backend_internal_transaction_application_dtos.PermanentDeleteTransactionOutput:
+    properties:
+      message:
+        type: string
+      transaction_id:
+        type: string
+    type: object
+  gestao-financeira_backend_internal_transaction_application_dtos.RestoreTransactionOutput:
+    properties:
+      message:
+        type: string
+      transaction_id:
+        type: string
     type: object
   gestao-financeira_backend_internal_transaction_application_dtos.TransactionOutput:
     properties:
@@ -335,13 +837,28 @@ definitions:
       user_id:
         type: string
     type: object
+  gestao-financeira_backend_pkg_pagination.PaginationResult:
+    properties:
+      has_next:
+        type: boolean
+      has_prev:
+        type: boolean
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
 host: localhost:8080
 info:
   contact:
     email: support@gestaofinanceira.com
     name: API Support
-  description: API REST para gestão financeira pessoal e profissional. Gerencia usuários,
-    contas e transações financeiras.
+    url: https://github.com/gestao-financeira
+  description: API REST completa para gestão financeira pessoal e profissional.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -353,32 +870,48 @@ paths:
     get:
       consumes:
       - application/json
-      description: Lists all accounts for the authenticated user. Optionally filter
-        by context (PERSONAL or BUSINESS).
+      description: Lists all accounts for the authenticated user. Supports filtering
+        by context and pagination.
       parameters:
       - description: Filter by context (PERSONAL or BUSINESS)
+        enum:
+        - PERSONAL
+        - BUSINESS
+        example: PERSONAL
         in: query
         name: context
+        type: string
+      - description: 'Page number (1-based, default: 1)'
+        example: "1"
+        in: query
+        name: page
+        type: string
+      - description: 'Items per page (default: 10, max: 100)'
+        example: "20"
+        in: query
+        name: limit
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: List of accounts with count
+          description: List of accounts with count and pagination metadata
           schema:
             $ref: '#/definitions/gestao-financeira_backend_internal_account_application_dtos.ListAccountsOutput'
         "400":
-          description: Bad request - invalid user ID or context
+          description: Bad request - invalid user ID, context, or pagination parameters"
+            example({"error":"Invalid context value","error_type":"VALIDATION_ERROR","code":400})
           schema:
             additionalProperties: true
             type: object
         "401":
-          description: Unauthorized - missing or invalid JWT token
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal server error
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
           schema:
             additionalProperties: true
             type: object
@@ -390,11 +923,10 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a new account for the authenticated user. Supports BANK,
-        WALLET, INVESTMENT, and CREDIT_CARD account types.
+      description: Creates a new account for the authenticated user. Supports multiple
+        account types and contexts.
       parameters:
-      - description: Account creation data (name, type, initial_balance, currency,
-          context)
+      - description: Account creation data
         in: body
         name: request
         required: true
@@ -404,26 +936,36 @@ paths:
       - application/json
       responses:
         "201":
-          description: Account data
+          description: Account data with all fields
           schema:
             $ref: '#/definitions/gestao-financeira_backend_internal_account_application_dtos.CreateAccountOutput'
         "400":
-          description: Bad request - invalid input data
+          description: Bad request - invalid input data or validation failed" example({"error":"Invalid
+            account data","error_type":"VALIDATION_ERROR","code":400,"details":{"field":"name","message":"name
+            cannot be empty"}})
           schema:
             additionalProperties: true
             type: object
         "401":
-          description: Unauthorized - missing or invalid JWT token
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
           schema:
             additionalProperties: true
             type: object
         "409":
-          description: Conflict - account already exists
+          description: Conflict - account with this name already exists" example({"error":"Account
+            already exists","error_type":"CONFLICT","code":409})
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Unprocessable entity - domain validation failed" example({"error":"Invalid
+            account type","error_type":"DOMAIN_ERROR","code":422})
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal server error
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
           schema:
             additionalProperties: true
             type: object
@@ -440,6 +982,7 @@ paths:
         belong to the authenticated user.
       parameters:
       - description: Account ID (UUID)
+        example: 550e8400-e29b-41d4-a716-446655440000
         in: path
         name: id
         required: true
@@ -448,31 +991,29 @@ paths:
       - application/json
       responses:
         "200":
-          description: Account data
+          description: Account data with all fields
           schema:
             $ref: '#/definitions/gestao-financeira_backend_internal_account_application_dtos.GetAccountOutput'
         "400":
-          description: Bad request - invalid account ID format
+          description: Bad request - invalid account ID format" example({"error":"Invalid
+            account ID format","error_type":"VALIDATION_ERROR","code":400})
           schema:
             additionalProperties: true
             type: object
         "401":
-          description: Unauthorized - missing or invalid JWT token
-          schema:
-            additionalProperties: true
-            type: object
-        "403":
-          description: Forbidden - account does not belong to user
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Not found - account does not exist
+          description: Not found - account does not exist or does not belong to user"
+            example({"error":"Account not found","error_type":"NOT_FOUND","code":404,"details":{"resource":"Account","identifier":"550e8400-e29b-41d4-a716-446655440000"}})
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal server error
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
           schema:
             additionalProperties: true
             type: object
@@ -486,9 +1027,10 @@ paths:
       consumes:
       - application/json
       description: Authenticates a user with email and password, returns a JWT token
-        for API access
+        for API access. The token should be included in subsequent requests in the
+        Authorization header.
       parameters:
-      - description: User login credentials (email and password)
+      - description: User login credentials
         in: body
         name: request
         required: true
@@ -502,22 +1044,26 @@ paths:
           schema:
             $ref: '#/definitions/gestao-financeira_backend_internal_identity_application_dtos.LoginOutput'
         "400":
-          description: Bad request - invalid input data
+          description: Bad request - invalid input data" example({"error":"Invalid
+            email format","error_type":"VALIDATION_ERROR","code":400})
           schema:
             additionalProperties: true
             type: object
         "401":
-          description: Unauthorized - invalid email or password
+          description: Unauthorized - invalid email or password" example({"error":"Email
+            ou senha inválidos","error_type":"UNAUTHORIZED","code":401})
           schema:
             additionalProperties: true
             type: object
         "403":
-          description: Forbidden - user account is inactive
+          description: Forbidden - user account is inactive" example({"error":"Conta
+            de usuário está inativa","error_type":"FORBIDDEN","code":403})
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal server error
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
           schema:
             additionalProperties: true
             type: object
@@ -529,7 +1075,7 @@ paths:
       consumes:
       - application/json
       description: Creates a new user account with the provided email, password, first
-        name, and last name.
+        name, and last name. The password is hashed using bcrypt before storage.
       parameters:
       - description: User registration data
         in: body
@@ -541,56 +1087,722 @@ paths:
       - application/json
       responses:
         "201":
-          description: 'User registered successfully" "Example: {\"message\": \"User
-            registered successfully\", \"data\": {\"user_id\": \"uuid\", \"email\":
-            \"user@example.com\", \"first_name\": \"John\", \"last_name\": \"Doe\",
-            \"full_name\": \"John Doe\"}}'
+          description: User registered successfully" example({"message":"Usuário registrado
+            com sucesso","data":{"user_id":"550e8400-e29b-41d4-a716-446655440000","email":"user@example.com","first_name":"John","last_name":"Doe","full_name":"John
+            Doe"}})
           schema:
             additionalProperties: true
             type: object
         "400":
           description: Bad request - Invalid input data (e.g., invalid email format,
-            password too short, missing fields)
+            password too short, missing fields)" example({"error":"Invalid email format","error_type":"VALIDATION_ERROR","code":400,"details":{"field":"email","message":"email
+            must be a valid email address"}})
           schema:
             additionalProperties: true
             type: object
         "409":
-          description: Conflict - User with this email already exists
+          description: Conflict - User with this email already exists" example({"error":"Já
+            existe um usuário com este email","error_type":"CONFLICT","code":409})
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Unprocessable entity - domain validation failed" example({"error":"Password
+            does not meet security requirements","error_type":"DOMAIN_ERROR","code":422})
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal server error - An unexpected error occurred
+          description: Internal server error - An unexpected error occurred" example({"error":"An
+            unexpected error occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
           schema:
             additionalProperties: true
             type: object
       summary: Register a new user
       tags:
       - auth
-  /transactions:
+  /budgets:
     get:
       consumes:
       - application/json
-      description: Lists all transactions for the authenticated user. Optionally filter
-        by account_id and/or type (INCOME or EXPENSE).
+      description: Lists all budgets for the authenticated user. Supports multiple
+        filters and pagination. Filters are applied in memory, then pagination is
+        applied to the filtered results.
       parameters:
-      - description: Filter by account ID (UUID)
+      - description: Filter by category ID (UUID)
+        example: 550e8400-e29b-41d4-a716-446655440000
         in: query
-        name: account_id
+        name: category_id
         type: string
-      - description: Filter by transaction type (INCOME or EXPENSE)
+      - description: Filter by period type (MONTHLY or YEARLY)
+        enum:
+        - MONTHLY
+        - YEARLY
+        example: MONTHLY
         in: query
-        name: type
+        name: period_type
+        type: string
+      - description: Filter by year
+        example: 2025
+        in: query
+        name: year
+        type: integer
+      - description: Filter by month (1-12)
+        example: 12
+        in: query
+        name: month
+        type: integer
+      - description: Filter by context (PERSONAL or BUSINESS)
+        enum:
+        - PERSONAL
+        - BUSINESS
+        example: PERSONAL
+        in: query
+        name: context
+        type: string
+      - description: Filter by active status (true or false)
+        example: true
+        in: query
+        name: is_active
+        type: boolean
+      - description: 'Page number (1-based, default: 1)'
+        example: "1"
+        in: query
+        name: page
+        type: string
+      - description: 'Items per page (default: 10, max: 100)'
+        example: "20"
+        in: query
+        name: limit
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: List of transactions with count
+          description: List of budgets with count and pagination metadata
           schema:
-            $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.ListTransactionsOutput'
+            $ref: '#/definitions/gestao-financeira_backend_internal_budget_application_dtos.ListBudgetsOutput'
         "400":
-          description: Bad request - invalid user ID, account ID or type
+          description: Bad request - invalid user ID, filters, or pagination parameters"
+            example({"error":"Invalid year value","error_type":"VALIDATION_ERROR","code":400})
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: List budgets
+      tags:
+      - budgets
+    post:
+      consumes:
+      - application/json
+      description: Creates a new budget for the authenticated user. Supports MONTHLY
+        and YEARLY period types.
+      parameters:
+      - description: Budget creation data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/gestao-financeira_backend_internal_budget_application_dtos.CreateBudgetInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Budget data with all fields
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_budget_application_dtos.CreateBudgetOutput'
+        "400":
+          description: Bad request - invalid input data or validation failed" example({"error":"Invalid
+            budget data","error_type":"VALIDATION_ERROR","code":400,"details":{"field":"amount","message":"amount
+            must be greater than 0"}})
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - category does not exist" example({"error":"Category
+            not found","error_type":"NOT_FOUND","code":404})
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict - budget already exists for this category and period"
+            example({"error":"Budget already exists for this category and period","error_type":"CONFLICT","code":409})
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Unprocessable entity - domain validation failed" example({"error":"Invalid
+            period type","error_type":"DOMAIN_ERROR","code":422})
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Create a new budget
+      tags:
+      - budgets
+  /budgets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a budget.
+      parameters:
+      - description: Budget ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budget deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request - invalid budget ID
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - budget does not exist
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete budget
+      tags:
+      - budgets
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific budget by its ID. Only returns budgets that
+        belong to the authenticated user.
+      parameters:
+      - description: Budget ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budget data
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_budget_application_dtos.GetBudgetOutput'
+        "400":
+          description: Bad request - invalid budget ID format
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden - budget does not belong to user
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - budget does not exist
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get budget by ID
+      tags:
+      - budgets
+    put:
+      consumes:
+      - application/json
+      description: Updates a budget. Only provided fields will be updated.
+      parameters:
+      - description: Budget ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Budget update data (amount, period_type, year, month, is_active
+          - at least one required)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/gestao-financeira_backend_internal_budget_application_dtos.UpdateBudgetInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated budget data
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_budget_application_dtos.UpdateBudgetOutput'
+        "400":
+          description: Bad request - invalid input data
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - budget does not exist
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Update budget
+      tags:
+      - budgets
+  /budgets/{id}/progress:
+    get:
+      consumes:
+      - application/json
+      description: Calculates the progress of a budget, including spent amount, remaining
+        amount, and percentage used.
+      parameters:
+      - description: Budget ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budget progress data
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_budget_application_dtos.GetBudgetProgressOutput'
+        "400":
+          description: Bad request - invalid budget ID
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - budget does not exist
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get budget progress
+      tags:
+      - budgets
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Lists all categories for the authenticated user. Supports filtering
+        by active status and pagination.
+      parameters:
+      - description: Filter by active status (true or false)
+        example: true
+        in: query
+        name: is_active
+        type: boolean
+      - description: 'Page number (1-based, default: 1)'
+        example: "1"
+        in: query
+        name: page
+        type: string
+      - description: 'Items per page (default: 10, max: 100)'
+        example: "20"
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of categories with count and pagination metadata
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_category_application_dtos.ListCategoriesOutput'
+        "400":
+          description: Bad request - invalid user ID or pagination parameters" example({"error":"Invalid
+            user ID","error_type":"VALIDATION_ERROR","code":400})
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: List categories
+      tags:
+      - categories
+    post:
+      consumes:
+      - application/json
+      description: Creates a new category for the authenticated user. Categories are
+        used to organize transactions.
+      parameters:
+      - description: Category creation data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/gestao-financeira_backend_internal_category_application_dtos.CreateCategoryInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Category data with all fields
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_category_application_dtos.CreateCategoryOutput'
+        "400":
+          description: Bad request - invalid input data or validation failed" example({"error":"Invalid
+            category data","error_type":"VALIDATION_ERROR","code":400,"details":{"field":"name","message":"name
+            cannot be empty"}})
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict - category with this name already exists" example({"error":"Já
+            existe uma categoria com este nome","error_type":"CONFLICT","code":409})
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Unprocessable entity - domain validation failed" example({"error":"Invalid
+            category name","error_type":"DOMAIN_ERROR","code":422})
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Create a new category
+      tags:
+      - categories
+  /categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a category (soft delete).
+      parameters:
+      - description: Category ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Deletion confirmation
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_category_application_dtos.DeleteCategoryOutput'
+        "400":
+          description: Bad request - invalid category ID
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - category does not exist
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete category
+      tags:
+      - categories
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific category by its ID for the authenticated user.
+      parameters:
+      - description: Category ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category data
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_category_application_dtos.GetCategoryOutput'
+        "400":
+          description: Bad request - invalid category ID
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - category does not exist
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get category by ID
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: Updates a category. Only provided fields will be updated.
+      parameters:
+      - description: Category ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Category update data (name, description - at least one required)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/gestao-financeira_backend_internal_category_application_dtos.UpdateCategoryInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated category data
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_category_application_dtos.UpdateCategoryOutput'
+        "400":
+          description: Bad request - invalid input data
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - category does not exist
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Update category
+      tags:
+      - categories
+  /categories/{id}/permanent:
+    delete:
+      consumes:
+      - application/json
+      description: Permanently deletes a category from the database (hard delete).
+        This action cannot be undone.
+      parameters:
+      - description: Category ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Deletion confirmation
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_category_application_dtos.PermanentDeleteCategoryOutput'
+        "400":
+          description: Bad request - invalid category ID format
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden - admin access required
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - category does not exist
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Permanently delete a category
+      tags:
+      - categories
+  /categories/{id}/restore:
+    post:
+      consumes:
+      - application/json
+      description: Restores a soft-deleted category by setting deleted_at to NULL.
+      parameters:
+      - description: Category ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Restoration confirmation
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_category_application_dtos.RestoreCategoryOutput'
+        "400":
+          description: Bad request - invalid category ID format
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - category does not exist or is not deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Restore a soft-deleted category
+      tags:
+      - categories
+  /reports/annual:
+    get:
+      consumes:
+      - application/json
+      description: Generates an annual financial report for the authenticated user
+      parameters:
+      - description: Year (e.g., 2025)
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Currency filter (BRL, USD, EUR)
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Annual report data
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.AnnualReportOutput'
+        "400":
+          description: Bad request - invalid input data
           schema:
             additionalProperties: true
             type: object
@@ -601,6 +1813,212 @@ paths:
             type: object
         "500":
           description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get annual report
+      tags:
+      - reports
+  /reports/category:
+    get:
+      consumes:
+      - application/json
+      description: Generates a category-based financial report for the authenticated
+        user
+      parameters:
+      - description: Category ID filter (UUID)
+        in: query
+        name: category_id
+        type: string
+      - description: Start date filter (YYYY-MM-DD)
+        in: query
+        name: start_date
+        type: string
+      - description: End date filter (YYYY-MM-DD)
+        in: query
+        name: end_date
+        type: string
+      - description: Currency filter (BRL, USD, EUR)
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category report data
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.CategoryReportOutput'
+        "400":
+          description: Bad request - invalid input data
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get category report
+      tags:
+      - reports
+  /reports/income-vs-expense:
+    get:
+      consumes:
+      - application/json
+      description: Generates an income vs expense comparison report for the authenticated
+        user
+      parameters:
+      - description: Start date filter (YYYY-MM-DD)
+        in: query
+        name: start_date
+        type: string
+      - description: End date filter (YYYY-MM-DD)
+        in: query
+        name: end_date
+        type: string
+      - description: Currency filter (BRL, USD, EUR)
+        in: query
+        name: currency
+        type: string
+      - description: Group by period (day, week, month, year)
+        in: query
+        name: group_by
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Income vs expense report data
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.IncomeVsExpenseOutput'
+        "400":
+          description: Bad request - invalid input data
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get income vs expense report
+      tags:
+      - reports
+  /reports/monthly:
+    get:
+      consumes:
+      - application/json
+      description: Generates a monthly financial report for the authenticated user
+      parameters:
+      - description: Year (e.g., 2025)
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      - description: Currency filter (BRL, USD, EUR)
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monthly report data
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_reporting_application_dtos.MonthlyReportOutput'
+        "400":
+          description: Bad request - invalid input data
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get monthly report
+      tags:
+      - reports
+  /transactions:
+    get:
+      consumes:
+      - application/json
+      description: Lists all transactions for the authenticated user. Supports filtering
+        by account_id and/or type, and pagination.
+      parameters:
+      - description: Filter by account ID (UUID)
+        example: 550e8400-e29b-41d4-a716-446655440000
+        in: query
+        name: account_id
+        type: string
+      - description: Filter by transaction type (INCOME or EXPENSE)
+        enum:
+        - INCOME
+        - EXPENSE
+        example: INCOME
+        in: query
+        name: type
+        type: string
+      - description: 'Page number (1-based, default: 1)'
+        example: "1"
+        in: query
+        name: page
+        type: string
+      - description: 'Items per page (default: 10, max: 100)'
+        example: "20"
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of transactions with count and pagination metadata
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.ListTransactionsOutput'
+        "400":
+          description: Bad request - invalid user ID, account ID, type, or pagination
+            parameters" example({"error":"Invalid account ID format","error_type":"VALIDATION_ERROR","code":400})
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
           schema:
             additionalProperties: true
             type: object
@@ -613,10 +2031,10 @@ paths:
       consumes:
       - application/json
       description: Creates a new transaction (INCOME or EXPENSE) for the authenticated
-        user. Links transaction to an account.
+        user. Links transaction to an account and automatically updates the account
+        balance atomically using Unit of Work pattern.
       parameters:
-      - description: Transaction creation data (account_id, type, amount, currency,
-          description, date)
+      - description: Transaction creation data
         in: body
         name: request
         required: true
@@ -626,21 +2044,36 @@ paths:
       - application/json
       responses:
         "201":
-          description: Transaction data
+          description: Transaction data with all fields
           schema:
             $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.CreateTransactionOutput'
         "400":
-          description: Bad request - invalid input data or account not found
+          description: Bad request - invalid input data, validation failed, or account
+            not found" example({"error":"Invalid transaction data","error_type":"VALIDATION_ERROR","code":400,"details":{"field":"amount","message":"amount
+            must be greater than 0"}})
           schema:
             additionalProperties: true
             type: object
         "401":
-          description: Unauthorized - missing or invalid JWT token
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - account does not exist" example({"error":"Account
+            not found","error_type":"NOT_FOUND","code":404,"details":{"resource":"Account","identifier":"550e8400-e29b-41d4-a716-446655440000"}})
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Unprocessable entity - domain validation failed" example({"error":"Account
+            balance would become negative","error_type":"DOMAIN_ERROR","code":422})
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal server error
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
           schema:
             additionalProperties: true
             type: object
@@ -653,10 +2086,13 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Deletes a transaction by its ID (soft delete). The transaction
-        is marked as deleted but not permanently removed from the database.
+      description: Deletes a transaction by its ID using Unit of Work pattern for
+        atomicity. Performs soft delete - the transaction is marked as deleted but
+        not permanently removed from the database. The account balance is automatically
+        reversed.
       parameters:
       - description: Transaction ID (UUID)
+        example: 550e8400-e29b-41d4-a716-446655440001
         in: path
         name: id
         required: true
@@ -665,26 +2101,29 @@ paths:
       - application/json
       responses:
         "200":
-          description: Deletion confirmation
+          description: Deletion confirmation with transaction ID
           schema:
             $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.DeleteTransactionOutput'
         "400":
-          description: Bad request - invalid transaction ID format
+          description: Bad request - invalid transaction ID format" example({"error":"Invalid
+            transaction ID format","error_type":"VALIDATION_ERROR","code":400})
           schema:
             additionalProperties: true
             type: object
         "401":
-          description: Unauthorized - missing or invalid JWT token
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Not found - transaction does not exist
+          description: Not found - transaction does not exist" example({"error":"Transaction
+            not found","error_type":"NOT_FOUND","code":404})
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal server error
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
           schema:
             additionalProperties: true
             type: object
@@ -700,6 +2139,7 @@ paths:
         that belong to the authenticated user.
       parameters:
       - description: Transaction ID (UUID)
+        example: 550e8400-e29b-41d4-a716-446655440001
         in: path
         name: id
         required: true
@@ -708,31 +2148,29 @@ paths:
       - application/json
       responses:
         "200":
-          description: Transaction data
+          description: Transaction data with all fields
           schema:
             $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.GetTransactionOutput'
         "400":
-          description: Bad request - invalid transaction ID format
+          description: Bad request - invalid transaction ID format" example({"error":"Invalid
+            transaction ID format","error_type":"VALIDATION_ERROR","code":400})
           schema:
             additionalProperties: true
             type: object
         "401":
-          description: Unauthorized - missing or invalid JWT token
-          schema:
-            additionalProperties: true
-            type: object
-        "403":
-          description: Forbidden - transaction does not belong to user
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Not found - transaction does not exist
+          description: Not found - transaction does not exist or does not belong to
+            user" example({"error":"Transaction not found","error_type":"NOT_FOUND","code":404,"details":{"resource":"Transaction","identifier":"550e8400-e29b-41d4-a716-446655440001"}})
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal server error
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
           schema:
             additionalProperties: true
             type: object
@@ -744,16 +2182,17 @@ paths:
     put:
       consumes:
       - application/json
-      description: Updates an existing transaction. Supports partial updates - only
-        provided fields will be updated. At least one field must be provided.
+      description: Updates an existing transaction using Unit of Work pattern for
+        atomicity. Supports partial updates - only provided fields will be updated.
+        At least one field must be provided.
       parameters:
       - description: Transaction ID (UUID)
+        example: 550e8400-e29b-41d4-a716-446655440001
         in: path
         name: id
         required: true
         type: string
-      - description: 'Transaction update data (all fields optional: type, amount,
-          currency, description, date)'
+      - description: Transaction update data (all fields optional)
         in: body
         name: request
         required: true
@@ -763,12 +2202,64 @@ paths:
       - application/json
       responses:
         "200":
-          description: Updated transaction data
+          description: Updated transaction data with all fields
           schema:
             $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.UpdateTransactionOutput'
         "400":
           description: Bad request - invalid transaction ID, invalid data, or no fields
-            provided
+            provided" example({"error":"At least one field must be provided for update","error_type":"VALIDATION_ERROR","code":400})
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token" example({"error":"Unauthorized","code":401})
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - transaction does not exist" example({"error":"Transaction
+            not found","error_type":"NOT_FOUND","code":404})
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Unprocessable entity - domain validation failed" example({"error":"Account
+            balance would become negative","error_type":"DOMAIN_ERROR","code":422})
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error" example({"error":"An unexpected error
+            occurred","error_type":"INTERNAL_ERROR","code":500,"request_id":"req-123"})
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Update a transaction
+      tags:
+      - transactions
+  /transactions/{id}/permanent:
+    delete:
+      consumes:
+      - application/json
+      description: Permanently deletes a transaction from the database (hard delete).
+        This action cannot be undone.
+      parameters:
+      - description: Transaction ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Deletion confirmation
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.PermanentDeleteTransactionOutput'
+        "400":
+          description: Bad request - invalid transaction ID format
           schema:
             additionalProperties: true
             type: object
@@ -778,7 +2269,7 @@ paths:
             additionalProperties: true
             type: object
         "403":
-          description: Forbidden - transaction does not belong to user
+          description: Forbidden - admin access required
           schema:
             additionalProperties: true
             type: object
@@ -794,7 +2285,50 @@ paths:
             type: object
       security:
       - Bearer: []
-      summary: Update a transaction
+      summary: Permanently delete a transaction
+      tags:
+      - transactions
+  /transactions/{id}/restore:
+    post:
+      consumes:
+      - application/json
+      description: Restores a soft-deleted transaction by setting deleted_at to NULL.
+      parameters:
+      - description: Transaction ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Restoration confirmation
+          schema:
+            $ref: '#/definitions/gestao-financeira_backend_internal_transaction_application_dtos.RestoreTransactionOutput'
+        "400":
+          description: Bad request - invalid transaction ID format
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - missing or invalid JWT token
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not found - transaction does not exist or is not deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Restore a soft-deleted transaction
       tags:
       - transactions
 schemes:
@@ -802,7 +2336,8 @@ schemes:
 - https
 securityDefinitions:
   Bearer:
-    description: Type "Bearer" followed by a space and JWT token.
+    description: 'Type "Bearer" followed by a space and JWT token. Example: "Bearer
+      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."'
     in: header
     name: Authorization
     type: apiKey
