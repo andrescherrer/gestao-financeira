@@ -90,14 +90,16 @@ func (h *AccountHandler) Create(c *fiber.Ctx) error {
 
 // List handles account listing requests.
 // @Summary List accounts
-// @Description Lists all accounts for the authenticated user. Optionally filter by context (PERSONAL or BUSINESS).
+// @Description Lists all accounts for the authenticated user. Optionally filter by context (PERSONAL or BUSINESS). Supports pagination with page and limit query parameters.
 // @Tags accounts
 // @Accept json
 // @Produce json
 // @Security Bearer
 // @Param context query string false "Filter by context (PERSONAL or BUSINESS)"
+// @Param page query string false "Page number (1-based, default: 1)"
+// @Param limit query string false "Items per page (default: 10, max: 100)"
 // @Success 200 {object} map[string]interface{} "Accounts retrieved successfully"
-// @Success 200 {object} dtos.ListAccountsOutput "List of accounts with count"
+// @Success 200 {object} dtos.ListAccountsOutput "List of accounts with count and pagination"
 // @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID or context"
 // @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
@@ -114,11 +116,16 @@ func (h *AccountHandler) List(c *fiber.Ctx) error {
 
 	// Get optional context filter from query parameter
 	context := c.Query("context", "")
+	// Get pagination parameters
+	page := c.Query("page", "")
+	limit := c.Query("limit", "")
 
 	// Build input
 	input := dtos.ListAccountsInput{
 		UserID:  userID,
 		Context: context,
+		Page:    page,
+		Limit:   limit,
 	}
 
 	// Execute use case

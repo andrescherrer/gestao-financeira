@@ -1,5 +1,7 @@
 package dtos
 
+import "gestao-financeira/backend/pkg/pagination"
+
 // ListBudgetsInput represents the input data for listing budgets.
 type ListBudgetsInput struct {
 	UserID     string `json:"user_id" validate:"required,uuid"`
@@ -9,12 +11,15 @@ type ListBudgetsInput struct {
 	Month      *int   `json:"month,omitempty" validate:"omitempty,min=1,max=12"`
 	Context    string `json:"context,omitempty" validate:"omitempty,oneof=PERSONAL BUSINESS"`
 	IsActive   *bool  `json:"is_active,omitempty"`
+	Page       string `json:"page,omitempty"`  // Query parameter
+	Limit      string `json:"limit,omitempty"` // Query parameter
 }
 
 // ListBudgetsOutput represents the output data for listing budgets.
 type ListBudgetsOutput struct {
-	Budgets []BudgetOutput `json:"budgets"`
-	Total   int64          `json:"total"`
+	Budgets    []BudgetOutput               `json:"budgets"`
+	Total      int64                        `json:"total"`
+	Pagination *pagination.PaginationResult `json:"pagination,omitempty"`
 }
 
 // BudgetOutput represents a budget in the list output.

@@ -7,6 +7,7 @@ import (
 	"gestao-financeira/backend/internal/category/domain/entities"
 	"gestao-financeira/backend/internal/category/domain/repositories"
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
+	"gestao-financeira/backend/pkg/pagination"
 )
 
 // ListCategoriesUseCase handles listing categories.
@@ -24,6 +25,7 @@ func NewListCategoriesUseCase(
 }
 
 // Execute performs the category listing.
+// Supports pagination when page and limit parameters are provided.
 func (uc *ListCategoriesUseCase) Execute(input dtos.ListCategoriesInput) (*dtos.ListCategoriesOutput, error) {
 	// Create user ID value object
 	userID, err := identityvalueobjects.NewUserID(input.UserID)
@@ -31,23 +33,42 @@ func (uc *ListCategoriesUseCase) Execute(input dtos.ListCategoriesInput) (*dtos.
 		return nil, fmt.Errorf("invalid user ID: %w", err)
 	}
 
+	// Parse pagination parameters
+	paginationParams := pagination.ParsePaginationParams(input.Page, input.Limit)
+	usePagination := input.Page != "" || input.Limit != ""
+
 	var categories []*entities.Category
+	var total int64
 
-	// Filter by active status if provided
-	if input.IsActive != nil {
-		categories, err = uc.categoryRepository.FindByUserIDAndActive(userID, *input.IsActive)
+	// Check if we should use pagination
+	if usePagination {
+		// Use paginated query
+		categories, total, err = uc.categoryRepository.FindByUserIDWithPagination(
+			userID,
+			input.IsActive,
+			paginationParams.CalculateOffset(),
+			paginationParams.Limit,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to list categories: %w", err)
+		}
 	} else {
-		categories, err = uc.categoryRepository.FindByUserID(userID)
-	}
+		// Use non-paginated query (backward compatibility)
+		if input.IsActive != nil {
+			categories, err = uc.categoryRepository.FindByUserIDAndActive(userID, *input.IsActive)
+		} else {
+			categories, err = uc.categoryRepository.FindByUserID(userID)
+		}
 
-	if err != nil {
-		return nil, fmt.Errorf("failed to list categories: %w", err)
-	}
+		if err != nil {
+			return nil, fmt.Errorf("failed to list categories: %w", err)
+		}
 
-	// Count total categories
-	count, err := uc.categoryRepository.Count(userID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to count categories: %w", err)
+		// Count total categories
+		total, err = uc.categoryRepository.Count(userID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to count categories: %w", err)
+		}
 	}
 
 	// Convert to output DTOs
@@ -67,7 +88,14 @@ func (uc *ListCategoriesUseCase) Execute(input dtos.ListCategoriesInput) (*dtos.
 
 	output := &dtos.ListCategoriesOutput{
 		Categories: categoryOutputs,
-		Count:      count,
+		Count:      int64(len(categoryOutputs)),
+	}
+
+	// Add pagination metadata if pagination was used
+	if usePagination {
+		paginationResult := pagination.BuildPaginationResult(paginationParams, total)
+		output.Pagination = &paginationResult
+		output.Count = total // Use total from query for accurate count
 	}
 
 	return output, nil

@@ -103,14 +103,16 @@ func (h *CategoryHandler) Create(c *fiber.Ctx) error {
 
 // List handles category listing requests.
 // @Summary List categories
-// @Description Lists all categories for the authenticated user. Optionally filter by active status.
+// @Description Lists all categories for the authenticated user. Optionally filter by active status. Supports pagination with page and limit query parameters.
 // @Tags categories
 // @Accept json
 // @Produce json
 // @Security Bearer
 // @Param is_active query bool false "Filter by active status (true or false)"
+// @Param page query string false "Page number (1-based, default: 1)"
+// @Param limit query string false "Items per page (default: 10, max: 100)"
 // @Success 200 {object} map[string]interface{} "Categories retrieved successfully"
-// @Success 200 {object} dtos.ListCategoriesOutput "List of categories with count"
+// @Success 200 {object} dtos.ListCategoriesOutput "List of categories with count and pagination"
 // @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID"
 // @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
@@ -137,9 +139,15 @@ func (h *CategoryHandler) List(c *fiber.Ctx) error {
 		}
 	}
 
+	// Get pagination parameters
+	page := c.Query("page", "")
+	limit := c.Query("limit", "")
+
 	input := dtos.ListCategoriesInput{
 		UserID:   userID,
 		IsActive: isActive,
+		Page:     page,
+		Limit:    limit,
 	}
 
 	// Execute use case

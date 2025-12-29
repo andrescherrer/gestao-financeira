@@ -39,4 +39,13 @@ type CategoryRepository interface {
 	// FindByUserIDAndSlug finds a category by user ID and slug.
 	// Returns nil if the category is not found.
 	FindByUserIDAndSlug(userID identityvalueobjects.UserID, slug valueobjects.CategorySlug) (*entities.Category, error)
+
+	// FindByUserIDWithPagination finds categories for a given user with pagination.
+	// If isActive is provided, filters by active status.
+	// Returns categories, total count, and error.
+	FindByUserIDWithPagination(
+		userID identityvalueobjects.UserID,
+		isActive *bool,
+		offset, limit int,
+	) ([]*entities.Category, int64, error)
 }

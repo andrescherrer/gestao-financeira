@@ -8,6 +8,7 @@ import (
 	"gestao-financeira/backend/internal/budget/domain/repositories"
 	categoryvalueobjects "gestao-financeira/backend/internal/category/domain/valueobjects"
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
+	"gestao-financeira/backend/pkg/pagination"
 )
 
 // ListBudgetsUseCase handles listing budgets for a user.
@@ -26,7 +27,7 @@ func NewListBudgetsUseCase(
 
 // Execute performs the budget listing.
 // It validates the input, retrieves budgets from the repository,
-// and returns them as DTOs.
+// applies filters, and returns them as DTOs. Supports pagination.
 func (uc *ListBudgetsUseCase) Execute(input dtos.ListBudgetsInput) (*dtos.ListBudgetsOutput, error) {
 	// Create user ID value object
 	userID, err := identityvalueobjects.NewUserID(input.UserID)
@@ -90,6 +91,35 @@ func (uc *ListBudgetsUseCase) Execute(input dtos.ListBudgetsInput) (*dtos.ListBu
 		filteredBudgets = append(filteredBudgets, budget)
 	}
 
+	// Parse pagination parameters
+	paginationParams := pagination.ParsePaginationParams(input.Page, input.Limit)
+	usePagination := input.Page != "" || input.Limit != ""
+
+	total := int64(len(filteredBudgets))
+
+	// Apply pagination if requested
+	if usePagination {
+		offset := paginationParams.CalculateOffset()
+		limit := paginationParams.Limit
+
+		// Calculate pagination bounds
+		start := offset
+		end := offset + limit
+		if start > len(filteredBudgets) {
+			start = len(filteredBudgets)
+		}
+		if end > len(filteredBudgets) {
+			end = len(filteredBudgets)
+		}
+
+		// Slice the filtered budgets
+		if start < len(filteredBudgets) {
+			filteredBudgets = filteredBudgets[start:end]
+		} else {
+			filteredBudgets = []*entities.Budget{}
+		}
+	}
+
 	// Build output
 	budgetOutputs := make([]dtos.BudgetOutput, 0, len(filteredBudgets))
 	for _, budget := range filteredBudgets {
@@ -112,7 +142,13 @@ func (uc *ListBudgetsUseCase) Execute(input dtos.ListBudgetsInput) (*dtos.ListBu
 
 	output := &dtos.ListBudgetsOutput{
 		Budgets: budgetOutputs,
-		Total:   int64(len(budgetOutputs)),
+		Total:   total,
+	}
+
+	// Add pagination metadata if pagination was used
+	if usePagination {
+		paginationResult := pagination.BuildPaginationResult(paginationParams, total)
+		output.Pagination = &paginationResult
 	}
 
 	return output, nil

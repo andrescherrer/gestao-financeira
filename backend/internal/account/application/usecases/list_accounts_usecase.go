@@ -8,6 +8,7 @@ import (
 	"gestao-financeira/backend/internal/account/domain/repositories"
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
 	sharedvalueobjects "gestao-financeira/backend/internal/shared/domain/valueobjects"
+	"gestao-financeira/backend/pkg/pagination"
 )
 
 // ListAccountsUseCase handles listing accounts for a user.
@@ -26,7 +27,7 @@ func NewListAccountsUseCase(
 
 // Execute performs the account listing.
 // It validates the input, retrieves accounts from the repository,
-// and returns them as DTOs.
+// and returns them as DTOs. Supports pagination.
 func (uc *ListAccountsUseCase) Execute(input dtos.ListAccountsInput) (*dtos.ListAccountsOutput, error) {
 	// Create user ID value object
 	userID, err := identityvalueobjects.NewUserID(input.UserID)
@@ -34,26 +35,47 @@ func (uc *ListAccountsUseCase) Execute(input dtos.ListAccountsInput) (*dtos.List
 		return nil, fmt.Errorf("invalid user ID: %w", err)
 	}
 
+	// Parse pagination parameters
+	paginationParams := pagination.ParsePaginationParams(input.Page, input.Limit)
+	usePagination := input.Page != "" || input.Limit != ""
+
 	var domainAccounts []*entities.Account
+	var total int64
 
-	// If context is provided, filter by context
-	if input.Context != "" {
-		// Create account context value object
-		context, err := sharedvalueobjects.NewAccountContext(input.Context)
-		if err != nil {
-			return nil, fmt.Errorf("invalid account context: %w", err)
-		}
-
-		// Find accounts by user ID and context
-		domainAccounts, err = uc.accountRepository.FindByUserIDAndContext(userID, context)
+	// Check if we should use pagination
+	if usePagination {
+		// Use paginated query
+		domainAccounts, total, err = uc.accountRepository.FindByUserIDWithPagination(
+			userID,
+			input.Context,
+			paginationParams.CalculateOffset(),
+			paginationParams.Limit,
+		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to find accounts: %w", err)
 		}
 	} else {
-		// Find all accounts for the user
-		domainAccounts, err = uc.accountRepository.FindByUserID(userID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to find accounts: %w", err)
+		// Use non-paginated query (backward compatibility)
+		if input.Context != "" {
+			// Create account context value object
+			context, err := sharedvalueobjects.NewAccountContext(input.Context)
+			if err != nil {
+				return nil, fmt.Errorf("invalid account context: %w", err)
+			}
+
+			// Find accounts by user ID and context
+			domainAccounts, err = uc.accountRepository.FindByUserIDAndContext(userID, context)
+			if err != nil {
+				return nil, fmt.Errorf("failed to find accounts: %w", err)
+			}
+			total = int64(len(domainAccounts))
+		} else {
+			// Find all accounts for the user
+			domainAccounts, err = uc.accountRepository.FindByUserID(userID)
+			if err != nil {
+				return nil, fmt.Errorf("failed to find accounts: %w", err)
+			}
+			total = int64(len(domainAccounts))
 		}
 	}
 
@@ -62,6 +84,12 @@ func (uc *ListAccountsUseCase) Execute(input dtos.ListAccountsInput) (*dtos.List
 	output := &dtos.ListAccountsOutput{
 		Accounts: accounts,
 		Count:    len(accounts),
+	}
+
+	// Add pagination metadata if pagination was used
+	if usePagination {
+		paginationResult := pagination.BuildPaginationResult(paginationParams, total)
+		output.Pagination = &paginationResult
 	}
 
 	return output, nil

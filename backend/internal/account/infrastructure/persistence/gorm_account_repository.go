@@ -151,6 +151,48 @@ func (r *GormAccountRepository) Count(userID identityvalueobjects.UserID) (int64
 	return count, nil
 }
 
+// FindByUserIDWithPagination finds accounts for a given user with pagination.
+func (r *GormAccountRepository) FindByUserIDWithPagination(
+	userID identityvalueobjects.UserID,
+	context string,
+	offset, limit int,
+) ([]*entities.Account, int64, error) {
+	var models []AccountModel
+	var total int64
+
+	query := r.db.Model(&AccountModel{}).Where("user_id = ?", userID.Value())
+
+	// Filter by context if provided
+	if context != "" {
+		query = query.Where("context = ?", context)
+	}
+
+	// Count total
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to count accounts: %w", err)
+	}
+
+	// Get paginated results
+	if err := query.
+		Order("created_at DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&models).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to find accounts: %w", err)
+	}
+
+	accounts := make([]*entities.Account, 0, len(models))
+	for _, model := range models {
+		account, err := r.toDomain(&model)
+		if err != nil {
+			return nil, 0, fmt.Errorf("failed to convert account model to domain: %w", err)
+		}
+		accounts = append(accounts, account)
+	}
+
+	return accounts, total, nil
+}
+
 // toDomain converts an AccountModel to an Account entity.
 func (r *GormAccountRepository) toDomain(model *AccountModel) (*entities.Account, error) {
 	// Convert value objects

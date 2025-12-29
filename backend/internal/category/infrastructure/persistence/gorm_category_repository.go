@@ -178,6 +178,48 @@ func (r *GormCategoryRepository) FindByUserIDAndSlug(userID identityvalueobjects
 	return r.toDomain(&model)
 }
 
+// FindByUserIDWithPagination finds categories for a given user with pagination.
+func (r *GormCategoryRepository) FindByUserIDWithPagination(
+	userID identityvalueobjects.UserID,
+	isActive *bool,
+	offset, limit int,
+) ([]*entities.Category, int64, error) {
+	var models []CategoryModel
+	var total int64
+
+	query := r.db.Model(&CategoryModel{}).Where("user_id = ?", userID.Value())
+
+	// Filter by active status if provided
+	if isActive != nil {
+		query = query.Where("is_active = ?", *isActive)
+	}
+
+	// Count total
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to count categories: %w", err)
+	}
+
+	// Get paginated results
+	if err := query.
+		Order("created_at DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&models).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to find categories: %w", err)
+	}
+
+	categories := make([]*entities.Category, 0, len(models))
+	for _, model := range models {
+		category, err := r.toDomain(&model)
+		if err != nil {
+			return nil, 0, fmt.Errorf("failed to convert category model to domain: %w", err)
+		}
+		categories = append(categories, category)
+	}
+
+	return categories, total, nil
+}
+
 // toDomain converts a CategoryModel to a Category domain entity.
 func (r *GormCategoryRepository) toDomain(model *CategoryModel) (*entities.Category, error) {
 	categoryID, err := valueobjects.NewCategoryID(model.ID)

@@ -1,9 +1,13 @@
 package dtos
 
+import "gestao-financeira/backend/pkg/pagination"
+
 // ListAccountsInput represents the input for listing accounts.
 type ListAccountsInput struct {
 	UserID  string `json:"user_id" validate:"required,uuid"`
 	Context string `json:"context,omitempty" validate:"omitempty,oneof=PERSONAL BUSINESS"`
+	Page    string `json:"page,omitempty"`  // Query parameter
+	Limit   string `json:"limit,omitempty"` // Query parameter
 }
 
 // AccountOutput represents a single account in the list.
@@ -22,6 +26,7 @@ type AccountOutput struct {
 
 // ListAccountsOutput represents the output for listing accounts.
 type ListAccountsOutput struct {
-	Accounts []*AccountOutput `json:"accounts"`
-	Count    int              `json:"count"`
+	Accounts   []*AccountOutput             `json:"accounts"`
+	Count      int                          `json:"count"`
+	Pagination *pagination.PaginationResult `json:"pagination,omitempty"`
 }

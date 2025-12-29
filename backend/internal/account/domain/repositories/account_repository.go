@@ -36,4 +36,13 @@ type AccountRepository interface {
 
 	// Count returns the total number of accounts for a given user.
 	Count(userID identityvalueobjects.UserID) (int64, error)
+
+	// FindByUserIDWithPagination finds accounts for a given user with pagination.
+	// If context is provided, filters by context.
+	// Returns accounts, total count, and error.
+	FindByUserIDWithPagination(
+		userID identityvalueobjects.UserID,
+		context string,
+		offset, limit int,
+	) ([]*entities.Account, int64, error)
 }

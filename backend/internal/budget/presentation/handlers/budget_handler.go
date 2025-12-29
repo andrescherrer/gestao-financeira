@@ -101,7 +101,7 @@ func (h *BudgetHandler) Create(c *fiber.Ctx) error {
 
 // List handles budget listing requests.
 // @Summary List budgets
-// @Description Lists all budgets for the authenticated user. Optionally filter by category_id, period_type, year, month, context, or is_active.
+// @Description Lists all budgets for the authenticated user. Optionally filter by category_id, period_type, year, month, context, or is_active. Supports pagination with page and limit query parameters.
 // @Tags budgets
 // @Accept json
 // @Produce json
@@ -112,8 +112,10 @@ func (h *BudgetHandler) Create(c *fiber.Ctx) error {
 // @Param month query int false "Filter by month (1-12)"
 // @Param context query string false "Filter by context (PERSONAL or BUSINESS)"
 // @Param is_active query bool false "Filter by active status (true or false)"
+// @Param page query string false "Page number (1-based, default: 1)"
+// @Param limit query string false "Items per page (default: 10, max: 100)"
 // @Success 200 {object} map[string]interface{} "Budgets retrieved successfully"
-// @Success 200 {object} dtos.ListBudgetsOutput "List of budgets with count"
+// @Success 200 {object} dtos.ListBudgetsOutput "List of budgets with count and pagination"
 // @Failure 400 {object} map[string]interface{} "Bad request - invalid user ID or filters"
 // @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
@@ -162,6 +164,10 @@ func (h *BudgetHandler) List(c *fiber.Ctx) error {
 			input.IsActive = &active
 		}
 	}
+
+	// Get pagination parameters
+	input.Page = c.Query("page", "")
+	input.Limit = c.Query("limit", "")
 
 	// Execute use case
 	output, err := h.listBudgetsUseCase.Execute(input)
