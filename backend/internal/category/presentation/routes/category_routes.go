@@ -27,5 +27,7 @@ func SetupCategoryRoutes(router fiber.Router, categoryHandler *handlers.Category
 		categories.Get("/:id", categoryHandler.Get)
 		categories.Put("/:id", categoryHandler.Update)
 		categories.Delete("/:id", categoryHandler.Delete)
+		categories.Post("/:id/restore", categoryHandler.Restore)
+		categories.Delete("/:id/permanent", categoryHandler.PermanentDelete)
 	}
 }

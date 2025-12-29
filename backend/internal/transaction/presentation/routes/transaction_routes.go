@@ -27,5 +27,7 @@ func SetupTransactionRoutes(router fiber.Router, transactionHandler *handlers.Tr
 		transactions.Get("/:id", transactionHandler.Get)
 		transactions.Put("/:id", transactionHandler.Update)
 		transactions.Delete("/:id", transactionHandler.Delete)
+		transactions.Post("/:id/restore", transactionHandler.Restore)
+		transactions.Delete("/:id/permanent", transactionHandler.PermanentDelete)
 	}
 }

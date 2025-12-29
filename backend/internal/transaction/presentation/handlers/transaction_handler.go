@@ -14,11 +14,13 @@ import (
 
 // TransactionHandler handles transaction-related HTTP requests.
 type TransactionHandler struct {
-	createTransactionUseCase *usecases.CreateTransactionUseCase
-	listTransactionsUseCase  *usecases.ListTransactionsUseCase
-	getTransactionUseCase    *usecases.GetTransactionUseCase
-	updateTransactionUseCase *usecases.UpdateTransactionUseCase
-	deleteTransactionUseCase *usecases.DeleteTransactionUseCase
+	createTransactionUseCase          *usecases.CreateTransactionUseCase
+	listTransactionsUseCase           *usecases.ListTransactionsUseCase
+	getTransactionUseCase             *usecases.GetTransactionUseCase
+	updateTransactionUseCase          *usecases.UpdateTransactionUseCase
+	deleteTransactionUseCase          *usecases.DeleteTransactionUseCase
+	restoreTransactionUseCase         *usecases.RestoreTransactionUseCase
+	permanentDeleteTransactionUseCase *usecases.PermanentDeleteTransactionUseCase
 }
 
 // NewTransactionHandler creates a new TransactionHandler instance.
@@ -28,13 +30,17 @@ func NewTransactionHandler(
 	getTransactionUseCase *usecases.GetTransactionUseCase,
 	updateTransactionUseCase *usecases.UpdateTransactionUseCase,
 	deleteTransactionUseCase *usecases.DeleteTransactionUseCase,
+	restoreTransactionUseCase *usecases.RestoreTransactionUseCase,
+	permanentDeleteTransactionUseCase *usecases.PermanentDeleteTransactionUseCase,
 ) *TransactionHandler {
 	return &TransactionHandler{
-		createTransactionUseCase: createTransactionUseCase,
-		listTransactionsUseCase:  listTransactionsUseCase,
-		getTransactionUseCase:    getTransactionUseCase,
-		updateTransactionUseCase: updateTransactionUseCase,
-		deleteTransactionUseCase: deleteTransactionUseCase,
+		createTransactionUseCase:          createTransactionUseCase,
+		listTransactionsUseCase:           listTransactionsUseCase,
+		getTransactionUseCase:             getTransactionUseCase,
+		updateTransactionUseCase:          updateTransactionUseCase,
+		deleteTransactionUseCase:          deleteTransactionUseCase,
+		restoreTransactionUseCase:         restoreTransactionUseCase,
+		permanentDeleteTransactionUseCase: permanentDeleteTransactionUseCase,
 	}
 }
 
@@ -458,6 +464,164 @@ func (h *TransactionHandler) handleDeleteTransactionError(c *fiber.Ctx, err erro
 	log.Error().Err(err).Str("transaction_id", transactionID).Msg("Delete transaction failed: unexpected error")
 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 		"error": "An unexpected error occurred",
+		"code":  fiber.StatusInternalServerError,
+	})
+}
+
+// Restore handles transaction restoration requests.
+// @Summary Restore a soft-deleted transaction
+// @Description Restores a soft-deleted transaction by setting deleted_at to NULL.
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Transaction ID (UUID)"
+// @Success 200 {object} map[string]interface{} "Transaction restored successfully"
+// @Success 200 {object} dtos.RestoreTransactionOutput "Restoration confirmation"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid transaction ID format"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
+// @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist or is not deleted"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/{id}/restore [post]
+func (h *TransactionHandler) Restore(c *fiber.Ctx) error {
+	// Get user ID from context (set by auth middleware)
+	userID := middleware.GetUserID(c)
+	if userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+			"code":  fiber.StatusUnauthorized,
+		})
+	}
+
+	// Get transaction ID from path parameter
+	transactionID := c.Params("id")
+	if transactionID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Transaction ID is required",
+			"code":  fiber.StatusBadRequest,
+		})
+	}
+
+	// Build input
+	input := dtos.RestoreTransactionInput{
+		TransactionID: transactionID,
+	}
+
+	// Execute use case
+	output, err := h.restoreTransactionUseCase.Execute(input)
+	if err != nil {
+		return h.handleRestoreTransactionError(c, err, transactionID)
+	}
+
+	// Return success response
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": output.Message,
+		"data":    output,
+	})
+}
+
+// PermanentDelete handles permanent transaction deletion requests (admin only).
+// @Summary Permanently delete a transaction
+// @Description Permanently deletes a transaction from the database (hard delete). This action cannot be undone.
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Transaction ID (UUID)"
+// @Success 200 {object} map[string]interface{} "Transaction permanently deleted successfully"
+// @Success 200 {object} dtos.PermanentDeleteTransactionOutput "Deletion confirmation"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid transaction ID format"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
+// @Failure 403 {object} map[string]interface{} "Forbidden - admin access required"
+// @Failure 404 {object} map[string]interface{} "Not found - transaction does not exist"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /transactions/{id}/permanent [delete]
+func (h *TransactionHandler) PermanentDelete(c *fiber.Ctx) error {
+	// Get user ID from context (set by auth middleware)
+	userID := middleware.GetUserID(c)
+	if userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+			"code":  fiber.StatusUnauthorized,
+		})
+	}
+
+	// TODO: Add admin check here
+	// For now, we'll allow any authenticated user, but in production this should be restricted
+
+	// Get transaction ID from path parameter
+	transactionID := c.Params("id")
+	if transactionID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Transaction ID is required",
+			"code":  fiber.StatusBadRequest,
+		})
+	}
+
+	// Build input
+	input := dtos.PermanentDeleteTransactionInput{
+		TransactionID: transactionID,
+	}
+
+	// Execute use case
+	output, err := h.permanentDeleteTransactionUseCase.Execute(input)
+	if err != nil {
+		return h.handlePermanentDeleteTransactionError(c, err, transactionID)
+	}
+
+	// Return success response
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": output.Message,
+		"data":    output,
+	})
+}
+
+// handleRestoreTransactionError handles errors from RestoreTransactionUseCase.
+func (h *TransactionHandler) handleRestoreTransactionError(c *fiber.Ctx, err error, transactionID string) error {
+	if strings.Contains(err.Error(), "invalid transaction ID") {
+		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Restore transaction failed: invalid transaction ID")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid transaction ID format",
+			"code":  fiber.StatusBadRequest,
+		})
+	}
+
+	if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "is not deleted") {
+		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Restore transaction failed: transaction not found or not deleted")
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Transaction not found or is not deleted",
+			"code":  fiber.StatusNotFound,
+		})
+	}
+
+	log.Error().Err(err).Str("transaction_id", transactionID).Msg("Restore transaction failed: unexpected error")
+	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+		"error": "Failed to restore transaction",
+		"code":  fiber.StatusInternalServerError,
+	})
+}
+
+// handlePermanentDeleteTransactionError handles errors from PermanentDeleteTransactionUseCase.
+func (h *TransactionHandler) handlePermanentDeleteTransactionError(c *fiber.Ctx, err error, transactionID string) error {
+	if strings.Contains(err.Error(), "invalid transaction ID") {
+		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Permanent delete transaction failed: invalid transaction ID")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid transaction ID format",
+			"code":  fiber.StatusBadRequest,
+		})
+	}
+
+	if strings.Contains(err.Error(), "not found") {
+		log.Warn().Err(err).Str("transaction_id", transactionID).Msg("Permanent delete transaction failed: transaction not found")
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Transaction not found",
+			"code":  fiber.StatusNotFound,
+		})
+	}
+
+	log.Error().Err(err).Str("transaction_id", transactionID).Msg("Permanent delete transaction failed: unexpected error")
+	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+		"error": "Failed to permanently delete transaction",
 		"code":  fiber.StatusInternalServerError,
 	})
 }

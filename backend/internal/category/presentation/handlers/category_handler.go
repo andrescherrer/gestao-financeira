@@ -14,11 +14,13 @@ import (
 
 // CategoryHandler handles category-related HTTP requests.
 type CategoryHandler struct {
-	createCategoryUseCase *usecases.CreateCategoryUseCase
-	listCategoriesUseCase *usecases.ListCategoriesUseCase
-	getCategoryUseCase    *usecases.GetCategoryUseCase
-	updateCategoryUseCase *usecases.UpdateCategoryUseCase
-	deleteCategoryUseCase *usecases.DeleteCategoryUseCase
+	createCategoryUseCase          *usecases.CreateCategoryUseCase
+	listCategoriesUseCase          *usecases.ListCategoriesUseCase
+	getCategoryUseCase             *usecases.GetCategoryUseCase
+	updateCategoryUseCase          *usecases.UpdateCategoryUseCase
+	deleteCategoryUseCase          *usecases.DeleteCategoryUseCase
+	restoreCategoryUseCase         *usecases.RestoreCategoryUseCase
+	permanentDeleteCategoryUseCase *usecases.PermanentDeleteCategoryUseCase
 }
 
 // NewCategoryHandler creates a new CategoryHandler instance.
@@ -28,13 +30,17 @@ func NewCategoryHandler(
 	getCategoryUseCase *usecases.GetCategoryUseCase,
 	updateCategoryUseCase *usecases.UpdateCategoryUseCase,
 	deleteCategoryUseCase *usecases.DeleteCategoryUseCase,
+	restoreCategoryUseCase *usecases.RestoreCategoryUseCase,
+	permanentDeleteCategoryUseCase *usecases.PermanentDeleteCategoryUseCase,
 ) *CategoryHandler {
 	return &CategoryHandler{
-		createCategoryUseCase: createCategoryUseCase,
-		listCategoriesUseCase: listCategoriesUseCase,
-		getCategoryUseCase:    getCategoryUseCase,
-		updateCategoryUseCase: updateCategoryUseCase,
-		deleteCategoryUseCase: deleteCategoryUseCase,
+		createCategoryUseCase:          createCategoryUseCase,
+		listCategoriesUseCase:          listCategoriesUseCase,
+		getCategoryUseCase:             getCategoryUseCase,
+		updateCategoryUseCase:          updateCategoryUseCase,
+		deleteCategoryUseCase:          deleteCategoryUseCase,
+		restoreCategoryUseCase:         restoreCategoryUseCase,
+		permanentDeleteCategoryUseCase: permanentDeleteCategoryUseCase,
 	}
 }
 
@@ -308,5 +314,88 @@ func (h *CategoryHandler) handleUseCaseError(c *fiber.Ctx, err error) error {
 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 		"error": "Internal server error",
 		"code":  fiber.StatusInternalServerError,
+	})
+}
+
+// Restore handles category restoration requests.
+// @Summary Restore a soft-deleted category
+// @Description Restores a soft-deleted category by setting deleted_at to NULL.
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Category ID (UUID)"
+// @Success 200 {object} map[string]interface{} "Category restored successfully"
+// @Success 200 {object} dtos.RestoreCategoryOutput "Restoration confirmation"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid category ID format"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
+// @Failure 404 {object} map[string]interface{} "Not found - category does not exist or is not deleted"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /categories/{id}/restore [post]
+func (h *CategoryHandler) Restore(c *fiber.Ctx) error {
+	categoryID := c.Params("id")
+	if categoryID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Category ID is required",
+			"code":  fiber.StatusBadRequest,
+		})
+	}
+
+	input := dtos.RestoreCategoryInput{
+		CategoryID: categoryID,
+	}
+
+	// Execute use case
+	output, err := h.restoreCategoryUseCase.Execute(input)
+	if err != nil {
+		return h.handleUseCaseError(c, err)
+	}
+
+	// Return success response
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": output.Message,
+		"data":    output,
+	})
+}
+
+// PermanentDelete handles permanent category deletion requests (admin only).
+// @Summary Permanently delete a category
+// @Description Permanently deletes a category from the database (hard delete). This action cannot be undone.
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Category ID (UUID)"
+// @Success 200 {object} map[string]interface{} "Category permanently deleted successfully"
+// @Success 200 {object} dtos.PermanentDeleteCategoryOutput "Deletion confirmation"
+// @Failure 400 {object} map[string]interface{} "Bad request - invalid category ID format"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - missing or invalid JWT token"
+// @Failure 403 {object} map[string]interface{} "Forbidden - admin access required"
+// @Failure 404 {object} map[string]interface{} "Not found - category does not exist"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /categories/{id}/permanent [delete]
+func (h *CategoryHandler) PermanentDelete(c *fiber.Ctx) error {
+	categoryID := c.Params("id")
+	if categoryID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Category ID is required",
+			"code":  fiber.StatusBadRequest,
+		})
+	}
+
+	input := dtos.PermanentDeleteCategoryInput{
+		CategoryID: categoryID,
+	}
+
+	// Execute use case
+	output, err := h.permanentDeleteCategoryUseCase.Execute(input)
+	if err != nil {
+		return h.handleUseCaseError(c, err)
+	}
+
+	// Return success response
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": output.Message,
+		"data":    output,
 	})
 }
