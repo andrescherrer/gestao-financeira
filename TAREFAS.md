@@ -39,6 +39,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **MIGRATIONS-001** (2025-12-28): ✅ Migrations Versionadas e Rollback - Completo
 - **CONFIG-001** (2025-12-28): ✅ Configuração Centralizada - Completo
 - **UNIT-OF-WORK-001** (2025-12-29): ✅ Gerenciamento de Transações de Banco de Dados - Completo
+- **UNIT-OF-WORK-002** (2025-12-29): ✅ UpdateTransactionUseCase e DeleteTransactionUseCase com UnitOfWork - Completo (testes de integração com problema conhecido)
 
 ### 📈 Progresso
 - **Fase 1 (Fundação e MVP)**: ✅ 100% concluído
@@ -774,10 +775,17 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | UNIT-OF-WORK-002 | Atualizar CreateTransactionUseCase para usar UnitOfWork | 🔵 | 🔴 | 4h | UNIT-OF-WORK-001 | ✅ |
 | UNIT-OF-WORK-003 | Criar testes para UnitOfWork | 🟤 | 🔴 | 4h | UNIT-OF-WORK-001 | ✅ |
 | UNIT-OF-WORK-004 | Criar testes de atomicidade | 🟤 | 🔴 | 4h | UNIT-OF-WORK-002 | ✅ |
+| UNIT-OF-WORK-005 | Atualizar UpdateTransactionUseCase para usar UnitOfWork | 🔵 | 🔴 | 4h | UNIT-OF-WORK-001 | ✅ |
+| UNIT-OF-WORK-006 | Atualizar DeleteTransactionUseCase para usar UnitOfWork | 🔵 | 🔴 | 4h | UNIT-OF-WORK-001 | ✅ |
+| UNIT-OF-WORK-007 | Criar testes de integração com banco real | 🟤 | 🔴 | 4h | UNIT-OF-WORK-005, UNIT-OF-WORK-006 | ⚠️ |
 
 **Entregável INFRA-004:** ✅ Gerenciamento de transações de banco de dados implementado com Unit of Work
 
-**Documentação:** `docs/tarefas_concluidas/20251229_055029_UNIT-OF-WORK-001.md`
+**Documentação:**
+- `docs/tarefas_concluidas/20251229_055029_UNIT-OF-WORK-001.md` - Implementação inicial
+- `docs/tarefas_concluidas/20251229_060442_UNIT-OF-WORK-002.md` - Update e Delete com UnitOfWork
+
+**Nota:** UNIT-OF-WORK-007 tem problema conhecido com SQLite em memória (tabelas não visíveis em transações)
 
 **Benefícios:**
 - ✅ Atomicidade garantida em operações críticas
