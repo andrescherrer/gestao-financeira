@@ -99,10 +99,33 @@ func (r *GormAccountRepository) Save(account *entities.Account) error {
 	return nil
 }
 
-// Delete deletes an account by its ID.
+// Delete deletes an account by its ID (soft delete).
 func (r *GormAccountRepository) Delete(id valueobjects.AccountID) error {
 	if err := r.db.Where("id = ?", id.Value()).Delete(&AccountModel{}).Error; err != nil {
 		return fmt.Errorf("failed to delete account: %w", err)
+	}
+
+	return nil
+}
+
+// Restore restores a soft-deleted account by setting deleted_at to NULL.
+func (r *GormAccountRepository) Restore(id valueobjects.AccountID) error {
+	if err := r.db.Unscoped().
+		Model(&AccountModel{}).
+		Where("id = ?", id.Value()).
+		Update("deleted_at", nil).Error; err != nil {
+		return fmt.Errorf("failed to restore account: %w", err)
+	}
+
+	return nil
+}
+
+// PermanentDelete permanently deletes an account (hard delete).
+func (r *GormAccountRepository) PermanentDelete(id valueobjects.AccountID) error {
+	if err := r.db.Unscoped().
+		Where("id = ?", id.Value()).
+		Delete(&AccountModel{}).Error; err != nil {
+		return fmt.Errorf("failed to permanently delete account: %w", err)
 	}
 
 	return nil

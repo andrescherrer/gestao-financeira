@@ -216,10 +216,33 @@ func (r *GormTransactionRepository) Save(transaction *entities.Transaction) erro
 	return nil
 }
 
-// Delete deletes a transaction by its ID.
+// Delete deletes a transaction by its ID (soft delete).
 func (r *GormTransactionRepository) Delete(id transactionvalueobjects.TransactionID) error {
 	if err := r.db.Where("id = ?", id.Value()).Delete(&TransactionModel{}).Error; err != nil {
 		return fmt.Errorf("failed to delete transaction: %w", err)
+	}
+
+	return nil
+}
+
+// Restore restores a soft-deleted transaction by setting deleted_at to NULL.
+func (r *GormTransactionRepository) Restore(id transactionvalueobjects.TransactionID) error {
+	if err := r.db.Unscoped().
+		Model(&TransactionModel{}).
+		Where("id = ?", id.Value()).
+		Update("deleted_at", nil).Error; err != nil {
+		return fmt.Errorf("failed to restore transaction: %w", err)
+	}
+
+	return nil
+}
+
+// PermanentDelete permanently deletes a transaction (hard delete).
+func (r *GormTransactionRepository) PermanentDelete(id transactionvalueobjects.TransactionID) error {
+	if err := r.db.Unscoped().
+		Where("id = ?", id.Value()).
+		Delete(&TransactionModel{}).Error; err != nil {
+		return fmt.Errorf("failed to permanently delete transaction: %w", err)
 	}
 
 	return nil

@@ -151,7 +151,9 @@ func TestTransactionHandler_Create(t *testing.T) {
 	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
 	updateUseCase := usecases.NewUpdateTransactionUseCase(mockRepo, eventBus)
 	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase)
+	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockRepo)
+	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockRepo)
+	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase, restoreUseCase, permanentDeleteUseCase)
 
 	app.Post("/transactions", func(c *fiber.Ctx) error {
 		c.Locals("userID", userID)
@@ -233,7 +235,9 @@ func TestTransactionHandler_List(t *testing.T) {
 	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
 	updateUseCase := usecases.NewUpdateTransactionUseCase(mockRepo, eventbus.NewEventBus())
 	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase)
+	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockRepo)
+	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockRepo)
+	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase, restoreUseCase, permanentDeleteUseCase)
 
 	app.Get("/transactions", func(c *fiber.Ctx) error {
 		c.Locals("userID", userID)
@@ -301,7 +305,9 @@ func TestTransactionHandler_Get(t *testing.T) {
 	listUseCase := usecases.NewListTransactionsUseCase(mockRepo)
 	updateUseCase := usecases.NewUpdateTransactionUseCase(mockRepo, eventbus.NewEventBus())
 	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase)
+	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockRepo)
+	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockRepo)
+	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase, restoreUseCase, permanentDeleteUseCase)
 
 	app.Get("/transactions/:id", func(c *fiber.Ctx) error {
 		c.Locals("userID", userID)
@@ -372,7 +378,9 @@ func TestTransactionHandler_Update(t *testing.T) {
 	listUseCase := usecases.NewListTransactionsUseCase(mockRepo)
 	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
 	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase)
+	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockRepo)
+	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockRepo)
+	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase, restoreUseCase, permanentDeleteUseCase)
 
 	app.Put("/transactions/:id", func(c *fiber.Ctx) error {
 		c.Locals("userID", userID)

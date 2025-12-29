@@ -113,10 +113,33 @@ func (r *GormCategoryRepository) Save(category *entities.Category) error {
 	return nil
 }
 
-// Delete deletes a category by its ID.
+// Delete deletes a category by its ID (soft delete).
 func (r *GormCategoryRepository) Delete(id valueobjects.CategoryID) error {
 	if err := r.db.Where("id = ?", id.Value()).Delete(&CategoryModel{}).Error; err != nil {
 		return fmt.Errorf("failed to delete category: %w", err)
+	}
+
+	return nil
+}
+
+// Restore restores a soft-deleted category by setting deleted_at to NULL.
+func (r *GormCategoryRepository) Restore(id valueobjects.CategoryID) error {
+	if err := r.db.Unscoped().
+		Model(&CategoryModel{}).
+		Where("id = ?", id.Value()).
+		Update("deleted_at", nil).Error; err != nil {
+		return fmt.Errorf("failed to restore category: %w", err)
+	}
+
+	return nil
+}
+
+// PermanentDelete permanently deletes a category (hard delete).
+func (r *GormCategoryRepository) PermanentDelete(id valueobjects.CategoryID) error {
+	if err := r.db.Unscoped().
+		Where("id = ?", id.Value()).
+		Delete(&CategoryModel{}).Error; err != nil {
+		return fmt.Errorf("failed to permanently delete category: %w", err)
 	}
 
 	return nil

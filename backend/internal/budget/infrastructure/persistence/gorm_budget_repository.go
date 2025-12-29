@@ -140,10 +140,33 @@ func (r *GormBudgetRepository) Save(budget *entities.Budget) error {
 	return nil
 }
 
-// Delete deletes a budget by its ID.
+// Delete deletes a budget by its ID (soft delete).
 func (r *GormBudgetRepository) Delete(id valueobjects.BudgetID) error {
 	if err := r.db.Where("id = ?", id.Value()).Delete(&BudgetModel{}).Error; err != nil {
 		return fmt.Errorf("failed to delete budget: %w", err)
+	}
+
+	return nil
+}
+
+// Restore restores a soft-deleted budget by setting deleted_at to NULL.
+func (r *GormBudgetRepository) Restore(id valueobjects.BudgetID) error {
+	if err := r.db.Unscoped().
+		Model(&BudgetModel{}).
+		Where("id = ?", id.Value()).
+		Update("deleted_at", nil).Error; err != nil {
+		return fmt.Errorf("failed to restore budget: %w", err)
+	}
+
+	return nil
+}
+
+// PermanentDelete permanently deletes a budget (hard delete).
+func (r *GormBudgetRepository) PermanentDelete(id valueobjects.BudgetID) error {
+	if err := r.db.Unscoped().
+		Where("id = ?", id.Value()).
+		Delete(&BudgetModel{}).Error; err != nil {
+		return fmt.Errorf("failed to permanently delete budget: %w", err)
 	}
 
 	return nil
