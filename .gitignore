@@ -5,6 +5,7 @@
 # Binários compilados
 backend/bin/
 backend/api
+backend/main
 
 # Arquivos de cobertura de testes
 backend/*.out
