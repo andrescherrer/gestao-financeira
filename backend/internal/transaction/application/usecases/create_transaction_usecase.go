@@ -6,28 +6,29 @@ import (
 
 	accountvalueobjects "gestao-financeira/backend/internal/account/domain/valueobjects"
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
+	sharedrepositories "gestao-financeira/backend/internal/shared/domain/repositories"
 	sharedvalueobjects "gestao-financeira/backend/internal/shared/domain/valueobjects"
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
 	"gestao-financeira/backend/internal/transaction/application/dtos"
 	"gestao-financeira/backend/internal/transaction/domain/entities"
-	"gestao-financeira/backend/internal/transaction/domain/repositories"
 	transactionvalueobjects "gestao-financeira/backend/internal/transaction/domain/valueobjects"
 )
 
 // CreateTransactionUseCase handles transaction creation.
+// It uses UnitOfWork to ensure atomicity when creating a transaction and updating account balance.
 type CreateTransactionUseCase struct {
-	transactionRepository repositories.TransactionRepository
-	eventBus              *eventbus.EventBus
+	unitOfWork sharedrepositories.UnitOfWork
+	eventBus   *eventbus.EventBus
 }
 
 // NewCreateTransactionUseCase creates a new CreateTransactionUseCase instance.
 func NewCreateTransactionUseCase(
-	transactionRepository repositories.TransactionRepository,
+	unitOfWork sharedrepositories.UnitOfWork,
 	eventBus *eventbus.EventBus,
 ) *CreateTransactionUseCase {
 	return &CreateTransactionUseCase{
-		transactionRepository: transactionRepository,
-		eventBus:              eventBus,
+		unitOfWork: unitOfWork,
+		eventBus:   eventBus,
 	}
 }
 
@@ -84,12 +85,62 @@ func (uc *CreateTransactionUseCase) Execute(input dtos.CreateTransactionInput) (
 		return nil, fmt.Errorf("failed to create transaction: %w", err)
 	}
 
-	// Save transaction to repository
-	if err := uc.transactionRepository.Save(transaction); err != nil {
+	// Get repositories from UnitOfWork
+	transactionRepository := uc.unitOfWork.TransactionRepository()
+	accountRepository := uc.unitOfWork.AccountRepository()
+
+	// Begin transaction to ensure atomicity
+	if err := uc.unitOfWork.Begin(); err != nil {
+		return nil, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	// Ensure rollback on error
+	defer func() {
+		if uc.unitOfWork.IsInTransaction() {
+			if rollbackErr := uc.unitOfWork.Rollback(); rollbackErr != nil {
+				// Log rollback error but don't fail the function
+				_ = rollbackErr
+			}
+		}
+	}()
+
+	// Save transaction to repository (within transaction)
+	if err := transactionRepository.Save(transaction); err != nil {
 		return nil, fmt.Errorf("failed to save transaction: %w", err)
 	}
 
-	// Publish domain events
+	// Find account and update balance (within transaction)
+	account, err := accountRepository.FindByID(accountID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find account: %w", err)
+	}
+	if account == nil {
+		return nil, fmt.Errorf("account not found: %s", accountID.Value())
+	}
+
+	// Update account balance based on transaction type
+	if transactionType.Value() == "INCOME" {
+		if err := account.Credit(amount); err != nil {
+			return nil, fmt.Errorf("failed to credit account: %w", err)
+		}
+	} else if transactionType.Value() == "EXPENSE" {
+		if err := account.Debit(amount); err != nil {
+			return nil, fmt.Errorf("failed to debit account: %w", err)
+		}
+	}
+
+	// Save updated account (within transaction)
+	if err := accountRepository.Save(account); err != nil {
+		return nil, fmt.Errorf("failed to save account: %w", err)
+	}
+
+	// Commit transaction (all operations succeed)
+	if err := uc.unitOfWork.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	// Publish domain events (after successful commit)
+	// Events are published outside the transaction to avoid blocking the commit
 	domainEvents := transaction.GetEvents()
 	for _, event := range domainEvents {
 		if err := uc.eventBus.Publish(event); err != nil {

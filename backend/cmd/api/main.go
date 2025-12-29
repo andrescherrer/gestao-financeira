@@ -32,6 +32,7 @@ import (
 	reportroutes "gestao-financeira/backend/internal/reporting/presentation/routes"
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
 	sharedhandlers "gestao-financeira/backend/internal/shared/infrastructure/handlers"
+	sharedpersistence "gestao-financeira/backend/internal/shared/infrastructure/persistence"
 	transactionusecases "gestao-financeira/backend/internal/transaction/application/usecases"
 	transactionpersistence "gestao-financeira/backend/internal/transaction/infrastructure/persistence"
 	transactionhandlers "gestao-financeira/backend/internal/transaction/presentation/handlers"
@@ -185,12 +186,18 @@ func main() {
 	updateBalanceHandler := accountinfrahandlers.NewUpdateBalanceHandler(accountRepository)
 
 	// Subscribe to transaction events for balance updates
+	// Note: With UnitOfWork, balance updates happen atomically within the transaction,
+	// but we still keep event handlers for other subscribers (logging, notifications, etc.)
 	eventBus.Subscribe("TransactionCreated", updateBalanceHandler.HandleTransactionCreated)
 	eventBus.Subscribe("TransactionUpdated", updateBalanceHandler.HandleTransactionUpdated)
 	eventBus.Subscribe("TransactionDeleted", updateBalanceHandler.HandleTransactionDeleted)
 
+	// Initialize UnitOfWork for atomic operations
+	unitOfWork := sharedpersistence.NewGormUnitOfWork(db)
+
 	// Initialize transaction use cases
-	createTransactionUseCase := transactionusecases.NewCreateTransactionUseCase(transactionRepository, eventBus)
+	// CreateTransactionUseCase now uses UnitOfWork to ensure atomicity
+	createTransactionUseCase := transactionusecases.NewCreateTransactionUseCase(unitOfWork, eventBus)
 	listTransactionsUseCase := transactionusecases.NewListTransactionsUseCase(transactionRepository)
 	getTransactionUseCase := transactionusecases.NewGetTransactionUseCase(transactionRepository)
 	updateTransactionUseCase := transactionusecases.NewUpdateTransactionUseCase(transactionRepository, eventBus)

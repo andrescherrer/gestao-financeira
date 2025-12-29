@@ -34,10 +34,11 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 4.1: Observabilidade Backend**: ⏳ Pendente
 - **Demais sprints**: ⏳ Não iniciadas
 
-### ✅ Implementações Recentes (2025-12-28)
-- **SOFT-DELETE-001**: ✅ Soft Delete Consistente - Completo
-- **MIGRATIONS-001**: ✅ Migrations Versionadas e Rollback - Completo
-- **CONFIG-001**: ✅ Configuração Centralizada - Completo
+### ✅ Implementações Recentes
+- **SOFT-DELETE-001** (2025-12-28): ✅ Soft Delete Consistente - Completo
+- **MIGRATIONS-001** (2025-12-28): ✅ Migrations Versionadas e Rollback - Completo
+- **CONFIG-001** (2025-12-28): ✅ Configuração Centralizada - Completo
+- **UNIT-OF-WORK-001** (2025-12-29): ✅ Gerenciamento de Transações de Banco de Dados - Completo
 
 ### 📈 Progresso
 - **Fase 1 (Fundação e MVP)**: ✅ 100% concluído
@@ -761,5 +762,30 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ---
 
-**Última atualização:** 2025-12-28 - Adicionadas implementações de Soft Delete, Migrations e Configuração Centralizada
+---
+
+## 🔧 Melhorias de Infraestrutura (2025-12-29)
+
+### Sprint INFRA-004: Gerenciamento de Transações
+
+| ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
+|----|--------|------|------------|---------|--------------|--------|
+| UNIT-OF-WORK-001 | Implementar Unit of Work pattern | 🔵 | 🔴 | 8h | TX-008, AC-006 | ✅ |
+| UNIT-OF-WORK-002 | Atualizar CreateTransactionUseCase para usar UnitOfWork | 🔵 | 🔴 | 4h | UNIT-OF-WORK-001 | ✅ |
+| UNIT-OF-WORK-003 | Criar testes para UnitOfWork | 🟤 | 🔴 | 4h | UNIT-OF-WORK-001 | ✅ |
+| UNIT-OF-WORK-004 | Criar testes de atomicidade | 🟤 | 🔴 | 4h | UNIT-OF-WORK-002 | ✅ |
+
+**Entregável INFRA-004:** ✅ Gerenciamento de transações de banco de dados implementado com Unit of Work
+
+**Documentação:** `docs/tarefas_concluidas/20251229_055029_UNIT-OF-WORK-001.md`
+
+**Benefícios:**
+- ✅ Atomicidade garantida em operações críticas
+- ✅ Consistência de dados
+- ✅ Rollback automático em caso de erro
+- ✅ Resolve problema crítico identificado no relatório de análise
+
+---
+
+**Última atualização:** 2025-12-29 - Adicionada implementação de Unit of Work para gerenciamento de transações
 
