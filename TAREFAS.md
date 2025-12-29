@@ -816,5 +816,31 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - ✅ Observabilidade: logging estruturado com tipo de erro
 - ✅ ~200 linhas de código duplicado removidas
 
-**Última atualização:** 2025-12-29 - Adicionada implementação de tratamento de erros consistente
+---
+
+## 🚀 Melhorias de Performance (2025-12-29)
+
+### Sprint PERF-002: Paginação Consistente
+
+| ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
+|----|--------|------|------------|---------|--------------|--------|
+| PAGINATION-001 | Implementar paginação consistente | 🔵 | 🟡 | 4h | - | ✅ |
+
+**Entregável PERF-002:** ✅ Paginação consistente implementada em todos os endpoints de listagem
+
+**Documentação:** `docs/tarefas_concluidas/20251229_063019_PAGINATION-001.md`
+
+**Benefícios:**
+- ✅ Performance: redução de uso de memória e queries mais rápidas
+- ✅ UX: respostas mais rápidas e navegação facilitada
+- ✅ Consistência: todos os endpoints seguem o mesmo padrão
+- ✅ Compatibilidade retroativa mantida
+
+**Endpoints com paginação:**
+- ✅ `/api/v1/transactions` (já implementado)
+- ✅ `/api/v1/accounts`
+- ✅ `/api/v1/categories`
+- ✅ `/api/v1/budgets`
+
+**Última atualização:** 2025-12-29 - Adicionada implementação de paginação consistente
 
