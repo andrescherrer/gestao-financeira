@@ -9,6 +9,7 @@ import (
 
 	"gestao-financeira/backend/internal/budget/application/dtos"
 	"gestao-financeira/backend/internal/budget/application/usecases"
+	"gestao-financeira/backend/pkg/metrics"
 	"gestao-financeira/backend/pkg/middleware"
 	"gestao-financeira/backend/pkg/validator"
 )
@@ -111,6 +112,9 @@ func (h *BudgetHandler) Create(c *fiber.Ctx) error {
 	if err != nil {
 		return h.handleUseCaseError(c, err)
 	}
+
+	// Record business metric
+	metrics.BusinessMetrics.BudgetsCreated.WithLabelValues(input.PeriodType).Inc()
 
 	// Return success response
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{

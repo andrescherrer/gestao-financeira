@@ -7,6 +7,7 @@ import (
 	"gestao-financeira/backend/internal/transaction/application/dtos"
 	"gestao-financeira/backend/internal/transaction/application/usecases"
 	apperrors "gestao-financeira/backend/pkg/errors"
+	"gestao-financeira/backend/pkg/metrics"
 	"gestao-financeira/backend/pkg/middleware"
 	"gestao-financeira/backend/pkg/validator"
 )
@@ -106,6 +107,9 @@ func (h *TransactionHandler) Create(c *fiber.Ctx) error {
 	if err != nil {
 		return h.handleUseCaseError(c, err)
 	}
+
+	// Record business metric
+	metrics.BusinessMetrics.TransactionsCreated.WithLabelValues(input.Type).Inc()
 
 	// Return success response
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
@@ -324,6 +328,9 @@ func (h *TransactionHandler) Update(c *fiber.Ctx) error {
 		})
 	}
 
+	// Record business metric
+	metrics.BusinessMetrics.TransactionsUpdated.WithLabelValues(output.Type).Inc()
+
 	// Return success response
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Transaction updated successfully",
@@ -379,6 +386,16 @@ func (h *TransactionHandler) Delete(c *fiber.Ctx) error {
 		})
 	}
 
+	// Get transaction before deletion to record metric with type
+	getInput := dtos.GetTransactionInput{
+		TransactionID: transactionID,
+	}
+	transaction, err := h.getTransactionUseCase.Execute(getInput)
+	transactionType := "unknown"
+	if err == nil && transaction != nil {
+		transactionType = transaction.Type
+	}
+
 	// Build input
 	input := dtos.DeleteTransactionInput{
 		TransactionID: transactionID,
@@ -389,6 +406,9 @@ func (h *TransactionHandler) Delete(c *fiber.Ctx) error {
 	if err != nil {
 		return h.handleDeleteTransactionError(c, err, transactionID)
 	}
+
+	// Record business metric
+	metrics.BusinessMetrics.TransactionsDeleted.WithLabelValues(transactionType).Inc()
 
 	// Return success response
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{

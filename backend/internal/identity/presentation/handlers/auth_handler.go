@@ -7,6 +7,7 @@ import (
 	"gestao-financeira/backend/internal/identity/application/dtos"
 	"gestao-financeira/backend/internal/identity/application/usecases"
 	apperrors "gestao-financeira/backend/pkg/errors"
+	"gestao-financeira/backend/pkg/metrics"
 	"gestao-financeira/backend/pkg/middleware"
 	"gestao-financeira/backend/pkg/validator"
 )
@@ -73,6 +74,9 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	if err != nil {
 		return h.handleUseCaseError(c, err)
 	}
+
+	// Record business metric
+	metrics.BusinessMetrics.UsersRegistered.Inc()
 
 	// Return success response
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
@@ -154,8 +158,13 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	// Execute use case
 	output, err := h.loginUseCase.Execute(input)
 	if err != nil {
+		// Record failed login attempt
+		metrics.BusinessMetrics.LoginAttempts.WithLabelValues("failure").Inc()
 		return h.handleLoginError(c, err)
 	}
+
+	// Record successful login attempt
+	metrics.BusinessMetrics.LoginAttempts.WithLabelValues("success").Inc()
 
 	// Return success response
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{

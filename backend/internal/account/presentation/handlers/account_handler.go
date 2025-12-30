@@ -7,6 +7,7 @@ import (
 	"gestao-financeira/backend/internal/account/application/dtos"
 	"gestao-financeira/backend/internal/account/application/usecases"
 	apperrors "gestao-financeira/backend/pkg/errors"
+	"gestao-financeira/backend/pkg/metrics"
 	"gestao-financeira/backend/pkg/middleware"
 	"gestao-financeira/backend/pkg/validator"
 )
@@ -97,6 +98,9 @@ func (h *AccountHandler) Create(c *fiber.Ctx) error {
 	if err != nil {
 		return h.handleUseCaseError(c, err)
 	}
+
+	// Record business metric
+	metrics.BusinessMetrics.AccountsCreated.WithLabelValues(input.Type).Inc()
 
 	// Return success response
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{

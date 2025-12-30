@@ -9,6 +9,7 @@ import (
 	"gestao-financeira/backend/internal/category/application/dtos"
 	"gestao-financeira/backend/internal/category/application/usecases"
 	apperrors "gestao-financeira/backend/pkg/errors"
+	"gestao-financeira/backend/pkg/metrics"
 	"gestao-financeira/backend/pkg/middleware"
 	"gestao-financeira/backend/pkg/validator"
 )
@@ -106,6 +107,9 @@ func (h *CategoryHandler) Create(c *fiber.Ctx) error {
 	if err != nil {
 		return h.handleUseCaseError(c, err)
 	}
+
+	// Record business metric (categories don't have types, using "default")
+	metrics.BusinessMetrics.CategoriesCreated.WithLabelValues("default").Inc()
 
 	// Return success response
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
