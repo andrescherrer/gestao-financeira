@@ -4,7 +4,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ## 📊 Status Geral do Projeto
 
-**Última verificação:** 2025-12-27
+**Última verificação:** 2025-12-30
 
 **Nota:** Frontend migrado de Next.js/React para Vue 3 em 2025-12-23
 
@@ -31,7 +31,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 3.2: Recurring Transactions - Backend** (REC-001 a REC-004): ✅ Completo e Integrado
 
 ### ⏳ Em Progresso / Pendente
-- **Sprint 4.1: Observabilidade Backend**: ⏳ Pendente
+- **Sprint 4.1: Observabilidade Backend**: ✅ Completo (OBS-001 a OBS-007)
 - **Demais sprints**: ⏳ Não iniciadas
 
 ### ✅ Implementações Recentes
@@ -43,6 +43,8 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **ERROR-HANDLING-001** (2025-12-29): ✅ Tratamento de Erros Consistente - Completo
 - **PAGINATION-001** (2025-12-29): ✅ Paginação Consistente - Completo
 - **API-DOC-001** (2025-12-29): ✅ Melhoria Completa da Documentação da API - Completo
+- **OBS-001 a OBS-007** (2025-12-30): ✅ Observabilidade Completa - Prometheus, OpenTelemetry, Grafana, Structured Logging - Completo
+- **API-DOC-002** (2025-12-30): ✅ Documentação de API Melhorada (Postman Collection) - Completo
 
 ### 📈 Progresso
 - **Fase 1 (Fundação e MVP)**: ✅ 100% concluído
@@ -63,9 +65,11 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
   - Melhorias Frontend: ✅ 100% (completo e testado)
   - Validações e Error Handling: ✅ 100% (completo e testado)
   - Testes de Integração: ✅ 100% (completo e testado)
-- **Fase 3 (Funcionalidades Essenciais)**: ~20% concluído
+- **Fase 3 (Funcionalidades Essenciais)**: ✅ 100% concluído
   - Budget Context - Backend: ✅ 100% (completo e testado)
   - Recurring Transactions - Backend: ✅ 100% (completo, integrado e testado)
+- **Fase 4 (Produção e Performance)**: ~20% concluído
+  - Observabilidade Backend: ✅ 100% (OBS-001 a OBS-007 completo)
 
 ---
 
@@ -553,7 +557,13 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | OBS-006 | Configurar Grafana para visualização | 🟠 | 🟡 | 4h | OBS-001 | ✅ |
 | OBS-007 | Criar dashboards no Grafana | 🟠 | 🟡 | 4h | OBS-006 | ✅ |
 
-**Entregável Sprint 4.1:** Sistema de observabilidade completo
+**Entregável Sprint 4.1:** Sistema de observabilidade completo ✅
+
+**Status:** ✅ **COMPLETO** - Todas as tarefas OBS-001 a OBS-007 foram implementadas:
+- ✅ Prometheus configurado com métricas HTTP e de negócio
+- ✅ OpenTelemetry para tracing distribuído
+- ✅ Structured logging com correlation IDs
+- ✅ Grafana configurado com dashboards
 
 ---
 
@@ -886,3 +896,33 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - 8 arquivos modificados
 
 **Documentação:** `docs/tarefas_concluidas/20251229_064634_API-DOC-001.md`
+
+---
+
+### API-DOC-002: Documentação de API Melhorada (Postman Collection)
+
+**Data:** 2025-12-30  
+**Status:** ✅ Completo
+
+**Objetivo:** Criar Postman collection completa e recursos adicionais para facilitar a integração com a API.
+
+**Implementação:**
+- Postman collection completa com 31 endpoints organizados por categoria
+- Postman environment com variáveis configuráveis
+- Scripts automáticos para autenticação e salvamento de IDs
+- README completo com guia de uso da API
+- Exemplos de request/response em cada endpoint
+- Documentação de autenticação, rate limiting e paginação
+
+**Arquivos Criados:**
+- `docs/api/Gestao_Financeira_API.postman_collection.json` - Collection completa
+- `docs/api/Gestao_Financeira_API.postman_environment.json` - Environment
+- `docs/api/README.md` - Documentação completa da API
+
+**Funcionalidades:**
+- Autenticação automática (token salvo após login)
+- IDs salvos automaticamente (user_id, account_id, transaction_id, etc.)
+- 31 endpoints documentados
+- Variáveis de ambiente configuráveis
+
+**Documentação:** `docs/tarefas_concluidas/20251230_090100_API-DOC-002.md`
