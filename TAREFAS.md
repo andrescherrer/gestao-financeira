@@ -545,12 +545,13 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| OBS-001 | Configurar Prometheus para métricas | 🔵 | 🔴 | 4h | BE-003 | ⏳ |
-| OBS-002 | Criar middleware de métricas HTTP | 🔵 | 🔴 | 4h | OBS-001 | ⏳ |
+| OBS-001 | Configurar Prometheus para métricas | 🔵 | 🔴 | 4h | BE-003 | ✅ |
+| OBS-002 | Criar middleware de métricas HTTP | 🔵 | 🔴 | 4h | OBS-001 | ✅ |
 | OBS-003 | Adicionar métricas de negócio (transações criadas, etc.) | 🔵 | 🟡 | 4h | OBS-001 | ⏳ |
 | OBS-004 | Configurar OpenTelemetry para tracing | 🔵 | 🟡 | 6h | BE-002 | ⏳ |
-| OBS-005 | Configurar Grafana para visualização | 🟠 | 🟡 | 4h | OBS-001 | ⏳ |
-| OBS-006 | Criar dashboards no Grafana | 🟠 | 🟡 | 4h | OBS-005 | ⏳ |
+| OBS-005 | Melhorar structured logging com correlation IDs | 🔵 | 🔴 | 2h | LOG-001 | ⏳ |
+| OBS-006 | Configurar Grafana para visualização | 🟠 | 🟡 | 4h | OBS-001 | ⏳ |
+| OBS-007 | Criar dashboards no Grafana | 🟠 | 🟡 | 4h | OBS-006 | ⏳ |
 
 **Entregável Sprint 4.1:** Sistema de observabilidade completo
 
