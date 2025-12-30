@@ -45,6 +45,7 @@ import (
 	"gestao-financeira/backend/pkg/metrics"
 	"gestao-financeira/backend/pkg/middleware"
 	"gestao-financeira/backend/pkg/migrations"
+	"gestao-financeira/backend/pkg/observability"
 	"gestao-financeira/backend/pkg/validator"
 
 	"github.com/gofiber/fiber/v2"
@@ -169,6 +170,25 @@ func main() {
 	// Initialize Prometheus metrics
 	metrics.Init()
 	log.Info().Msg("Prometheus metrics initialized")
+
+	// Initialize OpenTelemetry tracing (if enabled)
+	var tracingShutdown func()
+	if cfg.Observability.Tracing.Enabled {
+		shutdown, err := observability.InitTracing(observability.TracingConfig{
+			Enabled:     cfg.Observability.Tracing.Enabled,
+			ServiceName: cfg.Observability.Tracing.ServiceName,
+			Environment: cfg.Environment,
+			JaegerURL:   cfg.Observability.Tracing.JaegerURL,
+		})
+		if err != nil {
+			log.Warn().Err(err).Msg("Failed to initialize tracing (continuing without tracing)")
+		} else {
+			tracingShutdown = shutdown
+			log.Info().Str("jaeger_url", cfg.Observability.Tracing.JaegerURL).Msg("OpenTelemetry tracing initialized")
+		}
+	} else {
+		log.Info().Msg("OpenTelemetry tracing disabled")
+	}
 
 	// Initialize Event Bus
 	eventBus := eventbus.NewEventBus()
@@ -351,6 +371,11 @@ func main() {
 	// Request ID middleware (must be early in the chain)
 	app.Use(middleware.RequestIDMiddleware())
 
+	// OpenTelemetry tracing middleware (must be early to trace all requests)
+	if cfg.Observability.Tracing.Enabled {
+		app.Use(observability.TracingMiddleware())
+	}
+
 	// Prometheus metrics middleware (must be early to capture all requests)
 	app.Use(metrics.MetricsMiddleware())
 
@@ -451,6 +476,12 @@ func main() {
 	// Close database connection
 	if err := database.Close(); err != nil {
 		log.Error().Err(err).Msg("Error closing database")
+	}
+
+	// Shutdown tracing
+	if tracingShutdown != nil {
+		tracingShutdown()
+		log.Info().Msg("Tracing shutdown completed")
 	}
 
 	log.Info().Msg("Server exited")

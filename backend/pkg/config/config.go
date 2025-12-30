@@ -32,6 +32,9 @@ type Config struct {
 
 	// CORS
 	CORS CORSConfig `json:"cors"`
+
+	// Observability
+	Observability ObservabilityConfig `json:"observability"`
 }
 
 // ServerConfig holds server configuration
@@ -88,6 +91,18 @@ type CORSConfig struct {
 	MaxAge         int    `json:"max_age"`
 }
 
+// ObservabilityConfig holds observability configuration
+type ObservabilityConfig struct {
+	Tracing TracingConfig `json:"tracing"`
+}
+
+// TracingConfig holds tracing configuration
+type TracingConfig struct {
+	Enabled     bool   `json:"enabled"`
+	ServiceName string `json:"service_name"`
+	JaegerURL   string `json:"jaeger_url"`
+}
+
 // Load loads configuration from environment variables
 func Load() (*Config, error) {
 	cfg := &Config{
@@ -131,6 +146,13 @@ func Load() (*Config, error) {
 		CORS: CORSConfig{
 			AllowedOrigins: getEnv("ALLOWED_ORIGINS", "http://localhost:3000"),
 			MaxAge:         parseInt(getEnv("CORS_MAX_AGE", "86400"), 86400), // 24 hours
+		},
+		Observability: ObservabilityConfig{
+			Tracing: TracingConfig{
+				Enabled:     getEnv("TRACING_ENABLED", "false") == "true",
+				ServiceName: getEnv("TRACING_SERVICE_NAME", "gestao-financeira-api"),
+				JaegerURL:   getEnv("JAEGER_URL", "http://localhost:14268/api/traces"),
+			},
 		},
 	}
 
