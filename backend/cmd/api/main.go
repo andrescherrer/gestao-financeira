@@ -390,6 +390,11 @@ func main() {
 
 	// Global middlewares
 	app.Use(recover.New())
+
+	// Structured logging middleware (after auth to include user context)
+	app.Use(middleware.StructuredLoggingMiddleware())
+
+	// Fiber logger (for compatibility, but structured logging is preferred)
 	app.Use(fiberlogger.New(fiberlogger.Config{
 		Format:     "[${time}] ${status} - ${latency} ${method} ${path} [${header:X-Request-ID}]\n",
 		TimeFormat: "2006-01-02 15:04:05",
