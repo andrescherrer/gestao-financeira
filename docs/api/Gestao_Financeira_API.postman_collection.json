@@ -1,0 +1,1060 @@
+{
+	"info": {
+		"_postman_id": "gestao-financeira-api-v1",
+		"name": "Gestão Financeira API",
+		"description": "API REST completa para gestão financeira pessoal e profissional.\n\n## Autenticação\n\nA API utiliza autenticação JWT. Para usar os endpoints protegidos:\n\n1. Faça login em `/auth/login` para obter um token\n2. A collection automaticamente inclui o token no header `Authorization: Bearer <token>`\n3. O token expira após 24h (configurável)\n\n## Variáveis de Ambiente\n\n- `base_url`: URL base da API (padrão: http://localhost:8080)\n- `api_token`: Token JWT (preenchido automaticamente após login)\n- `user_id`: ID do usuário autenticado\n- `account_id`: ID da conta (preenchido após criar conta)\n- `transaction_id`: ID da transação (preenchido após criar transação)\n- `category_id`: ID da categoria (preenchido após criar categoria)\n- `budget_id`: ID do orçamento (preenchido após criar orçamento)\n\n## Rate Limiting\n\nA API implementa rate limiting:\n- Limite padrão: 100 requisições por minuto por IP\n- Headers de resposta incluem: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`\n\n## Códigos de Resposta\n\n- `200 OK`: Operação bem-sucedida\n- `201 Created`: Recurso criado\n- `400 Bad Request`: Dados inválidos\n- `401 Unauthorized`: Token ausente ou inválido\n- `403 Forbidden`: Acesso negado\n- `404 Not Found`: Recurso não encontrado\n- `409 Conflict`: Conflito (recurso já existe)\n- `422 Unprocessable Entity`: Erro de validação de domínio\n- `429 Too Many Requests`: Rate limit excedido\n- `500 Internal Server Error`: Erro interno",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "gestao-financeira"
+	},
+	"item": [
+		{
+			"name": "Health & Status",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": ["{{base_url}}"],
+							"path": ["health"]
+						},
+						"description": "Verifica o status de saúde da API"
+					},
+					"response": []
+				},
+				{
+					"name": "Liveness Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health/live",
+							"host": ["{{base_url}}"],
+							"path": ["health", "live"]
+						},
+						"description": "Verifica se a API está viva"
+					},
+					"response": []
+				},
+				{
+					"name": "Readiness Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health/ready",
+							"host": ["{{base_url}}"],
+							"path": ["health", "ready"]
+						},
+						"description": "Verifica se a API está pronta para receber requisições"
+					},
+					"response": []
+				},
+				{
+					"name": "API Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1"]
+						},
+						"description": "Retorna informações sobre a API"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de verificação de saúde e status da API"
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.user_id) {",
+									"        pm.environment.set('user_id', response.data.user_id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"SecurePass123\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "register"]
+						},
+						"description": "Cria uma nova conta de usuário. A senha é hasheada com bcrypt antes de ser armazenada."
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.environment.set('api_token', response.data.token);",
+									"    }",
+									"    if (response.data && response.data.user && response.data.user.user_id) {",
+									"        pm.environment.set('user_id', response.data.user.user_id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"SecurePass123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "login"]
+						},
+						"description": "Autentica um usuário e retorna um token JWT. O token deve ser incluído no header `Authorization: Bearer <token>` em requisições subsequentes."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de autenticação (públicos)"
+		},
+		{
+			"name": "Accounts",
+			"item": [
+				{
+					"name": "Create Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.account_id) {",
+									"        pm.environment.set('account_id', response.data.account_id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Conta Corrente\",\n    \"type\": \"BANK\",\n    \"initial_balance\": \"1000.00\",\n    \"currency\": \"BRL\",\n    \"context\": \"PERSONAL\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/accounts",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "accounts"]
+						},
+						"description": "Cria uma nova conta. Tipos disponíveis: BANK, WALLET, INVESTMENT, CREDIT_CARD. Contextos: PERSONAL, BUSINESS."
+					},
+					"response": []
+				},
+				{
+					"name": "List Accounts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/accounts?context=PERSONAL&page=1&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "accounts"],
+							"query": [
+								{
+									"key": "context",
+									"value": "PERSONAL",
+									"description": "Filtro por contexto (PERSONAL ou BUSINESS)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Número da página (1-based)"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Itens por página (máximo 100)"
+								}
+							]
+						},
+						"description": "Lista todas as contas do usuário autenticado. Suporta filtro por contexto e paginação."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/accounts/{{account_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "accounts", "{{account_id}}"]
+						},
+						"description": "Retorna os detalhes de uma conta específica."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gerenciamento de contas (requer autenticação)"
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Create Transaction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.transaction_id) {",
+									"        pm.environment.set('transaction_id', response.data.transaction_id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account_id\": \"{{account_id}}\",\n    \"type\": \"INCOME\",\n    \"amount\": \"150.50\",\n    \"currency\": \"BRL\",\n    \"description\": \"Salário\",\n    \"date\": \"2025-12-30\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/transactions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "transactions"]
+						},
+						"description": "Cria uma nova transação. Tipos: INCOME (receita) ou EXPENSE (despesa). A criação da transação e atualização do saldo da conta são atômicas (Unit of Work)."
+					},
+					"response": []
+				},
+				{
+					"name": "List Transactions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transactions?account_id={{account_id}}&type=INCOME&page=1&limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "transactions"],
+							"query": [
+								{
+									"key": "account_id",
+									"value": "{{account_id}}",
+									"description": "Filtro por conta (UUID)"
+								},
+								{
+									"key": "type",
+									"value": "INCOME",
+									"description": "Filtro por tipo (INCOME ou EXPENSE)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Número da página"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Itens por página"
+								}
+							]
+						},
+						"description": "Lista todas as transações do usuário autenticado. Suporta filtros por account_id e type, além de paginação."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transactions/{{transaction_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "transactions", "{{transaction_id}}"]
+						},
+						"description": "Retorna os detalhes de uma transação específica."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaction",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": \"200.00\",\n    \"description\": \"Salário atualizado\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/transactions/{{transaction_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "transactions", "{{transaction_id}}"]
+						},
+						"description": "Atualiza uma transação existente. Todos os campos são opcionais - apenas os campos fornecidos serão atualizados. A atualização é atômica (Unit of Work)."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Transaction",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transactions/{{transaction_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "transactions", "{{transaction_id}}"]
+						},
+						"description": "Deleta uma transação (soft delete). O saldo da conta é revertido automaticamente. A transação pode ser restaurada usando o endpoint de restore."
+					},
+					"response": []
+				},
+				{
+					"name": "Restore Transaction",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transactions/{{transaction_id}}/restore",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "transactions", "{{transaction_id}}", "restore"]
+						},
+						"description": "Restaura uma transação deletada (soft delete). O saldo da conta é atualizado novamente."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gerenciamento de transações (requer autenticação)"
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Create Category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.category_id) {",
+									"        pm.environment.set('category_id', response.data.category_id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Alimentação\",\n    \"description\": \"Gastos com alimentação\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories"]
+						},
+						"description": "Cria uma nova categoria. O slug é gerado automaticamente a partir do nome."
+					},
+					"response": []
+				},
+				{
+					"name": "List Categories",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories?page=1&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Lista todas as categorias do usuário autenticado. Suporta paginação."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/{{category_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories", "{{category_id}}"]
+						},
+						"description": "Retorna os detalhes de uma categoria específica."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Alimentação e Bebidas\",\n    \"description\": \"Gastos com alimentação e bebidas\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/{{category_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories", "{{category_id}}"]
+						},
+						"description": "Atualiza uma categoria existente."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/{{category_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories", "{{category_id}}"]
+						},
+						"description": "Deleta uma categoria (soft delete). Pode ser restaurada usando o endpoint de restore."
+					},
+					"response": []
+				},
+				{
+					"name": "Restore Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/{{category_id}}/restore",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories", "{{category_id}}", "restore"]
+						},
+						"description": "Restaura uma categoria deletada."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gerenciamento de categorias (requer autenticação)"
+		},
+		{
+			"name": "Budgets",
+			"item": [
+				{
+					"name": "Create Budget",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.budget_id) {",
+									"        pm.environment.set('budget_id', response.data.budget_id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"category_id\": \"{{category_id}}\",\n    \"amount\": \"1000.00\",\n    \"currency\": \"BRL\",\n    \"period_type\": \"MONTHLY\",\n    \"year\": 2025,\n    \"month\": 12,\n    \"context\": \"PERSONAL\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/budgets",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "budgets"]
+						},
+						"description": "Cria um novo orçamento. Tipos de período: MONTHLY (requer year e month) ou YEARLY (requer apenas year)."
+					},
+					"response": []
+				},
+				{
+					"name": "List Budgets",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/budgets?year=2025&month=12&page=1&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "budgets"],
+							"query": [
+								{
+									"key": "year",
+									"value": "2025"
+								},
+								{
+									"key": "month",
+									"value": "12"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Lista todos os orçamentos do usuário autenticado. Suporta filtros por year, month, category_id, period_type e context."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Budget by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/budgets/{{budget_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "budgets", "{{budget_id}}"]
+						},
+						"description": "Retorna os detalhes de um orçamento específico."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Budget Progress",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/budgets/{{budget_id}}/progress",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "budgets", "{{budget_id}}", "progress"]
+						},
+						"description": "Retorna o progresso de um orçamento (valor gasto vs valor orçado)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Budget",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": \"1500.00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/budgets/{{budget_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "budgets", "{{budget_id}}"]
+						},
+						"description": "Atualiza um orçamento existente."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Budget",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/budgets/{{budget_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "budgets", "{{budget_id}}"]
+						},
+						"description": "Deleta um orçamento."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gerenciamento de orçamentos (requer autenticação)"
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Monthly Report",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/reports/monthly?year=2025&month=12",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "reports", "monthly"],
+							"query": [
+								{
+									"key": "year",
+									"value": "2025",
+									"required": true
+								},
+								{
+									"key": "month",
+									"value": "12",
+									"required": true
+								}
+							]
+						},
+						"description": "Retorna relatório mensal de receitas e despesas."
+					},
+					"response": []
+				},
+				{
+					"name": "Annual Report",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/reports/annual?year=2025",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "reports", "annual"],
+							"query": [
+								{
+									"key": "year",
+									"value": "2025",
+									"required": true
+								}
+							]
+						},
+						"description": "Retorna relatório anual de receitas e despesas."
+					},
+					"response": []
+				},
+				{
+					"name": "Category Report",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/reports/category?start_date=2025-01-01&end_date=2025-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "reports", "category"],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2025-01-01",
+									"required": true
+								},
+								{
+									"key": "end_date",
+									"value": "2025-12-31",
+									"required": true
+								}
+							]
+						},
+						"description": "Retorna relatório de gastos por categoria em um período."
+					},
+					"response": []
+				},
+				{
+					"name": "Income vs Expense",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/reports/income-vs-expense?start_date=2025-01-01&end_date=2025-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "reports", "income-vs-expense"],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2025-01-01",
+									"required": true
+								},
+								{
+									"key": "end_date",
+									"value": "2025-12-31",
+									"required": true
+								}
+							]
+						},
+						"description": "Retorna comparação de receitas vs despesas em um período."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para relatórios financeiros (requer autenticação)"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "api_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
+
