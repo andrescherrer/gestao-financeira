@@ -205,8 +205,9 @@ const filteredTransactions = computed(() => {
   let result = [...transactionsStore.transactions]
 
   // Filtrar por tipo
-  if (filters.value.type) {
-    result = result.filter((tx) => tx.type === filters.value.type)
+  if (filters.value.type && (filters.value.type === 'INCOME' || filters.value.type === 'EXPENSE')) {
+    const filterType = filters.value.type
+    result = result.filter((tx) => tx.type === filterType)
   }
 
   // Filtrar por conta

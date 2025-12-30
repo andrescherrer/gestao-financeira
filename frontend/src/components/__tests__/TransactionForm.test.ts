@@ -70,9 +70,9 @@ describe('TransactionForm', () => {
   it('deve aceitar valores iniciais', () => {
     const initialValues = {
       account_id: 'acc-1',
-      type: 'INCOME',
-      amount: 1000.00,
-      currency: 'BRL',
+      type: 'INCOME' as const,
+      amount: '1000.00',
+      currency: 'BRL' as const,
       description: 'Salário',
       date: '2024-01-01',
     }

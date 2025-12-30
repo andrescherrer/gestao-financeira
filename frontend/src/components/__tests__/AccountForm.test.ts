@@ -31,10 +31,10 @@ describe('AccountForm', () => {
   it('deve aceitar valores iniciais', () => {
     const initialValues = {
       name: 'Conta Teste',
-      type: 'BANK',
-      context: 'PERSONAL',
-      currency: 'BRL',
-      initial_balance: 1000.00,
+      type: 'BANK' as const,
+      context: 'PERSONAL' as const,
+      currency: 'BRL' as const,
+      initial_balance: '1000.00',
     }
 
     const wrapper = mount(AccountForm, {

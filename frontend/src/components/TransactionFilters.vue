@@ -8,7 +8,10 @@
         <!-- Tipo -->
         <div>
           <Label for="type" class="mb-1">Tipo</Label>
-          <Select v-model="localFilters.type" @update:model-value="handleChange">
+          <Select 
+            :model-value="localFilters.type" 
+            @update:model-value="handleTypeChange"
+          >
             <SelectTrigger id="type">
               <SelectValue placeholder="Todos os tipos" />
             </SelectTrigger>
@@ -87,6 +90,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { X } from 'lucide-vue-next'
 import type { Account } from '@/api/types'
+import type { AcceptableValue } from 'reka-ui'
 
 interface Filters {
   type?: 'INCOME' | 'EXPENSE' | ''
@@ -121,6 +125,25 @@ const hasActiveFilters = computed(() => {
     localFilters.value.endDate
   )
 })
+
+function handleTypeChange(val: AcceptableValue) {
+  if (val === null || val === undefined) {
+    localFilters.value.type = undefined
+  } else if (val === '' || val === 'INCOME' || val === 'EXPENSE') {
+    localFilters.value.type = val as 'INCOME' | 'EXPENSE' | ''
+  } else {
+    // Se for outro tipo (número, objeto, etc), converter para string e validar
+    const strVal = String(val)
+    if (strVal === 'INCOME' || strVal === 'EXPENSE') {
+      localFilters.value.type = strVal
+    } else if (strVal === '') {
+      localFilters.value.type = ''
+    } else {
+      localFilters.value.type = undefined
+    }
+  }
+  handleChange()
+}
 
 function handleChange() {
   emit('update:filters', { ...localFilters.value })
