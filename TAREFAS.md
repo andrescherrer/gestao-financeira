@@ -551,7 +551,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | OBS-004 | Configurar OpenTelemetry para tracing | 🔵 | 🟡 | 6h | BE-002 | ✅ |
 | OBS-005 | Melhorar structured logging com correlation IDs | 🔵 | 🔴 | 2h | LOG-001 | ✅ |
 | OBS-006 | Configurar Grafana para visualização | 🟠 | 🟡 | 4h | OBS-001 | ✅ |
-| OBS-007 | Criar dashboards no Grafana | 🟠 | 🟡 | 4h | OBS-006 | ⏳ |
+| OBS-007 | Criar dashboards no Grafana | 🟠 | 🟡 | 4h | OBS-006 | ✅ |
 
 **Entregável Sprint 4.1:** Sistema de observabilidade completo
 
