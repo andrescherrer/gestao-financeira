@@ -42,6 +42,7 @@ import (
 	"gestao-financeira/backend/pkg/database"
 	"gestao-financeira/backend/pkg/health"
 	"gestao-financeira/backend/pkg/logger"
+	"gestao-financeira/backend/pkg/metrics"
 	"gestao-financeira/backend/pkg/middleware"
 	"gestao-financeira/backend/pkg/migrations"
 	"gestao-financeira/backend/pkg/validator"
@@ -164,6 +165,10 @@ func main() {
 	// Initialize validator
 	validator.Init()
 	log.Info().Msg("Validator initialized")
+
+	// Initialize Prometheus metrics
+	metrics.Init()
+	log.Info().Msg("Prometheus metrics initialized")
 
 	// Initialize Event Bus
 	eventBus := eventbus.NewEventBus()
@@ -346,6 +351,9 @@ func main() {
 	// Request ID middleware (must be early in the chain)
 	app.Use(middleware.RequestIDMiddleware())
 
+	// Prometheus metrics middleware (must be early to capture all requests)
+	app.Use(metrics.MetricsMiddleware())
+
 	// Granular rate limiting middleware (must be early, before other middlewares)
 	if cacheService != nil {
 		granularRateLimitConfig := middleware.DefaultGranularRateLimitConfig(cacheService)
@@ -385,6 +393,9 @@ func main() {
 
 	// Swagger documentation
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
+
+	// Prometheus metrics endpoint
+	app.Get("/metrics", metrics.MetricsHandler())
 
 	// API v1 routes
 	api := app.Group("/api/v1")
