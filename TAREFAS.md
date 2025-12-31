@@ -626,11 +626,11 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| CI-001 | Configurar GitHub Actions para testes | 🟠 | 🔴 | 4h | SETUP-006 | ⏳ |
-| CI-002 | Configurar build e push de Docker image | 🟠 | 🔴 | 4h | CI-001, BE-007 | ⏳ |
-| CI-003 | Configurar deploy automático (staging) | 🟠 | 🟡 | 4h | CI-002 | ⏳ |
-| CI-004 | Configurar CI/CD para frontend | 🟠 | 🟡 | 4h | FE-009 | ⏳ |
-| CI-005 | Configurar deploy frontend (Vercel/Netlify) | 🟠 | 🟡 | 2h | CI-004 | ⏳ |
+| CI-001 | Configurar GitHub Actions para testes | 🟠 | 🔴 | 4h | SETUP-006 | ✅ |
+| CI-002 | Configurar build e push de Docker image | 🟠 | 🔴 | 4h | CI-001, BE-007 | ✅ |
+| CI-003 | Configurar deploy automático (staging) | 🟠 | 🟡 | 4h | CI-002 | ✅ |
+| CI-004 | Configurar CI/CD para frontend | 🟠 | 🟡 | 4h | FE-009 | ✅ |
+| CI-005 | Configurar deploy frontend (Vercel/Netlify) | 🟠 | 🟡 | 2h | CI-004 | ✅ |
 
 **Entregável Sprint 4.3:** Pipeline CI/CD completo
 
