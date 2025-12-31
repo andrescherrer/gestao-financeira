@@ -18,6 +18,9 @@ RUN go mod download
 # Copy source code
 COPY . .
 
+# Ensure all dependencies are downloaded and go.sum is in sync
+RUN go mod download && go mod verify
+
 # Generate Swagger documentation
 RUN swag init -g cmd/api/main.go -o docs --parseDependency --parseInternal
 

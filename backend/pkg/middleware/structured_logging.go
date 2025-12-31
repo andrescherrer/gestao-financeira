@@ -45,8 +45,11 @@ func StructuredLoggingMiddleware() fiber.Handler {
 		// Calculate duration
 		duration := time.Since(start)
 
+		// Get logger instance
+		loggerInstance := requestLogger.Logger()
+
 		// Log request completion
-		logEvent := requestLogger.Logger().Info().
+		logEvent := loggerInstance.Info().
 			Int("status", c.Response().StatusCode()).
 			Dur("duration_ms", duration).
 			Int("bytes_sent", len(c.Response().Body()))
@@ -75,4 +78,3 @@ func GetRequestLogger(c *fiber.Ctx) zerolog.Logger {
 	}
 	return log.Logger
 }
-

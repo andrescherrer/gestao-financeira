@@ -1,10 +1,12 @@
 package observability
 
 import (
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -41,17 +43,21 @@ func TracingMiddleware() fiber.Handler {
 		err := c.Next()
 
 		// Add response attributes
+		statusCode := c.Response().StatusCode()
+		statusText := http.StatusText(statusCode)
 		span.SetAttributes(
-			attribute.Int("http.status_code", c.Response().StatusCode()),
-			attribute.String("http.status_text", c.Response().StatusMessage()),
+			attribute.Int("http.status_code", statusCode),
+			attribute.String("http.status_text", statusText),
 		)
 
 		// Set span status based on HTTP status code
-		if c.Response().StatusCode() >= 400 {
-			span.RecordError(err)
-			span.SetStatus(trace.StatusError, c.Response().StatusMessage())
+		if statusCode >= 400 {
+			if err != nil {
+				span.RecordError(err)
+			}
+			span.SetStatus(codes.Error, statusText)
 		} else {
-			span.SetStatus(trace.StatusOK, "OK")
+			span.SetStatus(codes.Ok, "OK")
 		}
 
 		return err
@@ -78,4 +84,3 @@ func (h *headerCarrier) Keys() []string {
 	}
 	return keys
 }
-

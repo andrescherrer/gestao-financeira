@@ -23,11 +23,11 @@ type LogEntry struct {
 		ID    string `json:"id,omitempty"`
 		Email string `json:"email,omitempty"`
 	} `json:"user,omitempty"`
-	RequestID  string `json:"request_id,omitempty"`
-	TraceID    string `json:"trace_id,omitempty"`
-	SpanID     string `json:"span_id,omitempty"`
-	URL        string `json:"url,omitempty"`
-	UserAgent  string `json:"user_agent,omitempty"`
+	RequestID   string `json:"request_id,omitempty"`
+	TraceID     string `json:"trace_id,omitempty"`
+	SpanID      string `json:"span_id,omitempty"`
+	URL         string `json:"url,omitempty"`
+	UserAgent   string `json:"user_agent,omitempty"`
 	Environment string `json:"environment,omitempty"`
 }
 
@@ -101,18 +101,21 @@ func (h *LogHandler) SubmitLogs(c *fiber.Ctx) error {
 			logger = logger.Interface("context", entry.Context)
 		}
 
+		// Get the logger instance
+		loggerInstance := logger.Logger()
+
 		// Log based on level
 		switch entry.Level {
 		case "debug":
-			logger.Logger().Debug().Msg(entry.Message)
+			loggerInstance.Debug().Msg(entry.Message)
 		case "info":
-			logger.Logger().Info().Msg(entry.Message)
+			loggerInstance.Info().Msg(entry.Message)
 		case "warn":
-			logger.Logger().Warn().Msg(entry.Message)
+			loggerInstance.Warn().Msg(entry.Message)
 		case "error":
-			logger.Logger().Error().Msg(entry.Message)
+			loggerInstance.Error().Msg(entry.Message)
 		default:
-			logger.Logger().Info().Msg(entry.Message)
+			loggerInstance.Info().Msg(entry.Message)
 		}
 	}
 
@@ -121,4 +124,3 @@ func (h *LogHandler) SubmitLogs(c *fiber.Ctx) error {
 		"count":   len(req.Logs),
 	})
 }
-

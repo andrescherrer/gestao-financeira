@@ -10,15 +10,14 @@ import (
 	"gestao-financeira/backend/pkg/database"
 
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
 // CheckResult represents the result of a health check
 type CheckResult struct {
-	Status      string                 `json:"status"`      // "healthy", "unhealthy", "degraded"
-	Message     string                 `json:"message,omitempty"`
-	Details     map[string]interface{} `json:"details,omitempty"`
-	ResponseTime string                `json:"response_time,omitempty"`
+	Status       string                 `json:"status"` // "healthy", "unhealthy", "degraded"
+	Message      string                 `json:"message,omitempty"`
+	Details      map[string]interface{} `json:"details,omitempty"`
+	ResponseTime string                 `json:"response_time,omitempty"`
 }
 
 // AdvancedHealthChecker provides advanced health check capabilities
@@ -80,14 +79,14 @@ func (a *AdvancedHealthChecker) DetailedHealthCheck(c *fiber.Ctx) error {
 	responseTime := time.Since(start)
 
 	response := fiber.Map{
-		"status":       overallStatus,
-		"service":      "gestao-financeira",
-		"version":      a.version,
-		"uptime_seconds": int(time.Since(a.startTime).Seconds()),
-		"uptime":       formatUptime(time.Since(a.startTime)),
-		"timestamp":    time.Now().Format(time.RFC3339),
-		"checks":       checks,
-		"system":       systemInfo,
+		"status":           overallStatus,
+		"service":          "gestao-financeira",
+		"version":          a.version,
+		"uptime_seconds":   int(time.Since(a.startTime).Seconds()),
+		"uptime":           formatUptime(time.Since(a.startTime)),
+		"timestamp":        time.Now().Format(time.RFC3339),
+		"checks":           checks,
+		"system":           systemInfo,
 		"response_time_ms": responseTime.Milliseconds(),
 	}
 
@@ -98,7 +97,7 @@ func (a *AdvancedHealthChecker) DetailedHealthCheck(c *fiber.Ctx) error {
 func (a *AdvancedHealthChecker) checkDatabase() CheckResult {
 	start := time.Now()
 	result := CheckResult{
-		Status: "healthy",
+		Status:  "healthy",
 		Details: make(map[string]interface{}),
 	}
 
@@ -270,13 +269,13 @@ func (a *AdvancedHealthChecker) getSystemInfo() map[string]interface{} {
 	runtime.ReadMemStats(&m)
 
 	return map[string]interface{}{
-		"go_version":      runtime.Version(),
-		"go_os":           runtime.GOOS,
-		"go_arch":         runtime.GOARCH,
-		"num_cpu":         runtime.NumCPU(),
-		"num_goroutines":  runtime.NumGoroutine(),
+		"go_version":     runtime.Version(),
+		"go_os":          runtime.GOOS,
+		"go_arch":        runtime.GOARCH,
+		"num_cpu":        runtime.NumCPU(),
+		"num_goroutines": runtime.NumGoroutine(),
 		"uptime_seconds": int(time.Since(a.startTime).Seconds()),
-		"uptime":          formatUptime(time.Since(a.startTime)),
+		"uptime":         formatUptime(time.Since(a.startTime)),
 	}
 }
 
@@ -301,4 +300,3 @@ func formatUptime(duration time.Duration) string {
 func (a *AdvancedHealthChecker) StartTime() time.Time {
 	return a.startTime
 }
-
