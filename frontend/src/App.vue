@@ -1,6 +1,7 @@
 <template>
   <router-view />
   <Toaster />
+  <PWAUpdatePrompt />
 </template>
 
 <script setup lang="ts">
@@ -10,6 +11,7 @@ import { useAuthStore } from '@/stores/auth'
 import { authService } from '@/api/auth'
 import { Toaster } from '@/components/ui/toast'
 import { useTheme } from '@/composables/useTheme'
+import PWAUpdatePrompt from '@/components/PWAUpdatePrompt.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

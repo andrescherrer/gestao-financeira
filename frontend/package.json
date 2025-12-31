@@ -19,7 +19,8 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix --cache",
-    "format": "prettier --write --experimental-cli src/"
+    "format": "prettier --write --experimental-cli src/",
+    "generate-pwa-icons": "node scripts/generate-pwa-icons.js"
   },
   "dependencies": {
     "@primevue/themes": "^4.5.4",
@@ -72,9 +73,11 @@
     "prettier": "3.6.2",
     "serve": "^14.2.5",
     "shadcn-vue": "^2.4.3",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.1.18",
     "typescript": "~5.9.0",
     "vite": "^7.2.4",
+    "vite-plugin-pwa": "^1.2.0",
     "vite-plugin-vue-devtools": "^8.0.5",
     "vitest": "^4.0.14",
     "vue-tsc": "^3.1.5"
