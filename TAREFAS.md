@@ -64,6 +64,10 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **CI-003** (2025-12-31): ✅ Deploy Automático (Staging) - Completo
 - **CI-004** (2025-12-31): ✅ CI/CD para Frontend - Completo
 - **CI-005** (2025-12-31): ✅ Deploy Frontend (Vercel/Netlify) - Completo
+- **FE-TEST-002** (2025-12-31): ✅ Testes Unitários para Componentes - Completo
+- **FE-TEST-004** (2025-12-31): ✅ Configurar Playwright para E2E - Completo
+- **FE-TEST-005** (2025-12-31): ✅ Criar Testes E2E Principais - Completo
+- **FE-TEST-006** (2025-12-31): ✅ Testes de Acessibilidade - Completo
 
 ### 📈 Progresso
 - **Fase 1 (Fundação e MVP)**: ✅ 100% concluído
