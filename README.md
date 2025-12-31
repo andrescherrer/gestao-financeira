@@ -1,6 +1,6 @@
 # Sistema de Gestão Financeira
 
-Sistema de gestão financeira pessoal e profissional desenvolvido em **Go** (backend) e **Next.js** (frontend) seguindo **Domain-Driven Design (DDD)**.
+Sistema de gestão financeira pessoal e profissional desenvolvido em **Go** (backend) e **Vue 3** (frontend) seguindo **Domain-Driven Design (DDD)**.
 
 ## 🚀 Stack Tecnológico
 
@@ -13,11 +13,13 @@ Sistema de gestão financeira pessoal e profissional desenvolvido em **Go** (bac
 - **Prometheus + Grafana** (monitoramento)
 
 ### Frontend
-- **Next.js 14+** com **TypeScript**
-- **shadcn/ui** (componentes UI)
+- **Vue 3** com **TypeScript**
+- **Vite** (build tool)
+- **PrimeVue** (componentes UI)
 - **Tailwind CSS** (styling)
 - **TanStack Query** (server state)
-- **React Hook Form + Zod** (formulários)
+- **Vee-Validate + Zod** (formulários)
+- **Pinia** (state management)
 
 ## 📁 Estrutura do Projeto
 
@@ -28,12 +30,18 @@ gestao-financeira/
 │   ├── internal/
 │   ├── pkg/
 │   └── migrations/
-├── frontend/             # Frontend Next.js
-│   ├── app/
-│   ├── components/
-│   └── lib/
+├── frontend/             # Frontend Vue 3
+│   ├── src/
+│   │   ├── components/
+│   │   ├── views/
+│   │   ├── stores/
+│   │   ├── api/
+│   │   └── utils/
+│   ├── public/
+│   └── cypress/
 ├── docs/                 # Documentação
-└── scripts/              # Scripts utilitários
+├── deploy/               # Scripts de deploy
+└── monitoring/           # Configurações de monitoramento
 ```
 
 ## 🛠️ Desenvolvimento
