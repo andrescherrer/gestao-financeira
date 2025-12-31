@@ -734,8 +734,8 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 |----|--------|------|------------|---------|--------------|--------|
 | GOAL-001 | Criar value objects para Goal | 🔵 | 🟡 | 4h | BE-001 | ✅ |
 | GOAL-002 | Criar entidade Goal | 🔵 | 🟡 | 6h | GOAL-001 | ✅ |
-| GOAL-003 | Implementar repositório e use cases | 🔵 | 🟡 | 8h | GOAL-002 | ⏳ |
-| GOAL-004 | Criar handlers e rotas | 🔵 | 🟡 | 4h | GOAL-003 | ⏳ |
+| GOAL-003 | Implementar repositório e use cases | 🔵 | 🟡 | 8h | GOAL-002 | ✅ |
+| GOAL-004 | Criar handlers e rotas | 🔵 | 🟡 | 4h | GOAL-003 | ✅ |
 | FE-GOAL-001 | Criar módulo de metas no frontend | 🟣 | 🟡 | 12h | GOAL-004 | ⏳ |
 
 **Entregável Sprint 5.2:** Módulo de metas completo
