@@ -13,8 +13,12 @@ describe('EmptyState - Accessibility', () => {
       },
       global: {
         stubs: {
-          Card: true,
-          CardContent: true,
+          Card: {
+            template: '<div><slot /></div>',
+          },
+          CardContent: {
+            template: '<div><slot /></div>',
+          },
           Button: true,
           RouterLink: true,
         },
@@ -35,8 +39,12 @@ describe('EmptyState - Accessibility', () => {
       },
       global: {
         stubs: {
-          Card: true,
-          CardContent: true,
+          Card: {
+            template: '<div><slot /></div>',
+          },
+          CardContent: {
+            template: '<div><slot /></div>',
+          },
           Button: true,
           RouterLink: true,
         },
@@ -60,8 +68,12 @@ describe('EmptyState - Accessibility', () => {
       },
       global: {
         stubs: {
-          Card: true,
-          CardContent: true,
+          Card: {
+            template: '<div><slot /></div>',
+          },
+          CardContent: {
+            template: '<div><slot /></div>',
+          },
           Button: {
             template: '<button><slot /></button>',
           },

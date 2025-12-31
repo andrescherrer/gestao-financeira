@@ -169,7 +169,9 @@ export function sanitizeText(text: string): string {
     return ''
   }
 
+  // Criar elemento temporário e definir innerHTML para parsear HTML
   const temp = document.createElement('div')
-  temp.textContent = text
-  return temp.textContent || ''
+  temp.innerHTML = text
+  // Usar textContent para extrair apenas o texto, removendo todas as tags
+  return temp.textContent || temp.innerText || ''
 }

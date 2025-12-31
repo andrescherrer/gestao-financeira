@@ -81,14 +81,25 @@ describe('ConfirmDialog - Accessibility', () => {
             template: '<div v-if="open"><slot /></div>',
             props: ['open'],
           },
-          DialogContent: true,
-          DialogHeader: true,
-          DialogTitle: true,
-          DialogDescription: true,
-          DialogFooter: true,
+          DialogContent: {
+            template: '<div><slot /></div>',
+          },
+          DialogHeader: {
+            template: '<div><slot /></div>',
+          },
+          DialogTitle: {
+            template: '<h2><slot /></h2>',
+          },
+          DialogDescription: {
+            template: '<p><slot /></p>',
+          },
+          DialogFooter: {
+            template: '<div><slot /></div>',
+          },
           Button: {
             template: '<button><slot /></button>',
           },
+          Loader2: true,
         },
       },
     })
