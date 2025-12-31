@@ -567,6 +567,16 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ---
 
+### Sprint 4.1.1: Observabilidade Frontend (Semana 14)
+
+| ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
+|----|--------|------|------------|---------|--------------|--------|
+| FE-OBS-001 | Implementar logging estruturado no frontend | 🟣 | 🟡 | 4h | OBS-005 | ⏳ |
+
+**Entregável Sprint 4.1.1:** Sistema de logging estruturado no frontend
+
+---
+
 ### Sprint 4.2: Segurança e Produção (Semana 14-15)
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |

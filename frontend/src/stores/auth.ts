@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authService } from '@/api/auth'
 import type { LoginRequest, RegisterRequest, User } from '@/api/types'
+import { logger } from '@/utils/logger'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -30,8 +31,12 @@ export const useAuthStore = defineStore('auth', () => {
       if (storedUser) {
         try {
           user.value = JSON.parse(storedUser)
+          // Atualizar contexto do usuário no logger
+          if (user.value) {
+            logger.setUserContext(user.value.user_id, user.value.email)
+          }
         } catch (error) {
-          console.error('Erro ao carregar dados do usuário do localStorage:', error)
+          logger.error('Erro ao carregar dados do usuário do localStorage', error)
           user.value = null
         }
       }
@@ -209,10 +214,9 @@ export const useAuthStore = defineStore('auth', () => {
       
       // Para outros erros HTTP (500, 502, 503, etc), por segurança limpamos
       // Pois não podemos garantir que o token é válido sem uma resposta bem-sucedida do backend
-      console.error('[Auth] Erro HTTP ao validar token:', {
+      logger.error('Erro HTTP ao validar token', error, {
         status: error.response?.status,
         statusText: error.response?.statusText,
-        message: error.message,
       })
       logout()
       isValidated.value = true
@@ -237,6 +241,14 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = response.user
       // Marcar como validado após login bem-sucedido
       isValidated.value = true
+      
+      // Atualizar contexto do usuário no logger
+      logger.setUserContext(response.user.user_id, response.user.email)
+      logger.info('Login realizado com sucesso', {
+        userId: response.user.user_id,
+        email: response.user.email,
+      })
+      
       return response
     } catch (error) {
       // Limpar token em caso de erro
@@ -261,6 +273,12 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function logout() {
+    // Log logout
+    logger.info('Logout realizado', {
+      userId: user.value?.user_id,
+      email: user.value?.email,
+    })
+    
     // Remover token primeiro
     authService.removeToken()
     // Remover dados do usuário do localStorage
@@ -293,10 +311,13 @@ export const useAuthStore = defineStore('auth', () => {
       }),
     ]).catch(err => {
       // Log mas não falha se alguma store não existir
-      if (import.meta.env.DEV) {
-        console.warn('[Auth] Erro ao limpar stores:', err)
-      }
+      logger.warn('Erro ao limpar stores', {
+        error: err,
+      })
     })
+    
+    // Limpar contexto do usuário no logger
+    logger.setUserContext(null, null)
   }
 
   return {

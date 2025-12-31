@@ -33,6 +33,7 @@ import (
 	"gestao-financeira/backend/internal/shared/infrastructure/eventbus"
 	sharedhandlers "gestao-financeira/backend/internal/shared/infrastructure/handlers"
 	sharedpersistence "gestao-financeira/backend/internal/shared/infrastructure/persistence"
+	sharedloghandlers "gestao-financeira/backend/internal/shared/presentation/handlers"
 	transactionusecases "gestao-financeira/backend/internal/transaction/application/usecases"
 	transactionpersistence "gestao-financeira/backend/internal/transaction/infrastructure/persistence"
 	transactionhandlers "gestao-financeira/backend/internal/transaction/presentation/handlers"
@@ -452,8 +453,12 @@ func main() {
 		// Setup budget routes (protected)
 		budgetroutes.SetupBudgetRoutes(api, budgetHandler, jwtService, userRepository, cacheService)
 
-		// Setup report routes (protected)
+			// Setup report routes (protected)
 		reportroutes.SetupReportRoutes(api, reportHandler, jwtService, userRepository, cacheService)
+
+		// Setup log routes (public endpoint for frontend logs)
+		logHandler := sharedloghandlers.NewLogHandler()
+		api.Post("/logs", logHandler.SubmitLogs)
 	}
 
 	// Get port from configuration

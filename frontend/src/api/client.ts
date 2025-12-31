@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance, type AxiosError } from 'axios'
 import { env } from '@/config/env'
+import { logger } from '@/utils/logger'
 
 /**
  * Cliente HTTP configurado
@@ -21,35 +22,41 @@ apiClient.interceptors.request.use(
       const trimmedToken = token.trim()
       if (trimmedToken) {
         config.headers.Authorization = `Bearer ${trimmedToken}`
-        // Debug: log apenas em desenvolvimento
-        if (import.meta.env.DEV) {
-          console.log('[API Client] Token adicionado ao header:', {
-            url: config.url,
-            hasToken: !!trimmedToken,
-            tokenLength: trimmedToken.length,
-          })
-        }
+        // Log token adicionado
+        logger.debug('Token adicionado ao header', {
+          url: config.url,
+          hasToken: !!trimmedToken,
+          tokenLength: trimmedToken.length,
+        })
       } else {
-        console.warn('[API Client] Token encontrado mas está vazio após trim')
+        logger.warn('Token encontrado mas está vazio após trim')
       }
     } else {
-      // Debug: log apenas em desenvolvimento
-      if (import.meta.env.DEV && config.url && !config.url.includes('/auth/')) {
-        console.warn('[API Client] Requisição sem token:', {
+      // Log requisição sem token (apenas para rotas protegidas)
+      if (config.url && !config.url.includes('/auth/')) {
+        logger.debug('Requisição sem token', {
           url: config.url,
           hasToken: !!token,
         })
       }
     }
 
-    // Log do body em desenvolvimento para POST/PUT/PATCH
-    if (import.meta.env.DEV && config.data && (config.method === 'post' || config.method === 'put' || config.method === 'patch')) {
-      console.log('[API Client] Request body:', {
+    // Log do body para POST/PUT/PATCH
+    if (config.data && (config.method === 'post' || config.method === 'put' || config.method === 'patch')) {
+      logger.debug('Request body', {
         url: config.url,
         method: config.method?.toUpperCase(),
         data: config.data,
-        dataString: JSON.stringify(config.data, null, 2),
       })
+    }
+
+    // Capturar correlation IDs dos headers de resposta anteriores
+    const requestId = config.headers?.['X-Request-ID'] as string
+    const traceId = config.headers?.['X-Trace-ID'] as string
+    const spanId = config.headers?.['X-Span-ID'] as string
+    
+    if (requestId || traceId || spanId) {
+      logger.setCorrelationIds(requestId, traceId, spanId)
     }
 
     return config
@@ -63,23 +70,33 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    // Log detalhado do erro em desenvolvimento
-    if (import.meta.env.DEV) {
-      const errorData = error.response?.data
-      console.error('[API Client] Erro na requisição:', {
-        url: error.config?.url,
-        method: error.config?.method?.toUpperCase(),
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        message: error.message,
-        code: error.code,
-        isNetworkError: !error.response, // Erro de rede (sem resposta do servidor)
-        isTimeout: error.code === 'ECONNABORTED',
-        errorType: (errorData as any)?.error_type,
-        requestId: (errorData as any)?.request_id,
-        errorDetails: (errorData as any)?.details,
-      })
+    // Log detalhado do erro
+    const errorData = error.response?.data as any
+    const isNetworkError = !error.response
+    const isTimeout = error.code === 'ECONNABORTED'
+
+    // Capturar correlation IDs da resposta
+    if (error.response) {
+      const requestId = error.response.headers['x-request-id']
+      const traceId = error.response.headers['x-trace-id']
+      const spanId = error.response.headers['x-span-id']
+      if (requestId || traceId || spanId) {
+        logger.setCorrelationIds(requestId, traceId, spanId)
+      }
     }
+
+    logger.error('Erro na requisição', error, {
+      url: error.config?.url,
+      method: error.config?.method?.toUpperCase(),
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      code: error.code,
+      isNetworkError,
+      isTimeout,
+      errorType: errorData?.error_type,
+      requestId: errorData?.request_id,
+      errorDetails: errorData?.details,
+    })
 
     // Tratar erros de autenticação (401 ou 403)
     if (error.response?.status === 401 || error.response?.status === 403) {
@@ -113,19 +130,16 @@ apiClient.interceptors.response.use(
     // Isso inclui: Failed to fetch, Network Error, timeout, etc.
     if (!error.response) {
       // Log do erro de rede
-      if (import.meta.env.DEV) {
-        console.error('[API Client] Erro de rede:', {
-          url: error.config?.url,
-          message: error.message,
-          code: error.code,
-          possibleCauses: [
-            'Backend não está rodando',
-            'Problema de conectividade',
-            'CORS bloqueando requisição',
-            'Timeout da requisição',
-          ],
-        })
-      }
+      logger.error('Erro de rede', error, {
+        url: error.config?.url,
+        code: error.code,
+        possibleCauses: [
+          'Backend não está rodando',
+          'Problema de conectividade',
+          'CORS bloqueando requisição',
+          'Timeout da requisição',
+        ],
+      })
       
       // Se for um erro de rede e estivermos em uma rota protegida,
       // não limpar o token automaticamente (pode ser problema temporário)
