@@ -19,10 +19,14 @@ docs/planejamento/
 │   ├── README.md
 │   ├── PLANEJAMENTO_NODE.md
 │   └── EXPLICACAO_NODE.md
-└── PHP/
+├── PHP/
+│    ├── README.md
+│    ├── PLANEJAMENTO_PHP.md
+│    └── EXPLICACAO_PHP.md
+└── python/
     ├── README.md
-    ├── PLANEJAMENTO_PHP.md
-    └── EXPLICACAO_PHP.md
+    ├── PLANEJAMENTO_PYTHON.md
+    └── EXPLICACAO_PYTHON.md
 ```
 
 ## Arquivos Principais
@@ -37,7 +41,7 @@ docs/planejamento/
 
 ### Planejamentos Específicos por Stack
 
-Cada pasta (GO, NODE, PHP) contém:
+Cada pasta (GO, NODE, PHP, python) contém:
 
 1. **PLANEJAMENTO_[STACK].md** - Planejamento completo e detalhado para a stack específica, incluindo:
    - Stack tecnológico completo
@@ -67,16 +71,17 @@ Cada pasta (GO, NODE, PHP) contém:
 
 ## Comparação entre Stacks
 
-| Aspecto | Go | Node.js | PHP |
-|---------|----|---------|-----|
-| **Framework** | Fiber | NestJS | Laravel/Symfony |
-| **ORM** | GORM | Prisma | Eloquent/Doctrine |
-| **Performance** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Produtividade** | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Type Safety** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **Ecossistema** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Curva de Aprendizado** | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **DDD Nativo** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Aspecto | Go | Node.js | PHP | Python |
+|---------|----|---------|-----|--------|
+| **Framework** | Fiber | NestJS | Laravel/Symfony | FastAPI |
+| **ORM** | GORM | Prisma | Eloquent/Doctrine | SQLAlchemy/Tortoise |
+| **Performance** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Produtividade** | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **Type Safety** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Ecossistema** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **Curva de Aprendizado** | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **DDD Nativo** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
+| **ML/IA** | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ |
 
 ## Como Usar
 
@@ -87,9 +92,11 @@ Cada pasta (GO, NODE, PHP) contém:
 
 ## Status do Projeto
 
-O projeto atual está implementado em **Go** (conforme código existente). Os planejamentos para Node.js e PHP foram criados para:
+O projeto atual está implementado em **Go** (conforme código existente). Os planejamentos para Node.js, PHP e Python foram criados para:
 - Comparação entre stacks
 - Possível migração futura
 - Aprendizado e referência
 - Decisões arquiteturais
+
+**Nota Especial - Python:** O planejamento Python inclui a **feature completa de upload e análise automática de comprovantes** integrada desde o início, aproveitando o ecossistema rico de ML/IA do Python.
 
