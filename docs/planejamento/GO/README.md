@@ -6,6 +6,8 @@ Esta pasta contém a documentação de planejamento específica para a implement
 
 - **PLANEJAMENTO_GO.md** - Planejamento completo e detalhado para implementação em Go com Fiber, GORM, seguindo DDD
 - **EXPLICACAO_GO.md** - Explicação e resumo do PLANEJAMENTO_GO.md, destacando os principais pontos e estrutura
+- **RECEIPT_SCANNING.md** - Planejamento completo para upload de comprovantes e análise automática via OCR/IA
+- **RECEIPT_SCANNING_COMPARISON.md** - Comparação detalhada entre soluções (Nativa Go, N8N, Híbrida)
 
 ## Stack Tecnológico
 
@@ -31,4 +33,15 @@ O planejamento inclui:
 - Versionamento de API
 - Auditoria e compliance
 - Multi-tenancy
+
+## Funcionalidades Especiais
+
+### Upload e Análise Automática de Comprovantes
+
+- **RECEIPT_SCANNING.md** - Planejamento completo para upload de comprovantes e análise automática via OCR/IA
+- **RECEIPT_SCANNING_COMPARISON.md** - Comparação detalhada entre soluções (Nativa Go, N8N, Híbrida)
+
+**Funcionalidade:** Upload de imagens de comprovantes → OCR → Análise com IA → Criação automática de transações
+
+**Recomendação:** Usar N8N + APIs (Google Vision + OpenAI GPT-4) para maior precisão e velocidade de implementação.
 

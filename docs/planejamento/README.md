@@ -12,7 +12,9 @@ docs/planejamento/
 ├── GO/
 │   ├── README.md
 │   ├── PLANEJAMENTO_GO.md
-│   └── EXPLICACAO_GO.md
+│   ├── EXPLICACAO_GO.md
+│   ├── RECEIPT_SCANNING.md
+│   └── RECEIPT_SCANNING_COMPARISON.md
 ├── NODE/
 │   ├── README.md
 │   ├── PLANEJAMENTO_NODE.md
@@ -81,6 +83,7 @@ Cada pasta (GO, NODE, PHP) contém:
 1. **Para entender a arquitetura geral**: Leia `PLANEJAMENTO.md`
 2. **Para escolher uma stack**: Leia os `EXPLICACAO_[STACK].md` de cada pasta
 3. **Para implementar**: Use o `PLANEJAMENTO_[STACK].md` correspondente como guia completo
+
 
 ## Status do Projeto
 
