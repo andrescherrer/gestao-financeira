@@ -59,6 +59,11 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **HEALTH-001** (2025-12-31): ✅ Health Check Avançado - Completo
 - **SEC-001** (2025-12-31): ✅ Headers de Segurança (Helmet-like) - Completo
 - **SEC-006** (2025-12-31): ✅ Revisão e Melhoria de Validações de Segurança - Completo
+- **CI-001** (2025-12-31): ✅ GitHub Actions para Testes - Completo
+- **CI-002** (2025-12-31): ✅ Build e Push de Docker Image - Completo
+- **CI-003** (2025-12-31): ✅ Deploy Automático (Staging) - Completo
+- **CI-004** (2025-12-31): ✅ CI/CD para Frontend - Completo
+- **CI-005** (2025-12-31): ✅ Deploy Frontend (Vercel/Netlify) - Completo
 
 ### 📈 Progresso
 - **Fase 1 (Fundação e MVP)**: ✅ 100% concluído
