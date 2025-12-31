@@ -1,0 +1,94 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ develop ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - 'staging'
+          - 'production'
+
+env:
+  REGISTRY: docker.io
+  BACKEND_IMAGE: gestao-financeira-backend
+  FRONTEND_IMAGE: gestao-financeira-frontend
+
+jobs:
+  deploy-backend-staging:
+    name: Deploy Backend to Staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    environment:
+      name: staging
+      url: ${{ secrets.STAGING_API_URL || 'https://api-staging.example.com' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Pull latest image
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.BACKEND_IMAGE }}:develop || true
+      
+      - name: Deploy to staging
+        run: |
+          echo "Deploying backend to staging environment"
+          echo "Image: ${{ secrets.DOCKER_USERNAME }}/${{ env.BACKEND_IMAGE }}:develop"
+          # Add your deployment commands here
+          # Example: kubectl, docker-compose, ssh, etc.
+          # kubectl set image deployment/api api=${{ secrets.DOCKER_USERNAME }}/${{ env.BACKEND_IMAGE }}:develop -n staging
+        continue-on-error: true
+      
+      - name: Health check
+        run: |
+          echo "Waiting for deployment to be ready..."
+          sleep 10
+          # Add health check command
+          # curl -f ${{ secrets.STAGING_API_URL }}/health || exit 1
+        continue-on-error: true
+
+  deploy-frontend-staging:
+    name: Deploy Frontend to Staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    environment:
+      name: staging
+      url: ${{ secrets.STAGING_FRONTEND_URL || 'https://staging.example.com' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Pull latest image
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.FRONTEND_IMAGE }}:develop || true
+      
+      - name: Deploy to staging
+        run: |
+          echo "Deploying frontend to staging environment"
+          echo "Image: ${{ secrets.DOCKER_USERNAME }}/${{ env.FRONTEND_IMAGE }}:develop"
+          # Add your deployment commands here
+        continue-on-error: true
+
