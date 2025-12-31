@@ -465,11 +465,63 @@
 - ✅ `backend/pkg/health/advanced_test.go` - Testes unitários
 - ✅ Endpoint `/health/detailed` adicionado
 
-**Arquivo:** `backend/pkg/health/health.go`
+**Arquivos:**
+- ✅ `backend/pkg/health/advanced.go` - Health check avançado
+- ✅ `backend/pkg/health/advanced_test.go` - Testes unitários
+- ✅ Endpoint `/health/detailed` adicionado
 
 ---
 
-#### 19. ✅ Logging Estruturado no Frontend
+#### 19. ✅ Headers de Segurança (Helmet-like)
+**Problema:** Falta de headers de segurança  
+**Impacto:** Segurança  
+**Esforço:** 2h  
+**Benefício:** Proteção contra ataques comuns
+
+**Status:** ✅ **IMPLEMENTADO**
+
+**Implementação:**
+- ✅ Middleware de security headers implementado
+- ✅ Headers essenciais: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection
+- ✅ Headers de política: Referrer-Policy, Permissions-Policy, Content-Security-Policy
+- ✅ HSTS (Strict-Transport-Security) em produção
+- ✅ X-Permitted-Cross-Domain-Policies
+- ✅ Testes unitários implementados
+
+**Arquivos:**
+- ✅ `backend/pkg/middleware/security_headers.go` - Middleware de security headers
+- ✅ `backend/pkg/middleware/security_headers_test.go` - Testes unitários
+- ✅ Integrado no `main.go`
+
+---
+
+#### 20. ✅ Revisão e Melhoria de Validações de Segurança
+**Problema:** Validações de segurança básicas  
+**Impacto:** Segurança  
+**Esforço:** 4h  
+**Benefício:** Proteção contra injection attacks
+
+**Status:** ✅ **IMPLEMENTADO**
+
+**Implementação:**
+- ✅ Validações anti-SQL injection
+- ✅ Validações anti-XSS
+- ✅ Validações anti-path traversal
+- ✅ Validação de força de senha (3 de 4 tipos de caracteres)
+- ✅ Validação de UTF-8
+- ✅ Função de sanitização de strings
+- ✅ Validações aplicadas em todos os DTOs principais
+- ✅ Mensagens de erro personalizadas
+- ✅ Testes unitários implementados
+
+**Arquivos:**
+- ✅ `backend/pkg/validator/security.go` - Módulo de validações de segurança
+- ✅ `backend/pkg/validator/security_test.go` - Testes unitários
+- ✅ DTOs atualizados: RegisterUserInput, CreateTransactionInput, CreateAccountInput, CreateCategoryInput
+
+---
+
+#### 21. ✅ Logging Estruturado no Frontend
 **Problema:** Logs apenas com console.log  
 **Impacto:** Debug em produção  
 **Esforço:** 4-6h  
