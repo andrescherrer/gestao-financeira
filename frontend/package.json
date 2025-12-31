@@ -23,7 +23,6 @@
     "generate-pwa-icons": "node scripts/generate-pwa-icons.js"
   },
   "dependencies": {
-    "@primevue/themes": "^4.5.4",
     "@sentry/tracing": "^7.120.4",
     "@sentry/vue": "^10.32.1",
     "@tanstack/vue-query": "^5.92.1",
@@ -37,8 +36,6 @@
     "jspdf": "^3.0.4",
     "lucide-vue-next": "^0.562.0",
     "pinia": "^3.0.4",
-    "primeicons": "^7.0.0",
-    "primevue": "^4.5.4",
     "reka-ui": "^2.7.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
