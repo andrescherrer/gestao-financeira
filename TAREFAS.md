@@ -46,6 +46,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **OBS-001 a OBS-007** (2025-12-30): ✅ Observabilidade Completa - Prometheus, OpenTelemetry, Grafana, Structured Logging - Completo
 - **API-DOC-002** (2025-12-30): ✅ Documentação de API Melhorada (Postman Collection) - Completo
 - **FE-OBS-001** (2025-12-31): ✅ Logging Estruturado no Frontend - Completo
+- **HEALTH-001** (2025-12-31): ✅ Health Check Avançado - Completo
 
 ### 📈 Progresso
 - **Fase 1 (Fundação e MVP)**: ✅ 100% concluído
@@ -586,7 +587,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | SEC-002 | Implementar rate limiting robusto | 🔵 | 🔴 | 4h | PERF-005 | ⏳ |
 | SEC-003 | Configurar CORS para produção | 🔵 | 🔴 | 2h | BE-003 | ⏳ |
 | SEC-004 | Implementar graceful shutdown | 🔵 | 🔴 | 4h | BE-003 | ⏳ |
-| HEALTH-001 | Implementar health check avançado | 🔵 | 🔴 | 4h | BE-005 | ⏳ |
+| HEALTH-001 | Implementar health check avançado | 🔵 | 🔴 | 4h | BE-005 | ✅ |
 | SEC-006 | Revisar e melhorar validações de segurança | 🔵 | 🟡 | 4h | VAL-001 | ⏳ |
 
 **Entregável Sprint 4.2:** Sistema seguro e pronto para produção
