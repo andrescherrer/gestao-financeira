@@ -35,7 +35,9 @@ import (
 	investmenthandlers "gestao-financeira/backend/internal/investment/presentation/handlers"
 	investmentroutes "gestao-financeira/backend/internal/investment/presentation/routes"
 	notificationusecases "gestao-financeira/backend/internal/notification/application/usecases"
+	notificationevents "gestao-financeira/backend/internal/notification/infrastructure/events"
 	notificationpersistence "gestao-financeira/backend/internal/notification/infrastructure/persistence"
+	notificationwebsocket "gestao-financeira/backend/internal/notification/infrastructure/websocket"
 	notificationhandlers "gestao-financeira/backend/internal/notification/presentation/handlers"
 	notificationroutes "gestao-financeira/backend/internal/notification/presentation/routes"
 	reportingusecases "gestao-financeira/backend/internal/reporting/application/usecases"
@@ -223,6 +225,7 @@ func main() {
 	eventBus.Subscribe("TransactionDeleted", eventLoggerHandler.Handle)
 	eventBus.Subscribe("BudgetCreated", eventLoggerHandler.Handle)
 	eventBus.Subscribe("BudgetDeleted", eventLoggerHandler.Handle)
+	eventBus.Subscribe("NotificationCreated", eventLoggerHandler.Handle)
 
 	// Initialize cache service (optional - continues without cache if Redis is unavailable)
 	var cacheService *cache.CacheService
@@ -265,6 +268,17 @@ func main() {
 	goalRepository := goalpersistence.NewGormGoalRepository(db)
 
 	notificationRepository := notificationpersistence.NewGormNotificationRepository(db)
+
+	// Initialize WebSocket hub for notifications
+	notificationHub := notificationwebsocket.NewHub()
+	go notificationHub.Run()
+
+	// Initialize WebSocket notification service
+	notificationService := notificationwebsocket.NewNotificationService(notificationHub)
+
+	// Initialize notification event handler for WebSocket
+	notificationEventHandler := notificationevents.NewNotificationEventHandler(notificationService)
+	eventBus.Subscribe("NotificationCreated", notificationEventHandler.HandleNotificationCreated)
 
 	// Initialize services
 	jwtService := services.NewJWTServiceWithConfig(
@@ -408,6 +422,7 @@ func main() {
 		archiveNotificationUseCase,
 		deleteNotificationUseCase,
 	)
+	websocketHandler := notificationhandlers.NewWebSocketHandler(notificationHub, jwtService)
 	reportHandler := reporthandlers.NewReportHandler(
 		monthlyReportUseCase,
 		annualReportUseCase,
@@ -533,7 +548,7 @@ func main() {
 		goalroutes.SetupGoalRoutes(api, goalHandler, jwtService, userRepository, cacheService)
 
 		// Setup notification routes (protected)
-		notificationroutes.SetupNotificationRoutes(api, notificationHandler, jwtService, userRepository, cacheService)
+		notificationroutes.SetupNotificationRoutes(api, notificationHandler, websocketHandler, jwtService, userRepository, cacheService)
 
 		// Setup report routes (protected)
 		reportroutes.SetupReportRoutes(api, reportHandler, jwtService, userRepository, cacheService)

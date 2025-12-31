@@ -11,7 +11,7 @@ import (
 )
 
 // SetupNotificationRoutes configures notification routes.
-func SetupNotificationRoutes(router fiber.Router, notificationHandler *handlers.NotificationHandler, jwtService *services.JWTService, userRepository repositories.UserRepository, cacheService *cache.CacheService) {
+func SetupNotificationRoutes(router fiber.Router, notificationHandler *handlers.NotificationHandler, websocketHandler *handlers.WebSocketHandler, jwtService *services.JWTService, userRepository repositories.UserRepository, cacheService *cache.CacheService) {
 	notifications := router.Group("/notifications")
 
 	// Apply authentication middleware to all notification routes
@@ -30,4 +30,7 @@ func SetupNotificationRoutes(router fiber.Router, notificationHandler *handlers.
 		notifications.Post("/:id/archive", notificationHandler.Archive)
 		notifications.Delete("/:id", notificationHandler.Delete)
 	}
+
+	// WebSocket route (no auth middleware needed, authentication is handled in the handler)
+	router.Get("/ws/notifications", websocketHandler.HandleWebSocket)
 }
