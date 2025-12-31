@@ -220,6 +220,51 @@ export interface ListInvestmentsResponse {
   }
 }
 
+export interface Goal {
+  goal_id: string
+  user_id: string
+  name: string
+  target_amount: string
+  current_amount: string
+  currency: 'BRL' | 'USD' | 'EUR'
+  deadline: string
+  context: 'PERSONAL' | 'BUSINESS'
+  status: 'IN_PROGRESS' | 'COMPLETED' | 'OVERDUE' | 'CANCELLED'
+  progress: number
+  remaining_days: number
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateGoalRequest {
+  name: string
+  target_amount: number
+  currency: 'BRL' | 'USD' | 'EUR'
+  deadline: string // YYYY-MM-DD
+  context: 'PERSONAL' | 'BUSINESS'
+}
+
+export interface AddContributionRequest {
+  amount: number
+}
+
+export interface UpdateProgressRequest {
+  amount: number
+}
+
+export interface ListGoalsResponse {
+  goals: Goal[]
+  count: number
+  pagination?: {
+    page: number
+    limit: number
+    total: number
+    total_pages: number
+    has_next: boolean
+    has_prev: boolean
+  }
+}
+
 // Re-export report types from reports.ts
 export type {
   MonthlyReport,

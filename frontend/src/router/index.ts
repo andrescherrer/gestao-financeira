@@ -107,6 +107,24 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/goals',
+      name: 'goals',
+      component: () => import(/* webpackChunkName: "goals" */ '@/views/GoalsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/goals/new',
+      name: 'new-goal',
+      component: () => import(/* webpackChunkName: "goals" */ '@/views/NewGoalView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/goals/:id',
+      name: 'goal-details',
+      component: () => import(/* webpackChunkName: "goals" */ '@/views/GoalDetailsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/reports',
       name: 'reports',
       component: () => import(/* webpackChunkName: "reports" */ '@/views/ReportsView.vue'),

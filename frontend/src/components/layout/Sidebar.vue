@@ -129,6 +129,24 @@
           </li>
           <li>
             <RouterLink
+              to="/goals"
+              class="group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
+              :class="
+                $route.name === 'goals' ||
+                $route.name === 'new-goal' ||
+                $route.name === 'goal-details'
+                  ? 'bg-accent text-accent-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+              "
+            >
+              <div class="flex items-center gap-3">
+                <Target class="h-4 w-4" />
+                <span>Metas</span>
+              </div>
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink
               to="/reports"
               class="group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
               :class="
