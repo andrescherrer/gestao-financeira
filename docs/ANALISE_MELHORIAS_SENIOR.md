@@ -547,7 +547,7 @@
 
 ---
 
-#### 20. Documentação de Arquitetura
+#### 22. Documentação de Arquitetura
 **Problema:** Documentação técnica espalhada  
 **Impacto:** Onboarding e manutenção  
 **Esforço:** 8-12h  
