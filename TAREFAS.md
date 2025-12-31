@@ -659,11 +659,11 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
 | FE-TEST-001 | Configurar Vitest e React Testing Library | 🟤 | 🟡 | 4h | FE-001 | ✅ |
-| FE-TEST-002 | Criar testes unitários para componentes | 🟤 | 🟡 | 8h | FE-TEST-001 | ⏳ |
-| FE-TEST-003 | Criar testes de integração frontend-backend | 🟤 | 🟡 | 8h | FE-TEST-001 | ⏳ |
-| FE-TEST-004 | Configurar Playwright para E2E | 🟤 | 🟡 | 4h | FE-001 | ⏳ |
-| FE-TEST-005 | Criar testes E2E principais | 🟤 | 🟡 | 8h | FE-TEST-004 | ⏳ |
-| FE-TEST-006 | Testes de acessibilidade | 🟤 | 🟢 | 4h | FE-TEST-001 | ⏳ |
+| FE-TEST-002 | Criar testes unitários para componentes | 🟤 | 🟡 | 8h | FE-TEST-001 | ✅ |
+| FE-TEST-003 | Criar testes de integração frontend-backend | 🟤 | 🟡 | 8h | FE-TEST-001 | ✅ |
+| FE-TEST-004 | Configurar Playwright para E2E | 🟤 | 🟡 | 4h | FE-001 | ✅ |
+| FE-TEST-005 | Criar testes E2E principais | 🟤 | 🟡 | 8h | FE-TEST-004 | ✅ |
+| FE-TEST-006 | Testes de acessibilidade | 🟤 | 🟢 | 4h | FE-TEST-001 | ✅ |
 
 **Entregável Sprint 4.4:** Suite de testes frontend completa
 
