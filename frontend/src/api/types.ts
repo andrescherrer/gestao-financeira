@@ -278,3 +278,32 @@ export type {
   PeriodSummary,
 } from './reports'
 
+// Notification types
+export interface Notification {
+  notification_id: string
+  user_id: string
+  title: string
+  message: string
+  type: 'INFO' | 'WARNING' | 'SUCCESS' | 'ERROR'
+  status: 'UNREAD' | 'READ' | 'ARCHIVED'
+  read_at?: string | null
+  metadata?: Record<string, any>
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateNotificationRequest {
+  title: string
+  message: string
+  type: 'INFO' | 'WARNING' | 'SUCCESS' | 'ERROR'
+  metadata?: Record<string, any>
+}
+
+export interface ListNotificationsResponse {
+  notifications: Notification[]
+  total: number
+  page: number
+  page_size: number
+  total_pages: number
+}
+

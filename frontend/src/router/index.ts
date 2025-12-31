@@ -113,6 +113,18 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/notifications',
+      name: 'notifications',
+      component: () => import(/* webpackChunkName: "notifications" */ '@/views/NotificationsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/notifications/:id',
+      name: 'notification-details',
+      component: () => import(/* webpackChunkName: "notifications" */ '@/views/NotificationDetailsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/goals/new',
       name: 'new-goal',
       component: () => import(/* webpackChunkName: "goals" */ '@/views/NewGoalView.vue'),
