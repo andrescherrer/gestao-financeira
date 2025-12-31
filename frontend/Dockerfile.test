@@ -1,16 +1,46 @@
-FROM node:20-alpine
+FROM node:20-slim
 
 WORKDIR /app
+
+# Install Cypress system dependencies
+# Using Debian slim which has better compatibility with Cypress
+RUN apt-get update && apt-get install -y \
+    xvfb \
+    libgtk-3-0 \
+    libgbm-dev \
+    libnotify-dev \
+    libgconf-2-4 \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libxtst6 \
+    xauth \
+    xfonts-base \
+    xfonts-75dpi \
+    fonts-liberation \
+    fonts-noto-color-emoji \
+    ca-certificates \
+    curl \
+    wget \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables for Cypress
+ENV DISPLAY=:99
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies (including Cypress)
 RUN npm ci
 
 # Copy source code
 COPY . .
 
-# Default command - run tests
+# Note: Cypress verification is skipped during build (no display available)
+# It will be verified during test execution with Xvfb
+
+# Default command - run unit tests
+# For E2E: npm run test:e2e (with Xvfb started in docker-compose)
 CMD ["npm", "run", "test:unit"]
 
