@@ -695,7 +695,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | DEPLOY-002 | Documentação de deploy | ⚪ | 🔴 | 4h | DEPLOY-001 | ✅ |
 | OPT-001 | Otimizar queries do banco de dados | 🔵 | 🟡 | 4h | PERF-006 | ✅ |
 | OPT-003 | Otimizar bundle size do frontend | 🟣 | 🟡 | 4h | FE-001 | ✅ |
-| OPT-004 | Configurar error tracking (Sentry) | 🟣 | 🟡 | 4h | FE-001 | ⏳ |
+| OPT-004 | Configurar error tracking (Sentry) | 🟣 | 🟡 | 4h | FE-001 | ✅ |
 | OPT-005 | Configurar PWA (opcional) | 🟣 | 🟢 | 6h | FE-001 | ⏳ |
 
 **Entregável Sprint 4.5:** Sistema deployado em produção
