@@ -52,5 +52,5 @@ go run cmd/api/main.go
 
 ## 📚 Documentação
 
-Veja o [PLANEJAMENTO_GO.md](../../docs/planejamento/PLANEJAMENTO_GO.md) para mais detalhes sobre a arquitetura.
+Veja o [PLANEJAMENTO_GO.md](../../docs/planejamento/GO/PLANEJAMENTO_GO.md) para mais detalhes sobre a arquitetura.
 

@@ -46,7 +46,7 @@ Bem-vindo à documentação completa do Sistema de Gestão Financeira.
 - [Documentação da API](./api/README.md) - Postman collection e documentação da API
 
 ### 📅 Planejamento
-- [Planejamento Completo](./planejamento/PLANEJAMENTO_GO.md) - Planejamento detalhado do projeto
+- [Planejamento Completo](./planejamento/GO/PLANEJAMENTO_GO.md) - Planejamento detalhado do projeto
 
 ### ✅ Tarefas Concluídas
 - [Tarefas Concluídas](./tarefas_concluidas/) - Histórico de todas as tarefas concluídas
