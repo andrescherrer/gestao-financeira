@@ -639,6 +639,13 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 **Entregável Sprint 4.3:** Pipeline CI/CD completo
 
+**Status:** ✅ **COMPLETO**
+- ✅ GitHub Actions para testes implementado (CI-001)
+- ✅ Build e push de Docker image implementado (CI-002)
+- ✅ Deploy automático (staging) implementado (CI-003)
+- ✅ CI/CD para frontend implementado (CI-004)
+- ✅ Deploy frontend (Vercel/Netlify) implementado (CI-005)
+
 ---
 
 ### Sprint 4.4: Testes Frontend (Semana 15-16)
