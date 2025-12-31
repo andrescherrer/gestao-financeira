@@ -6,11 +6,13 @@ Sistema de gestão financeira pessoal e profissional desenvolvido em **Node.js c
 
 **Stack Principal:**
 - **Backend**: Node.js 20+ LTS com NestJS 10+ (framework web)
-- **Frontend**: Next.js 14+ com TypeScript, shadcn/ui e Tailwind CSS
+- **Frontend**: Vue 3 com TypeScript (já existente - reutilizar) ⚠️ Ver seção 3.3
 - **Banco de Dados**: PostgreSQL
 - **Cache**: Redis (cache e rate limiting)
 - **ORM**: Prisma 5+ (type-safe)
 - **Observabilidade**: OpenTelemetry, Prometheus + Grafana
+
+> ⚠️ **NOTA:** O projeto já possui um frontend Vue 3 funcional. Não é necessário criar novo frontend. Veja seção 3.3 para detalhes de compatibilidade.
 
 **Diferenciais:**
 - Type-safety excepcional (TypeScript + Prisma)
@@ -21,7 +23,11 @@ Sistema de gestão financeira pessoal e profissional desenvolvido em **Node.js c
 
 ## 1. Visão Geral
 
-Sistema de gestão financeira pessoal e profissional desenvolvido em **Node.js com TypeScript** (backend) e **Next.js** (frontend) com Domain-Driven Design (DDD), aproveitando o type-safety, DDD nativo do NestJS e ecossistema moderno. O frontend é desenvolvido **incrementalmente**, sempre que um módulo do backend estiver pronto, utilizando **shadcn/ui** para interfaces modernas e acessíveis. Projetado para **alta performance I/O** e **escalabilidade**, com potencial para evoluir para produto comercial.
+Sistema de gestão financeira pessoal e profissional desenvolvido em **Node.js com TypeScript** (backend) seguindo Domain-Driven Design (DDD), aproveitando o type-safety, DDD nativo do NestJS e ecossistema moderno. 
+
+> ⚠️ **IMPORTANTE:** O projeto já possui um **frontend Vue 3** completamente funcional e independente. Este frontend deve ser **reutilizado** sem modificações, apenas configurando a URL da API. Veja seção 3.3 para detalhes de compatibilidade.
+
+Projetado para **alta performance I/O** e **escalabilidade**, com potencial para evoluir para produto comercial.
 
 ## 2. Objetivos
 
@@ -400,6 +406,117 @@ export class AppModule {}
 - ⚠️ **Runtime overhead** - JavaScript tem overhead
 - ⚠️ **Memory** - Pode consumir mais que Go
 
+### 3.3. Compatibilidade com Frontend Vue 3 Existente
+
+**✅ IMPORTANTE:** O projeto já possui um frontend Vue 3 completamente funcional e independente do backend. **NÃO é necessário criar um novo frontend** para Node.js.
+
+#### 3.3.1. Por que o Frontend Vue 3 é Reutilizável?
+
+O frontend Vue 3 atual foi desenvolvido de forma **desacoplada** do backend, comunicando-se exclusivamente via **API REST**. Isso significa:
+
+- ✅ **Arquitetura independente**: Frontend não depende da tecnologia do backend
+- ✅ **Comunicação via HTTP/JSON**: Qualquer backend que implemente a mesma API funciona
+- ✅ **Configuração via variáveis de ambiente**: Apenas muda a URL da API
+- ✅ **Zero alterações no código**: O frontend Vue 3 funciona sem modificações
+
+#### 3.3.2. Requisitos de Compatibilidade da API
+
+Para que o frontend Vue 3 existente funcione com o backend Node.js/NestJS, é necessário implementar a **mesma interface de API REST**:
+
+**Endpoints Principais:**
+```
+POST   /api/v1/auth/register
+POST   /api/v1/auth/login
+GET    /api/v1/auth/me
+POST   /api/v1/transactions
+GET    /api/v1/transactions
+GET    /api/v1/transactions/:id
+PUT    /api/v1/transactions/:id
+DELETE /api/v1/transactions/:id
+GET    /api/v1/accounts
+POST   /api/v1/accounts
+GET    /api/v1/categories
+POST   /api/v1/categories
+GET    /api/v1/budgets
+POST   /api/v1/budgets
+GET    /api/v1/reports/monthly
+... (outros endpoints conforme necessário)
+```
+
+**Formato de Request/Response:**
+- Content-Type: `application/json`
+- Autenticação: JWT Bearer Token (header `Authorization: Bearer <token>`)
+- Formato de resposta padronizado:
+  ```json
+  {
+    "data": { ... },
+    "message": "Success",
+    "status": 200
+  }
+  ```
+- Códigos de status HTTP padronizados (200, 201, 400, 401, 404, 500, etc.)
+
+**Autenticação:**
+- JWT tokens com mesma estrutura de payload
+- Refresh tokens (se implementado)
+- Mesmos headers de autenticação
+
+#### 3.3.3. Configuração do Frontend para Node.js
+
+Para usar o frontend Vue 3 com o backend Node.js/NestJS, apenas configure a variável de ambiente:
+
+```bash
+# .env ou .env.local no frontend
+VITE_API_URL=http://localhost:3000/api/v1
+```
+
+Ou no `docker-compose.yml`:
+```yaml
+frontend:
+  environment:
+    - VITE_API_URL=http://node-backend:3000/api/v1
+```
+
+**Nenhuma alteração no código do frontend é necessária!**
+
+#### 3.3.4. Vantagens dessa Abordagem
+
+1. **Migração facilitada**: Trocar de backend Go para Node.js é apenas implementar a API
+2. **Reutilização total**: Frontend Vue 3 já desenvolvido e testado
+3. **Economia de tempo**: Não precisa desenvolver novo frontend
+4. **Consistência**: Mesma experiência de usuário independente do backend
+5. **Testes**: Frontend já testado e validado com a API
+
+#### 3.3.5. Checklist de Compatibilidade
+
+Ao implementar o backend Node.js/NestJS, garanta:
+
+- [ ] Todos os endpoints da API implementados
+- [ ] Mesmo formato de request/response JSON
+- [ ] Mesma estrutura de autenticação JWT
+- [ ] Mesmos códigos de status HTTP
+- [ ] Mesmas validações e mensagens de erro
+- [ ] CORS configurado corretamente
+- [ ] Headers de segurança compatíveis
+- [ ] Paginação implementada (se aplicável)
+- [ ] Filtros e ordenação (se aplicável)
+
+#### 3.3.6. Documentação da API
+
+O projeto Go atual possui documentação Swagger/OpenAPI em `/docs/swagger.json`. Use essa documentação como referência para garantir compatibilidade:
+
+- Endpoints exatos
+- Parâmetros de request
+- Estrutura de response
+- Códigos de erro
+- Validações
+
+**Referência:** `backend/docs/swagger.json` ou `http://localhost:8080/docs/swagger/index.html`
+
+#### 3.3.7. Nota sobre a Seção "Stack Tecnológico Frontend"
+
+A seção "4. Stack Tecnológico Frontend" neste documento menciona Next.js como opção de frontend. Isso é apenas uma **referência teórica** para novos projetos. Para este projeto específico, **reutilize o frontend Vue 3 existente** conforme descrito acima.
+
 ## 4. Arquitetura DDD em NestJS
 
 ### 4.1. Estrutura em Camadas (NestJS)
@@ -430,9 +547,13 @@ export class AppModule {}
 
 ## 4. Stack Tecnológico Frontend
 
-### 4.1. Abordagem de Desenvolvimento
+> ⚠️ **NOTA IMPORTANTE:** Esta seção descreve uma abordagem teórica para novos projetos. Para este projeto específico, **reutilize o frontend Vue 3 existente** conforme descrito na seção 3.3 (Compatibilidade com Frontend Vue 3 Existente). O frontend Vue 3 atual é completamente compatível e não requer desenvolvimento adicional.
 
-O frontend será desenvolvido **incrementalmente**, sempre que um módulo do backend estiver pronto. Esta abordagem permite:
+### 4.1. Abordagem de Desenvolvimento (Referência Teórica)
+
+> Esta seção é apenas para referência. O frontend Vue 3 existente deve ser reutilizado.
+
+O frontend seria desenvolvido **incrementalmente**, sempre que um módulo do backend estiver pronto. Esta abordagem permite:
 
 - ✅ **Validação rápida**: Testar funcionalidades assim que o backend estiver disponível
 - ✅ **Feedback contínuo**: Identificar problemas de integração cedo

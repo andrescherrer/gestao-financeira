@@ -4,6 +4,8 @@
 
 Sistema de gestão financeira pessoal e profissional desenvolvido em **PHP 8.2+** usando **Laravel** ou **Symfony**, aproveitando a produtividade, ecossistema maduro e performance do PHP 8.x com JIT.
 
+> ⚠️ **IMPORTANTE:** O projeto já possui um **frontend Vue 3** completamente funcional e independente. Este frontend deve ser **reutilizado** sem modificações, apenas configurando a URL da API. Veja seção 3.3 para detalhes de compatibilidade.
+
 ## 2. Objetivos
 
 - Controle total de finanças pessoais e profissionais
@@ -60,6 +62,113 @@ Sistema de gestão financeira pessoal e profissional desenvolvido em **PHP 8.2+*
 - ⚠️ **DDD menos comum** - Menos exemplos/práticas DDD
 - ⚠️ **Type safety** - PHP 8+ melhorou, mas não é TypeScript
 - ⚠️ **Performance absoluta** - Ainda abaixo de Go
+
+### 3.3. Compatibilidade com Frontend Vue 3 Existente
+
+**✅ IMPORTANTE:** O projeto já possui um frontend Vue 3 completamente funcional e independente do backend. **NÃO é necessário criar um novo frontend** para PHP.
+
+#### 3.3.1. Por que o Frontend Vue 3 é Reutilizável?
+
+O frontend Vue 3 atual foi desenvolvido de forma **desacoplada** do backend, comunicando-se exclusivamente via **API REST**. Isso significa:
+
+- ✅ **Arquitetura independente**: Frontend não depende da tecnologia do backend
+- ✅ **Comunicação via HTTP/JSON**: Qualquer backend que implemente a mesma API funciona
+- ✅ **Configuração via variáveis de ambiente**: Apenas muda a URL da API
+- ✅ **Zero alterações no código**: O frontend Vue 3 funciona sem modificações
+
+#### 3.3.2. Requisitos de Compatibilidade da API
+
+Para que o frontend Vue 3 existente funcione com o backend PHP, é necessário implementar a **mesma interface de API REST**:
+
+**Endpoints Principais:**
+```
+POST   /api/v1/auth/register
+POST   /api/v1/auth/login
+GET    /api/v1/auth/me
+POST   /api/v1/transactions
+GET    /api/v1/transactions
+GET    /api/v1/transactions/:id
+PUT    /api/v1/transactions/:id
+DELETE /api/v1/transactions/:id
+GET    /api/v1/accounts
+POST   /api/v1/accounts
+GET    /api/v1/categories
+POST   /api/v1/categories
+GET    /api/v1/budgets
+POST   /api/v1/budgets
+GET    /api/v1/reports/monthly
+... (outros endpoints conforme necessário)
+```
+
+**Formato de Request/Response:**
+- Content-Type: `application/json`
+- Autenticação: JWT Bearer Token (header `Authorization: Bearer <token>`)
+- Formato de resposta padronizado:
+  ```json
+  {
+    "data": { ... },
+    "message": "Success",
+    "status": 200
+  }
+  ```
+- Códigos de status HTTP padronizados (200, 201, 400, 401, 404, 500, etc.)
+
+**Autenticação:**
+- JWT tokens com mesma estrutura de payload
+- Refresh tokens (se implementado)
+- Mesmos headers de autenticação
+
+#### 3.3.3. Configuração do Frontend para PHP
+
+Para usar o frontend Vue 3 com o backend PHP, apenas configure a variável de ambiente:
+
+```bash
+# .env ou .env.local no frontend
+VITE_API_URL=http://localhost:8000/api/v1
+```
+
+Ou no `docker-compose.yml`:
+```yaml
+frontend:
+  environment:
+    - VITE_API_URL=http://php-backend:8000/api/v1
+```
+
+**Nenhuma alteração no código do frontend é necessária!**
+
+#### 3.3.4. Vantagens dessa Abordagem
+
+1. **Migração facilitada**: Trocar de backend Go para PHP é apenas implementar a API
+2. **Reutilização total**: Frontend Vue 3 já desenvolvido e testado
+3. **Economia de tempo**: Não precisa desenvolver novo frontend
+4. **Consistência**: Mesma experiência de usuário independente do backend
+5. **Testes**: Frontend já testado e validado com a API
+
+#### 3.3.5. Checklist de Compatibilidade
+
+Ao implementar o backend PHP, garanta:
+
+- [ ] Todos os endpoints da API implementados
+- [ ] Mesmo formato de request/response JSON
+- [ ] Mesma estrutura de autenticação JWT
+- [ ] Mesmos códigos de status HTTP
+- [ ] Mesmas validações e mensagens de erro
+- [ ] CORS configurado corretamente
+- [ ] Headers de segurança compatíveis
+- [ ] Paginação implementada (se aplicável)
+- [ ] Filtros e ordenação (se aplicável)
+
+#### 3.3.6. Documentação da API
+
+O projeto Go atual possui documentação Swagger/OpenAPI em `/docs/swagger.json`. Use essa documentação como referência para garantir compatibilidade:
+
+- Endpoints exatos
+- Parâmetros de request
+- Estrutura de response
+- Códigos de erro
+- Validações
+
+**Referência:** `backend/docs/swagger.json` ou `http://localhost:8080/docs/swagger/index.html`
 
 ## 4. Arquitetura DDD em PHP
 
