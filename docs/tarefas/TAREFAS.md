@@ -721,7 +721,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | INV-001 | Criar value objects para Investment | 🔵 | 🟡 | 4h | BE-001 | ✅ |
 | INV-002 | Criar entidade Investment | 🔵 | 🟡 | 6h | INV-001 | ✅ |
 | INV-003 | Implementar repositório e use cases | 🔵 | 🟡 | 8h | INV-002 | ✅ |
-| INV-004 | Criar handlers e rotas | 🔵 | 🟡 | 4h | INV-003 | ⏳ |
+| INV-004 | Criar handlers e rotas | 🔵 | 🟡 | 4h | INV-003 | ✅ |
 | FE-INV-001 | Criar módulo de investimentos no frontend | 🟣 | 🟡 | 12h | INV-004 | ⏳ |
 
 **Entregável Sprint 5.1:** Módulo de investimentos completo
