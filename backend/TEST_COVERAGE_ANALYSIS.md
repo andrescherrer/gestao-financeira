@@ -1,5 +1,8 @@
 # Análise de Cobertura de Testes - Identity Context
 
+> ⚠️ **NOTA:** Este documento contém uma análise específica do Identity Context realizada em uma data anterior.  
+> As métricas podem estar desatualizadas. Para informações gerais sobre testes, consulte [TESTING_GUIDE.md](./TESTING_GUIDE.md).
+
 ## 📊 Métricas Atuais
 
 ### Cobertura por Componente
