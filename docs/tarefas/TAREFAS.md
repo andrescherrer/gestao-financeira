@@ -751,7 +751,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | NOT-003 | Criar handlers e rotas | 🔵 | 🟡 | 4h | NOT-002 | ✅ |
 | NOT-004 | Implementar WebSocket para notificações em tempo real | 🔵 | 🟡 | 8h | NOT-002 | ✅ |
 | FE-NOT-001 | Criar módulo de notificações no frontend | 🟣 | 🟡 | 8h | NOT-003 | ✅ |
-| FE-NOT-002 | Integrar WebSocket no frontend | 🟣 | 🟡 | 4h | FE-NOT-001, NOT-004 | ⏳ |
+| FE-NOT-002 | Integrar WebSocket no frontend | 🟣 | 🟡 | 4h | FE-NOT-001, NOT-004 | ✅ |
 
 **Entregável Sprint 5.3:** Sistema de notificações em tempo real
 
