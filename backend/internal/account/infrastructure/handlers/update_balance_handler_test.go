@@ -57,6 +57,9 @@ func (m *mockAccountRepositoryForBalanceHandler) Exists(id accountvalueobjects.A
 func (m *mockAccountRepositoryForBalanceHandler) Count(userID identityvalueobjects.UserID) (int64, error) {
 	return 0, nil
 }
+func (m *mockAccountRepositoryForBalanceHandler) FindByUserIDWithPagination(userID identityvalueobjects.UserID, context string, offset, limit int) ([]*entities.Account, int64, error) {
+	return nil, 0, nil
+}
 
 func TestUpdateBalanceHandler_HandleTransactionCreated(t *testing.T) {
 	tests := []struct {

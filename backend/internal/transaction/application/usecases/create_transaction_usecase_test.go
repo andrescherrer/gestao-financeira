@@ -153,6 +153,43 @@ func (m *mockTransactionRepository) FindByUserIDAndFiltersWithPagination(
 
 	return result, total, nil
 }
+func (m *mockTransactionRepository) FindByUserIDAndDateRange(userID identityvalueobjects.UserID, startDate, endDate time.Time) ([]*entities.Transaction, error) {
+	var result []*entities.Transaction
+	for _, tx := range m.transactions {
+		if tx.UserID().Value() == userID.Value() {
+			txDate := tx.Date()
+			if (txDate.Equal(startDate) || txDate.After(startDate)) && (txDate.Before(endDate) || txDate.Equal(endDate)) {
+				result = append(result, tx)
+			}
+		}
+	}
+	return result, nil
+}
+func (m *mockTransactionRepository) FindByUserIDAndDateRangeWithCurrency(userID identityvalueobjects.UserID, startDate, endDate time.Time, currency string) ([]*entities.Transaction, error) {
+	var result []*entities.Transaction
+	for _, tx := range m.transactions {
+		if tx.UserID().Value() == userID.Value() && tx.Amount().Currency().Code() == currency {
+			txDate := tx.Date()
+			if (txDate.Equal(startDate) || txDate.After(startDate)) && (txDate.Before(endDate) || txDate.Equal(endDate)) {
+				result = append(result, tx)
+			}
+		}
+	}
+	return result, nil
+}
+func (m *mockTransactionRepository) FindByUserIDWithPagination(userID identityvalueobjects.UserID, offset, limit int) ([]*entities.Transaction, int64, error) {
+	all, _ := m.FindByUserID(userID)
+	total := int64(len(all))
+	start := offset
+	end := offset + limit
+	if start > len(all) {
+		return []*entities.Transaction{}, total, nil
+	}
+	if end > len(all) {
+		end = len(all)
+	}
+	return all[start:end], total, nil
+}
 
 func TestCreateTransactionUseCase_Execute(t *testing.T) {
 	userID := identityvalueobjects.GenerateUserID()

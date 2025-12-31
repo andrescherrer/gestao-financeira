@@ -73,6 +73,33 @@ func (m *mockCategoryRepository) Count(userID identityvalueobjects.UserID) (int6
 	}
 	return count, nil
 }
+func (m *mockCategoryRepository) FindByUserIDAndSlug(userID identityvalueobjects.UserID, slug valueobjects.CategorySlug) (*entities.Category, error) {
+	for _, cat := range m.categories {
+		if cat.UserID().Equals(userID) && cat.Slug().Equals(slug) {
+			return cat, nil
+		}
+	}
+	return nil, nil
+}
+func (m *mockCategoryRepository) FindByUserIDWithPagination(userID identityvalueobjects.UserID, isActive *bool, offset, limit int) ([]*entities.Category, int64, error) {
+	all, _ := m.FindByUserID(userID)
+	var filtered []*entities.Category
+	for _, cat := range all {
+		if isActive == nil || cat.IsActive() == *isActive {
+			filtered = append(filtered, cat)
+		}
+	}
+	total := int64(len(filtered))
+	start := offset
+	end := offset + limit
+	if start > len(filtered) {
+		return []*entities.Category{}, total, nil
+	}
+	if end > len(filtered) {
+		end = len(filtered)
+	}
+	return filtered[start:end], total, nil
+}
 
 func TestCreateCategoryUseCase_Execute(t *testing.T) {
 	eventBus := eventbus.NewEventBus()

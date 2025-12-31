@@ -81,6 +81,15 @@ func (m *mockListTransactionRepository) FindByUserIDAndType(userID identityvalue
 	}
 	return m.mockTransactionRepository.FindByUserIDAndType(userID, transactionType)
 }
+func (m *mockListTransactionRepository) FindByUserIDAndDateRange(userID identityvalueobjects.UserID, startDate, endDate time.Time) ([]*entities.Transaction, error) {
+	return m.mockTransactionRepository.FindByUserIDAndDateRange(userID, startDate, endDate)
+}
+func (m *mockListTransactionRepository) FindByUserIDAndDateRangeWithCurrency(userID identityvalueobjects.UserID, startDate, endDate time.Time, currency string) ([]*entities.Transaction, error) {
+	return m.mockTransactionRepository.FindByUserIDAndDateRangeWithCurrency(userID, startDate, endDate, currency)
+}
+func (m *mockListTransactionRepository) FindByUserIDWithPagination(userID identityvalueobjects.UserID, offset, limit int) ([]*entities.Transaction, int64, error) {
+	return m.mockTransactionRepository.FindByUserIDWithPagination(userID, offset, limit)
+}
 
 func TestListTransactionsUseCase_Execute(t *testing.T) {
 	userID := identityvalueobjects.GenerateUserID()

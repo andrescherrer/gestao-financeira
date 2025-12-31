@@ -86,6 +86,25 @@ func (m *mockAccountRepositoryForHandler) Count(userID identityvalueobjects.User
 	}
 	return count, nil
 }
+func (m *mockAccountRepositoryForHandler) FindByUserIDWithPagination(userID identityvalueobjects.UserID, context string, offset, limit int) ([]*entities.Account, int64, error) {
+	all, _ := m.FindByUserID(userID)
+	var filtered []*entities.Account
+	for _, acc := range all {
+		if context == "" || acc.Context().Value() == context {
+			filtered = append(filtered, acc)
+		}
+	}
+	total := int64(len(filtered))
+	start := offset
+	end := offset + limit
+	if start > len(filtered) {
+		return []*entities.Account{}, total, nil
+	}
+	if end > len(filtered) {
+		end = len(filtered)
+	}
+	return filtered[start:end], total, nil
+}
 
 func TestAccountHandler_Create(t *testing.T) {
 	userID := "550e8400-e29b-41d4-a716-446655440000"
@@ -272,7 +291,7 @@ func TestAccountHandler_Get(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		accountID     string
+		accountID      string
 		expectedStatus int
 		expectedError  string
 	}{

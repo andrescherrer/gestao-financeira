@@ -71,6 +71,25 @@ func (m *mockCategoryRepository) Exists(id valueobjects.CategoryID) (bool, error
 	_, exists := m.categories[id.Value()]
 	return exists, nil
 }
+func (m *mockCategoryRepository) FindByUserIDWithPagination(userID identityvalueobjects.UserID, isActive *bool, offset, limit int) ([]*entities.Category, int64, error) {
+	all, _ := m.FindByUserID(userID)
+	var filtered []*entities.Category
+	for _, cat := range all {
+		if isActive == nil || cat.IsActive() == *isActive {
+			filtered = append(filtered, cat)
+		}
+	}
+	total := int64(len(filtered))
+	start := offset
+	end := offset + limit
+	if start > len(filtered) {
+		return []*entities.Category{}, total, nil
+	}
+	if end > len(filtered) {
+		end = len(filtered)
+	}
+	return filtered[start:end], total, nil
+}
 
 func (m *mockCategoryRepository) Count(userID identityvalueobjects.UserID) (int64, error) {
 	return int64(len(m.users[userID.Value()])), nil

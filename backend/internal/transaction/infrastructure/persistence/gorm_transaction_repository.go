@@ -62,13 +62,14 @@ func (r *GormTransactionRepository) FindByUserIDWithPagination(userID identityva
 	var models []TransactionModel
 	var total int64
 
-	// Count total
-	if err := r.db.Model(&TransactionModel{}).Where("user_id = ?", userID.Value()).Count(&total).Error; err != nil {
+	// Count total - optimized to use index
+	baseQuery := r.db.Model(&TransactionModel{}).Where("user_id = ?", userID.Value())
+	if err := baseQuery.Count(&total).Error; err != nil {
 		return nil, 0, fmt.Errorf("failed to count transactions: %w", err)
 	}
 
-	// Get paginated results
-	if err := r.db.Where("user_id = ?", userID.Value()).
+	// Get paginated results - use index idx_transactions_user_date
+	if err := baseQuery.
 		Order("date DESC, created_at DESC").
 		Offset(offset).
 		Limit(limit).
@@ -108,12 +109,15 @@ func (r *GormTransactionRepository) FindByUserIDAndFiltersWithPagination(
 		query = query.Where("type = ?", transactionType)
 	}
 
-	// Count total
+	// Count total - optimized to use appropriate index
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, fmt.Errorf("failed to count transactions: %w", err)
 	}
 
-	// Get paginated results
+	// Get paginated results - use appropriate index based on filters
+	// If type is specified, use idx_transactions_user_type_date
+	// If account is specified, use idx_transactions_account_date
+	// Otherwise, use idx_transactions_user_date
 	if err := query.
 		Order("date DESC, created_at DESC").
 		Offset(offset).
@@ -249,9 +253,15 @@ func (r *GormTransactionRepository) PermanentDelete(id transactionvalueobjects.T
 }
 
 // Exists checks if a transaction with the given ID already exists.
+// Optimized to check existence without loading full record.
 func (r *GormTransactionRepository) Exists(id transactionvalueobjects.TransactionID) (bool, error) {
 	var count int64
-	if err := r.db.Model(&TransactionModel{}).Where("id = ?", id.Value()).Count(&count).Error; err != nil {
+	// Use COUNT with LIMIT 1 hint for better performance
+	// PostgreSQL optimizer will use index and stop after first match
+	if err := r.db.Model(&TransactionModel{}).
+		Where("id = ?", id.Value()).
+		Limit(1).
+		Count(&count).Error; err != nil {
 		return false, fmt.Errorf("failed to check transaction existence: %w", err)
 	}
 
@@ -279,6 +289,7 @@ func (r *GormTransactionRepository) CountByAccountID(accountID accountvalueobjec
 }
 
 // FindActiveRecurringTransactions finds all active recurring transactions that need to be processed.
+// Optimized to use index idx_transactions_active_recurring.
 func (r *GormTransactionRepository) FindActiveRecurringTransactions() ([]*entities.Transaction, error) {
 	var models []TransactionModel
 	today := time.Now().Format("2006-01-02")
@@ -287,6 +298,7 @@ func (r *GormTransactionRepository) FindActiveRecurringTransactions() ([]*entiti
 	// - is_recurring = true
 	// - (recurrence_end_date IS NULL OR recurrence_end_date >= today)
 	// - parent_transaction_id IS NULL (only parent transactions, not generated instances)
+	// Uses index idx_transactions_active_recurring for optimal performance
 	query := r.db.Where("is_recurring = ? AND parent_transaction_id IS NULL", true).
 		Where("recurrence_end_date IS NULL OR recurrence_end_date >= ?", today)
 
@@ -312,9 +324,12 @@ func (r *GormTransactionRepository) FindByParentIDAndDate(
 	date time.Time,
 ) (*entities.Transaction, error) {
 	var model TransactionModel
-	dateStr := date.Format("2006-01-02")
+	// Normalize date to start of day for comparison (date field stores only date part)
+	dateStart := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+	dateEnd := dateStart.Add(24 * time.Hour)
 
-	if err := r.db.Where("parent_transaction_id = ? AND date = ?", parentID.Value(), dateStr).First(&model).Error; err != nil {
+	// Use date range to handle timezone differences
+	if err := r.db.Where("parent_transaction_id = ? AND date >= ? AND date < ?", parentID.Value(), dateStart, dateEnd).First(&model).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -322,6 +337,63 @@ func (r *GormTransactionRepository) FindByParentIDAndDate(
 	}
 
 	return r.toDomain(&model)
+}
+
+// FindByUserIDAndDateRange finds transactions for a given user within a date range.
+func (r *GormTransactionRepository) FindByUserIDAndDateRange(
+	userID identityvalueobjects.UserID,
+	startDate, endDate time.Time,
+) ([]*entities.Transaction, error) {
+	var models []TransactionModel
+	startDateStr := startDate.Format("2006-01-02")
+	endDateStr := endDate.Format("2006-01-02")
+
+	// Use index idx_transactions_user_date for optimal performance
+	if err := r.db.Where("user_id = ? AND date >= ? AND date <= ?", userID.Value(), startDateStr, endDateStr).
+		Order("date DESC, created_at DESC").
+		Find(&models).Error; err != nil {
+		return nil, fmt.Errorf("failed to find transactions by user ID and date range: %w", err)
+	}
+
+	transactions := make([]*entities.Transaction, 0, len(models))
+	for _, model := range models {
+		transaction, err := r.toDomain(&model)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert transaction model to domain: %w", err)
+		}
+		transactions = append(transactions, transaction)
+	}
+
+	return transactions, nil
+}
+
+// FindByUserIDAndDateRangeWithCurrency finds transactions for a given user within a date range and currency.
+func (r *GormTransactionRepository) FindByUserIDAndDateRangeWithCurrency(
+	userID identityvalueobjects.UserID,
+	startDate, endDate time.Time,
+	currency string,
+) ([]*entities.Transaction, error) {
+	var models []TransactionModel
+	startDateStr := startDate.Format("2006-01-02")
+	endDateStr := endDate.Format("2006-01-02")
+
+	// Use index idx_transactions_user_date for optimal performance
+	if err := r.db.Where("user_id = ? AND date >= ? AND date <= ? AND currency = ?", userID.Value(), startDateStr, endDateStr, currency).
+		Order("date DESC, created_at DESC").
+		Find(&models).Error; err != nil {
+		return nil, fmt.Errorf("failed to find transactions by user ID, date range and currency: %w", err)
+	}
+
+	transactions := make([]*entities.Transaction, 0, len(models))
+	for _, model := range models {
+		transaction, err := r.toDomain(&model)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert transaction model to domain: %w", err)
+		}
+		transactions = append(transactions, transaction)
+	}
+
+	return transactions, nil
 }
 
 // toDomain converts a TransactionModel to a Transaction entity.

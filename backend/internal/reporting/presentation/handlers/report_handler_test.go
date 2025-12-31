@@ -67,6 +67,36 @@ func (m *mockTransactionRepositoryForReports) FindActiveRecurringTransactions() 
 func (m *mockTransactionRepositoryForReports) FindByParentIDAndDate(parentID transactionvalueobjects.TransactionID, date time.Time) (*entities.Transaction, error) {
 	return nil, nil
 }
+func (m *mockTransactionRepositoryForReports) FindByUserIDAndDateRange(userID identityvalueobjects.UserID, startDate, endDate time.Time) ([]*entities.Transaction, error) {
+	var result []*entities.Transaction
+	for _, tx := range m.transactions {
+		if tx.UserID().Equals(userID) {
+			txDate := tx.Date()
+			if (txDate.Equal(startDate) || txDate.After(startDate)) && (txDate.Before(endDate) || txDate.Equal(endDate)) {
+				result = append(result, tx)
+			}
+		}
+	}
+	return result, nil
+}
+func (m *mockTransactionRepositoryForReports) FindByUserIDAndDateRangeWithCurrency(userID identityvalueobjects.UserID, startDate, endDate time.Time, currency string) ([]*entities.Transaction, error) {
+	var result []*entities.Transaction
+	for _, tx := range m.transactions {
+		if tx.UserID().Equals(userID) && tx.Amount().Currency().Code() == currency {
+			txDate := tx.Date()
+			if (txDate.Equal(startDate) || txDate.After(startDate)) && (txDate.Before(endDate) || txDate.Equal(endDate)) {
+				result = append(result, tx)
+			}
+		}
+	}
+	return result, nil
+}
+func (m *mockTransactionRepositoryForReports) FindByUserIDWithPagination(userID identityvalueobjects.UserID, offset, limit int) ([]*entities.Transaction, int64, error) {
+	return nil, 0, nil
+}
+func (m *mockTransactionRepositoryForReports) FindByUserIDAndFiltersWithPagination(userID identityvalueobjects.UserID, accountID string, transactionType string, offset, limit int) ([]*entities.Transaction, int64, error) {
+	return nil, 0, nil
+}
 
 func TestReportHandler_GetMonthlyReport(t *testing.T) {
 	// Create test data

@@ -138,6 +138,66 @@ func (m *mockTransactionRepository) FindByParentIDAndDate(parentID transactionva
 	}
 	return nil, nil
 }
+func (m *mockTransactionRepository) FindByUserIDAndDateRange(userID identityvalueobjects.UserID, startDate, endDate time.Time) ([]*entities.Transaction, error) {
+	var result []*entities.Transaction
+	for _, tx := range m.transactions {
+		if tx.UserID().Equals(userID) {
+			txDate := tx.Date()
+			if (txDate.Equal(startDate) || txDate.After(startDate)) && (txDate.Before(endDate) || txDate.Equal(endDate)) {
+				result = append(result, tx)
+			}
+		}
+	}
+	return result, nil
+}
+func (m *mockTransactionRepository) FindByUserIDAndDateRangeWithCurrency(userID identityvalueobjects.UserID, startDate, endDate time.Time, currency string) ([]*entities.Transaction, error) {
+	var result []*entities.Transaction
+	for _, tx := range m.transactions {
+		if tx.UserID().Equals(userID) && tx.Amount().Currency().Code() == currency {
+			txDate := tx.Date()
+			if (txDate.Equal(startDate) || txDate.After(startDate)) && (txDate.Before(endDate) || txDate.Equal(endDate)) {
+				result = append(result, tx)
+			}
+		}
+	}
+	return result, nil
+}
+func (m *mockTransactionRepository) FindByUserIDWithPagination(userID identityvalueobjects.UserID, offset, limit int) ([]*entities.Transaction, int64, error) {
+	all, _ := m.FindByUserID(userID)
+	total := int64(len(all))
+	start := offset
+	end := offset + limit
+	if start > len(all) {
+		return []*entities.Transaction{}, total, nil
+	}
+	if end > len(all) {
+		end = len(all)
+	}
+	return all[start:end], total, nil
+}
+func (m *mockTransactionRepository) FindByUserIDAndFiltersWithPagination(userID identityvalueobjects.UserID, accountID string, transactionType string, offset, limit int) ([]*entities.Transaction, int64, error) {
+	all, _ := m.FindByUserID(userID)
+	var filtered []*entities.Transaction
+	for _, tx := range all {
+		if accountID != "" && tx.AccountID().Value() != accountID {
+			continue
+		}
+		if transactionType != "" && tx.TransactionType().Value() != transactionType {
+			continue
+		}
+		filtered = append(filtered, tx)
+	}
+	total := int64(len(filtered))
+	start := offset
+	end := offset + limit
+	if start > len(filtered) {
+		return []*entities.Transaction{}, total, nil
+	}
+	if end > len(filtered) {
+		end = len(filtered)
+	}
+	return filtered[start:end], total, nil
+}
 
 func TestRecurringTransactionProcessor_ProcessRecurringTransactions(t *testing.T) {
 	eventBus := eventbus.NewEventBus()

@@ -37,9 +37,11 @@ func (r *GormAccountRepository) FindByID(id valueobjects.AccountID) (*entities.A
 }
 
 // FindByUserID finds all accounts for a given user.
+// Optimized to use index idx_accounts_user_active.
 func (r *GormAccountRepository) FindByUserID(userID identityvalueobjects.UserID) ([]*entities.Account, error) {
 	var models []AccountModel
-	if err := r.db.Where("user_id = ?", userID.Value()).Find(&models).Error; err != nil {
+	// Use index idx_accounts_user_active for optimal performance
+	if err := r.db.Where("user_id = ? AND deleted_at IS NULL", userID.Value()).Find(&models).Error; err != nil {
 		return nil, fmt.Errorf("failed to find accounts by user ID: %w", err)
 	}
 
@@ -132,9 +134,13 @@ func (r *GormAccountRepository) PermanentDelete(id valueobjects.AccountID) error
 }
 
 // Exists checks if an account with the given ID already exists.
+// Optimized to use LIMIT 1 for better performance.
 func (r *GormAccountRepository) Exists(id valueobjects.AccountID) (bool, error) {
 	var count int64
-	if err := r.db.Model(&AccountModel{}).Where("id = ?", id.Value()).Count(&count).Error; err != nil {
+	if err := r.db.Model(&AccountModel{}).
+		Where("id = ?", id.Value()).
+		Limit(1).
+		Count(&count).Error; err != nil {
 		return false, fmt.Errorf("failed to check account existence: %w", err)
 	}
 

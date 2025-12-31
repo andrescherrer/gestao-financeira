@@ -9,6 +9,7 @@ import (
 	"gestao-financeira/backend/internal/reporting/application/dtos"
 	reportingservices "gestao-financeira/backend/internal/reporting/infrastructure/services"
 	sharedvalueobjects "gestao-financeira/backend/internal/shared/domain/valueobjects"
+	"gestao-financeira/backend/internal/transaction/domain/entities"
 	"gestao-financeira/backend/internal/transaction/domain/repositories"
 	transactionvalueobjects "gestao-financeira/backend/internal/transaction/domain/valueobjects"
 )
@@ -64,39 +65,33 @@ func (uc *MonthlyReportUseCase) Execute(input dtos.MonthlyReportInput) (*dtos.Mo
 
 	// Create date range for the month
 	startDate := time.Date(input.Year, time.Month(input.Month), 1, 0, 0, 0, 0, time.UTC)
-	endDate := startDate.AddDate(0, 1, 0).Add(-time.Nanosecond) // Last moment of the month
+	endDate := startDate.AddDate(0, 1, 0).AddDate(0, 0, -1) // Last day of the month
 
-	// Get all transactions for the user
-	allTransactions, err := uc.transactionRepository.FindByUserID(userID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find transactions: %w", err)
+	// Get transactions for the user within date range (optimized query)
+	var transactions []*entities.Transaction
+	if input.Currency != "" {
+		// Filter by currency at database level
+		transactions, err = uc.transactionRepository.FindByUserIDAndDateRangeWithCurrency(userID, startDate, endDate, input.Currency)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find transactions: %w", err)
+		}
+	} else {
+		// Get all transactions in date range
+		transactions, err = uc.transactionRepository.FindByUserIDAndDateRange(userID, startDate, endDate)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find transactions: %w", err)
+		}
 	}
 
-	// Filter transactions by date range and currency (if specified)
+	// Process transactions
 	type transactionData struct {
 		Type     string
 		Amount   int64
 		Currency string
 	}
 
-	var filteredTransactions []transactionData
-
-	for _, tx := range allTransactions {
-		txDate := tx.Date()
-
-		// Check if transaction is within the month
-		if txDate.Before(startDate) || txDate.After(endDate) {
-			continue
-		}
-
-		// Filter by currency if specified
-		if input.Currency != "" {
-			currency, err := sharedvalueobjects.NewCurrency(input.Currency)
-			if err == nil && !tx.Amount().Currency().Equals(currency) {
-				continue
-			}
-		}
-
+	filteredTransactions := make([]transactionData, 0, len(transactions))
+	for _, tx := range transactions {
 		txType := tx.TransactionType()
 		amount := tx.Amount()
 

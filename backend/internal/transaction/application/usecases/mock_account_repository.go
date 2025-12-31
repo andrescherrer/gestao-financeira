@@ -81,6 +81,25 @@ func (m *mockAccountRepository) Count(userID identityvalueobjects.UserID) (int64
 	}
 	return count, nil
 }
+func (m *mockAccountRepository) FindByUserIDWithPagination(userID identityvalueobjects.UserID, context string, offset, limit int) ([]*entities.Account, int64, error) {
+	all, _ := m.FindByUserID(userID)
+	var filtered []*entities.Account
+	for _, acc := range all {
+		if context == "" || acc.Context().Value() == context {
+			filtered = append(filtered, acc)
+		}
+	}
+	total := int64(len(filtered))
+	start := offset
+	end := offset + limit
+	if start > len(filtered) {
+		return []*entities.Account{}, total, nil
+	}
+	if end > len(filtered) {
+		end = len(filtered)
+	}
+	return filtered[start:end], total, nil
+}
 
 // Helper function to create a test account with a specific ID
 func createTestAccountWithID(userID identityvalueobjects.UserID, accountID valueobjects.AccountID, initialBalance sharedvalueobjects.Money) (*entities.Account, error) {

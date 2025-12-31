@@ -38,9 +38,11 @@ func (r *GormBudgetRepository) FindByID(id valueobjects.BudgetID) (*entities.Bud
 }
 
 // FindByUserID finds all budgets for a given user.
+// Optimized to exclude soft-deleted records.
 func (r *GormBudgetRepository) FindByUserID(userID identityvalueobjects.UserID) ([]*entities.Budget, error) {
 	var models []BudgetModel
-	if err := r.db.Where("user_id = ?", userID.Value()).Find(&models).Error; err != nil {
+	// Exclude soft-deleted records for better performance
+	if err := r.db.Where("user_id = ? AND deleted_at IS NULL", userID.Value()).Find(&models).Error; err != nil {
 		return nil, fmt.Errorf("failed to find budgets by user ID: %w", err)
 	}
 
@@ -173,9 +175,13 @@ func (r *GormBudgetRepository) PermanentDelete(id valueobjects.BudgetID) error {
 }
 
 // Exists checks if a budget with the given ID already exists.
+// Optimized to use LIMIT 1 for better performance.
 func (r *GormBudgetRepository) Exists(id valueobjects.BudgetID) (bool, error) {
 	var count int64
-	if err := r.db.Model(&BudgetModel{}).Where("id = ?", id.Value()).Count(&count).Error; err != nil {
+	if err := r.db.Model(&BudgetModel{}).
+		Where("id = ?", id.Value()).
+		Limit(1).
+		Count(&count).Error; err != nil {
 		return false, fmt.Errorf("failed to check budget existence: %w", err)
 	}
 

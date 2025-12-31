@@ -56,4 +56,19 @@ type TransactionRepository interface {
 		transactionType string,
 		offset, limit int,
 	) ([]*entities.Transaction, int64, error)
+
+	// FindByUserIDAndDateRange finds transactions for a given user within a date range.
+	// Returns transactions filtered by startDate and endDate (inclusive).
+	FindByUserIDAndDateRange(
+		userID identityvalueobjects.UserID,
+		startDate, endDate time.Time,
+	) ([]*entities.Transaction, error)
+
+	// FindByUserIDAndDateRangeWithCurrency finds transactions for a given user within a date range and currency.
+	// Returns transactions filtered by startDate, endDate (inclusive), and currency.
+	FindByUserIDAndDateRangeWithCurrency(
+		userID identityvalueobjects.UserID,
+		startDate, endDate time.Time,
+		currency string,
+	) ([]*entities.Transaction, error)
 }

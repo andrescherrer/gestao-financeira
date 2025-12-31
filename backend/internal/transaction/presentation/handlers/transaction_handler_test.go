@@ -11,6 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	accountentities "gestao-financeira/backend/internal/account/domain/entities"
+	accountrepositories "gestao-financeira/backend/internal/account/domain/repositories"
 	accountvalueobjects "gestao-financeira/backend/internal/account/domain/valueobjects"
 	identityvalueobjects "gestao-financeira/backend/internal/identity/domain/valueobjects"
 	sharedvalueobjects "gestao-financeira/backend/internal/shared/domain/valueobjects"
@@ -18,6 +20,7 @@ import (
 	"gestao-financeira/backend/internal/transaction/application/dtos"
 	"gestao-financeira/backend/internal/transaction/application/usecases"
 	"gestao-financeira/backend/internal/transaction/domain/entities"
+	transactionrepositories "gestao-financeira/backend/internal/transaction/domain/repositories"
 	transactionvalueobjects "gestao-financeira/backend/internal/transaction/domain/valueobjects"
 )
 
@@ -137,6 +140,161 @@ func (m *mockTransactionRepositoryForHandler) CountByAccountID(accountID account
 	}
 	return count, nil
 }
+func (m *mockTransactionRepositoryForHandler) FindActiveRecurringTransactions() ([]*entities.Transaction, error) {
+	return nil, nil
+}
+func (m *mockTransactionRepositoryForHandler) FindByParentIDAndDate(parentID transactionvalueobjects.TransactionID, date time.Time) (*entities.Transaction, error) {
+	return nil, nil
+}
+func (m *mockTransactionRepositoryForHandler) FindByUserIDAndDateRange(userID identityvalueobjects.UserID, startDate, endDate time.Time) ([]*entities.Transaction, error) {
+	var result []*entities.Transaction
+	for _, tx := range m.transactions {
+		if tx.UserID().Value() == userID.Value() {
+			txDate := tx.Date()
+			if (txDate.Equal(startDate) || txDate.After(startDate)) && (txDate.Before(endDate) || txDate.Equal(endDate)) {
+				result = append(result, tx)
+			}
+		}
+	}
+	return result, nil
+}
+func (m *mockTransactionRepositoryForHandler) FindByUserIDAndDateRangeWithCurrency(userID identityvalueobjects.UserID, startDate, endDate time.Time, currency string) ([]*entities.Transaction, error) {
+	var result []*entities.Transaction
+	for _, tx := range m.transactions {
+		if tx.UserID().Value() == userID.Value() && tx.Amount().Currency().Code() == currency {
+			txDate := tx.Date()
+			if (txDate.Equal(startDate) || txDate.After(startDate)) && (txDate.Before(endDate) || txDate.Equal(endDate)) {
+				result = append(result, tx)
+			}
+		}
+	}
+	return result, nil
+}
+func (m *mockTransactionRepositoryForHandler) FindByUserIDWithPagination(userID identityvalueobjects.UserID, offset, limit int) ([]*entities.Transaction, int64, error) {
+	all, _ := m.FindByUserID(userID)
+	total := int64(len(all))
+	start := offset
+	end := offset + limit
+	if start > len(all) {
+		return []*entities.Transaction{}, total, nil
+	}
+	if end > len(all) {
+		end = len(all)
+	}
+	return all[start:end], total, nil
+}
+func (m *mockTransactionRepositoryForHandler) FindByUserIDAndFiltersWithPagination(userID identityvalueobjects.UserID, accountID string, transactionType string, offset, limit int) ([]*entities.Transaction, int64, error) {
+	all, _ := m.FindByUserID(userID)
+	var filtered []*entities.Transaction
+	for _, tx := range all {
+		if accountID != "" && tx.AccountID().Value() != accountID {
+			continue
+		}
+		if transactionType != "" && tx.TransactionType().Value() != transactionType {
+			continue
+		}
+		filtered = append(filtered, tx)
+	}
+	total := int64(len(filtered))
+	start := offset
+	end := offset + limit
+	if start > len(filtered) {
+		return []*entities.Transaction{}, total, nil
+	}
+	if end > len(filtered) {
+		end = len(filtered)
+	}
+	return filtered[start:end], total, nil
+}
+
+// mockUnitOfWorkForHandler is a mock implementation of UnitOfWork for handler testing.
+type mockUnitOfWorkForHandler struct {
+	transactionRepository *mockTransactionRepositoryForHandler
+	accountRepository     *mockAccountRepositoryForHandler
+}
+
+func newMockUnitOfWorkForHandler() *mockUnitOfWorkForHandler {
+	return &mockUnitOfWorkForHandler{
+		transactionRepository: newMockTransactionRepositoryForHandler(),
+		accountRepository:     newMockAccountRepositoryForHandler(),
+	}
+}
+
+func (m *mockUnitOfWorkForHandler) Begin() error {
+	return nil
+}
+
+func (m *mockUnitOfWorkForHandler) Commit() error {
+	return nil
+}
+
+func (m *mockUnitOfWorkForHandler) Rollback() error {
+	return nil
+}
+
+func (m *mockUnitOfWorkForHandler) TransactionRepository() transactionrepositories.TransactionRepository {
+	return m.transactionRepository
+}
+
+func (m *mockUnitOfWorkForHandler) AccountRepository() accountrepositories.AccountRepository {
+	return m.accountRepository
+}
+
+func (m *mockUnitOfWorkForHandler) IsInTransaction() bool {
+	return false
+}
+
+// mockAccountRepositoryForHandler is a mock implementation of AccountRepository for handler testing.
+type mockAccountRepositoryForHandler struct {
+	accounts map[string]*accountentities.Account
+}
+
+func newMockAccountRepositoryForHandler() *mockAccountRepositoryForHandler {
+	return &mockAccountRepositoryForHandler{
+		accounts: make(map[string]*accountentities.Account),
+	}
+}
+
+func (m *mockAccountRepositoryForHandler) FindByID(id accountvalueobjects.AccountID) (*accountentities.Account, error) {
+	return m.accounts[id.Value()], nil
+}
+
+func (m *mockAccountRepositoryForHandler) FindByUserID(userID identityvalueobjects.UserID) ([]*accountentities.Account, error) {
+	var result []*accountentities.Account
+	for _, acc := range m.accounts {
+		if acc.UserID().Value() == userID.Value() {
+			result = append(result, acc)
+		}
+	}
+	return result, nil
+}
+
+func (m *mockAccountRepositoryForHandler) FindByUserIDAndContext(userID identityvalueobjects.UserID, context sharedvalueobjects.AccountContext) ([]*accountentities.Account, error) {
+	return nil, nil
+}
+
+func (m *mockAccountRepositoryForHandler) Save(account *accountentities.Account) error {
+	m.accounts[account.ID().Value()] = account
+	return nil
+}
+
+func (m *mockAccountRepositoryForHandler) Delete(id accountvalueobjects.AccountID) error {
+	delete(m.accounts, id.Value())
+	return nil
+}
+
+func (m *mockAccountRepositoryForHandler) Exists(id accountvalueobjects.AccountID) (bool, error) {
+	_, exists := m.accounts[id.Value()]
+	return exists, nil
+}
+
+func (m *mockAccountRepositoryForHandler) Count(userID identityvalueobjects.UserID) (int64, error) {
+	return int64(len(m.accounts)), nil
+}
+
+func (m *mockAccountRepositoryForHandler) FindByUserIDWithPagination(userID identityvalueobjects.UserID, context string, offset, limit int) ([]*accountentities.Account, int64, error) {
+	return nil, 0, nil
+}
 
 func TestTransactionHandler_Create(t *testing.T) {
 	userID := "550e8400-e29b-41d4-a716-446655440000"
@@ -144,15 +302,15 @@ func TestTransactionHandler_Create(t *testing.T) {
 	date := time.Now().Format("2006-01-02")
 
 	app := fiber.New()
-	mockRepo := newMockTransactionRepositoryForHandler()
+	mockUOW := newMockUnitOfWorkForHandler()
 	eventBus := eventbus.NewEventBus()
-	createUseCase := usecases.NewCreateTransactionUseCase(mockRepo, eventBus)
-	listUseCase := usecases.NewListTransactionsUseCase(mockRepo)
-	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
-	updateUseCase := usecases.NewUpdateTransactionUseCase(mockRepo, eventBus)
-	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockRepo)
-	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockRepo)
+	createUseCase := usecases.NewCreateTransactionUseCase(mockUOW, eventBus)
+	listUseCase := usecases.NewListTransactionsUseCase(mockUOW.TransactionRepository())
+	getUseCase := usecases.NewGetTransactionUseCase(mockUOW.TransactionRepository())
+	updateUseCase := usecases.NewUpdateTransactionUseCase(mockUOW, eventBus)
+	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockUOW.TransactionRepository())
+	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockUOW.TransactionRepository())
 	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase, restoreUseCase, permanentDeleteUseCase)
 
 	app.Post("/transactions", func(c *fiber.Ctx) error {
@@ -196,7 +354,7 @@ func TestTransactionHandler_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Reset mock
-			mockRepo.transactions = make(map[string]*entities.Transaction)
+			mockUOW.transactionRepository.transactions = make(map[string]*entities.Transaction)
 
 			bodyJSON, _ := json.Marshal(tt.body)
 			req := httptest.NewRequest("POST", "/transactions", bytes.NewBuffer(bodyJSON))
@@ -229,14 +387,14 @@ func TestTransactionHandler_List(t *testing.T) {
 	accountID := accountvalueobjects.GenerateAccountID().Value()
 
 	app := fiber.New()
-	mockRepo := newMockTransactionRepositoryForHandler()
-	listUseCase := usecases.NewListTransactionsUseCase(mockRepo)
-	createUseCase := usecases.NewCreateTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
-	updateUseCase := usecases.NewUpdateTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockRepo)
-	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockRepo)
+	mockUOW := newMockUnitOfWorkForHandler()
+	listUseCase := usecases.NewListTransactionsUseCase(mockUOW.TransactionRepository())
+	createUseCase := usecases.NewCreateTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	getUseCase := usecases.NewGetTransactionUseCase(mockUOW.TransactionRepository())
+	updateUseCase := usecases.NewUpdateTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockUOW.TransactionRepository())
+	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockUOW.TransactionRepository())
 	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase, restoreUseCase, permanentDeleteUseCase)
 
 	app.Get("/transactions", func(c *fiber.Ctx) error {
@@ -249,10 +407,10 @@ func TestTransactionHandler_List(t *testing.T) {
 	accountIDVO, _ := accountvalueobjects.NewAccountID(accountID)
 	date := time.Now()
 	transaction1, _ := createTestTransactionForHandler(userIDVO, accountIDVO, "INCOME", 100.0, "BRL", "Test 1", date)
-	mockRepo.transactions[transaction1.ID().Value()] = transaction1
+	mockUOW.transactionRepository.transactions[transaction1.ID().Value()] = transaction1
 
 	transaction2, _ := createTestTransactionForHandler(userIDVO, accountIDVO, "EXPENSE", 50.0, "BRL", "Test 2", date)
-	mockRepo.transactions[transaction2.ID().Value()] = transaction2
+	mockUOW.transactionRepository.transactions[transaction2.ID().Value()] = transaction2
 
 	tests := []struct {
 		name           string
@@ -299,14 +457,14 @@ func TestTransactionHandler_Get(t *testing.T) {
 	accountID := accountvalueobjects.GenerateAccountID().Value()
 
 	app := fiber.New()
-	mockRepo := newMockTransactionRepositoryForHandler()
-	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
-	createUseCase := usecases.NewCreateTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	listUseCase := usecases.NewListTransactionsUseCase(mockRepo)
-	updateUseCase := usecases.NewUpdateTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockRepo)
-	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockRepo)
+	mockUOW := newMockUnitOfWorkForHandler()
+	getUseCase := usecases.NewGetTransactionUseCase(mockUOW.TransactionRepository())
+	createUseCase := usecases.NewCreateTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	listUseCase := usecases.NewListTransactionsUseCase(mockUOW.TransactionRepository())
+	updateUseCase := usecases.NewUpdateTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockUOW.TransactionRepository())
+	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockUOW.TransactionRepository())
 	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase, restoreUseCase, permanentDeleteUseCase)
 
 	app.Get("/transactions/:id", func(c *fiber.Ctx) error {
@@ -319,7 +477,7 @@ func TestTransactionHandler_Get(t *testing.T) {
 	accountIDVO, _ := accountvalueobjects.NewAccountID(accountID)
 	date := time.Now()
 	transaction, _ := createTestTransactionForHandler(userIDVO, accountIDVO, "INCOME", 100.0, "BRL", "Test", date)
-	mockRepo.transactions[transaction.ID().Value()] = transaction
+	mockUOW.transactionRepository.transactions[transaction.ID().Value()] = transaction
 
 	tests := []struct {
 		name           string
@@ -372,14 +530,14 @@ func TestTransactionHandler_Update(t *testing.T) {
 	accountID := accountvalueobjects.GenerateAccountID().Value()
 
 	app := fiber.New()
-	mockRepo := newMockTransactionRepositoryForHandler()
-	updateUseCase := usecases.NewUpdateTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	createUseCase := usecases.NewCreateTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	listUseCase := usecases.NewListTransactionsUseCase(mockRepo)
-	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
-	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockRepo)
-	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockRepo)
+	mockUOW := newMockUnitOfWorkForHandler()
+	updateUseCase := usecases.NewUpdateTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	createUseCase := usecases.NewCreateTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	listUseCase := usecases.NewListTransactionsUseCase(mockUOW.TransactionRepository())
+	getUseCase := usecases.NewGetTransactionUseCase(mockUOW.TransactionRepository())
+	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockUOW.TransactionRepository())
+	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockUOW.TransactionRepository())
 	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase, restoreUseCase, permanentDeleteUseCase)
 
 	app.Put("/transactions/:id", func(c *fiber.Ctx) error {
@@ -392,7 +550,7 @@ func TestTransactionHandler_Update(t *testing.T) {
 	accountIDVO, _ := accountvalueobjects.NewAccountID(accountID)
 	date := time.Now()
 	transaction, _ := createTestTransactionForHandler(userIDVO, accountIDVO, "INCOME", 100.0, "BRL", "Test", date)
-	mockRepo.transactions[transaction.ID().Value()] = transaction
+	mockUOW.transactionRepository.transactions[transaction.ID().Value()] = transaction
 
 	tests := []struct {
 		name           string
@@ -454,13 +612,15 @@ func TestTransactionHandler_Delete(t *testing.T) {
 	accountID := accountvalueobjects.GenerateAccountID().Value()
 
 	app := fiber.New()
-	mockRepo := newMockTransactionRepositoryForHandler()
-	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	createUseCase := usecases.NewCreateTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	listUseCase := usecases.NewListTransactionsUseCase(mockRepo)
-	getUseCase := usecases.NewGetTransactionUseCase(mockRepo)
-	updateUseCase := usecases.NewUpdateTransactionUseCase(mockRepo, eventbus.NewEventBus())
-	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase)
+	mockUOW := newMockUnitOfWorkForHandler()
+	deleteUseCase := usecases.NewDeleteTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	createUseCase := usecases.NewCreateTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	listUseCase := usecases.NewListTransactionsUseCase(mockUOW.TransactionRepository())
+	getUseCase := usecases.NewGetTransactionUseCase(mockUOW.TransactionRepository())
+	updateUseCase := usecases.NewUpdateTransactionUseCase(mockUOW, eventbus.NewEventBus())
+	restoreUseCase := usecases.NewRestoreTransactionUseCase(mockUOW.TransactionRepository())
+	permanentDeleteUseCase := usecases.NewPermanentDeleteTransactionUseCase(mockUOW.TransactionRepository())
+	handler := NewTransactionHandler(createUseCase, listUseCase, getUseCase, updateUseCase, deleteUseCase, restoreUseCase, permanentDeleteUseCase)
 
 	app.Delete("/transactions/:id", func(c *fiber.Ctx) error {
 		c.Locals("userID", userID)
@@ -472,7 +632,7 @@ func TestTransactionHandler_Delete(t *testing.T) {
 	accountIDVO, _ := accountvalueobjects.NewAccountID(accountID)
 	date := time.Now()
 	transaction, _ := createTestTransactionForHandler(userIDVO, accountIDVO, "INCOME", 100.0, "BRL", "Test", date)
-	mockRepo.transactions[transaction.ID().Value()] = transaction
+	mockUOW.transactionRepository.transactions[transaction.ID().Value()] = transaction
 
 	tests := []struct {
 		name           string

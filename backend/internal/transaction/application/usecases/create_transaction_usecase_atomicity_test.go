@@ -83,6 +83,9 @@ func (m *mockAccountRepositoryWithError) Exists(id accountvalueobjects.AccountID
 func (m *mockAccountRepositoryWithError) Count(userID identityvalueobjects.UserID) (int64, error) {
 	return 0, m.err
 }
+func (m *mockAccountRepositoryWithError) FindByUserIDWithPagination(userID identityvalueobjects.UserID, context string, offset, limit int) ([]*accountentities.Account, int64, error) {
+	return nil, 0, m.err
+}
 
 func TestCreateTransactionUseCase_Atomicity(t *testing.T) {
 	userID := identityvalueobjects.GenerateUserID()

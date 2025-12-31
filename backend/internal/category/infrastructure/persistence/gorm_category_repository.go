@@ -37,9 +37,11 @@ func (r *GormCategoryRepository) FindByID(id valueobjects.CategoryID) (*entities
 }
 
 // FindByUserID finds all categories for a given user.
+// Optimized to use index idx_categories_user_active_optimized.
 func (r *GormCategoryRepository) FindByUserID(userID identityvalueobjects.UserID) ([]*entities.Category, error) {
 	var models []CategoryModel
-	if err := r.db.Where("user_id = ?", userID.Value()).Find(&models).Error; err != nil {
+	// Use index idx_categories_user_active_optimized for optimal performance
+	if err := r.db.Where("user_id = ? AND deleted_at IS NULL", userID.Value()).Find(&models).Error; err != nil {
 		return nil, fmt.Errorf("failed to find categories by user ID: %w", err)
 	}
 
@@ -146,9 +148,13 @@ func (r *GormCategoryRepository) PermanentDelete(id valueobjects.CategoryID) err
 }
 
 // Exists checks if a category with the given ID already exists.
+// Optimized to use LIMIT 1 for better performance.
 func (r *GormCategoryRepository) Exists(id valueobjects.CategoryID) (bool, error) {
 	var count int64
-	if err := r.db.Model(&CategoryModel{}).Where("id = ?", id.Value()).Count(&count).Error; err != nil {
+	if err := r.db.Model(&CategoryModel{}).
+		Where("id = ?", id.Value()).
+		Limit(1).
+		Count(&count).Error; err != nil {
 		return false, fmt.Errorf("failed to check category existence: %w", err)
 	}
 
