@@ -21,6 +21,10 @@ import (
 	categorypersistence "gestao-financeira/backend/internal/category/infrastructure/persistence"
 	categoryhandlers "gestao-financeira/backend/internal/category/presentation/handlers"
 	categoryroutes "gestao-financeira/backend/internal/category/presentation/routes"
+	goalusecases "gestao-financeira/backend/internal/goal/application/usecases"
+	goalpersistence "gestao-financeira/backend/internal/goal/infrastructure/persistence"
+	goalhandlers "gestao-financeira/backend/internal/goal/presentation/handlers"
+	goalroutes "gestao-financeira/backend/internal/goal/presentation/routes"
 	"gestao-financeira/backend/internal/identity/application/usecases"
 	"gestao-financeira/backend/internal/identity/infrastructure/persistence"
 	"gestao-financeira/backend/internal/identity/infrastructure/services"
@@ -254,6 +258,8 @@ func main() {
 
 	investmentRepository := investmentpersistence.NewGormInvestmentRepository(db)
 
+	goalRepository := goalpersistence.NewGormGoalRepository(db)
+
 	// Initialize services
 	jwtService := services.NewJWTServiceWithConfig(
 		cfg.JWT.SecretKey,
@@ -324,6 +330,15 @@ func main() {
 	updateInvestmentUseCase := investmentusecases.NewUpdateInvestmentUseCase(investmentRepository, eventBus)
 	deleteInvestmentUseCase := investmentusecases.NewDeleteInvestmentUseCase(investmentRepository)
 
+	// Initialize goal use cases
+	createGoalUseCase := goalusecases.NewCreateGoalUseCase(goalRepository, eventBus)
+	listGoalsUseCase := goalusecases.NewListGoalsUseCase(goalRepository)
+	getGoalUseCase := goalusecases.NewGetGoalUseCase(goalRepository)
+	addContributionUseCase := goalusecases.NewAddContributionUseCase(goalRepository, eventBus)
+	updateProgressUseCase := goalusecases.NewUpdateProgressUseCase(goalRepository, eventBus)
+	cancelGoalUseCase := goalusecases.NewCancelGoalUseCase(goalRepository)
+	deleteGoalUseCase := goalusecases.NewDeleteGoalUseCase(goalRepository)
+
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUserUseCase, loginUseCase)
 	accountHandler := accounthandlers.NewAccountHandler(createAccountUseCase, listAccountsUseCase, getAccountUseCase)
@@ -359,6 +374,15 @@ func main() {
 		getInvestmentUseCase,
 		updateInvestmentUseCase,
 		deleteInvestmentUseCase,
+	)
+	goalHandler := goalhandlers.NewGoalHandler(
+		createGoalUseCase,
+		listGoalsUseCase,
+		getGoalUseCase,
+		addContributionUseCase,
+		updateProgressUseCase,
+		cancelGoalUseCase,
+		deleteGoalUseCase,
 	)
 	reportHandler := reporthandlers.NewReportHandler(
 		monthlyReportUseCase,
@@ -480,6 +504,9 @@ func main() {
 
 		// Setup investment routes (protected)
 		investmentroutes.SetupInvestmentRoutes(api, investmentHandler, jwtService, userRepository, cacheService)
+
+		// Setup goal routes (protected)
+		goalroutes.SetupGoalRoutes(api, goalHandler, jwtService, userRepository, cacheService)
 
 		// Setup report routes (protected)
 		reportroutes.SetupReportRoutes(api, reportHandler, jwtService, userRepository, cacheService)
