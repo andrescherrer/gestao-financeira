@@ -49,8 +49,6 @@
     "@axe-core/playwright": "^4.10.0",
     "@playwright/test": "^1.48.0",
     "@tailwindcss/postcss": "^4.1.18",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/vue": "^9.3.0",
     "@tsconfig/node24": "^24.0.3",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.2",
