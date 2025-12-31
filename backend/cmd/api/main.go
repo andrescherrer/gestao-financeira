@@ -34,6 +34,10 @@ import (
 	investmentpersistence "gestao-financeira/backend/internal/investment/infrastructure/persistence"
 	investmenthandlers "gestao-financeira/backend/internal/investment/presentation/handlers"
 	investmentroutes "gestao-financeira/backend/internal/investment/presentation/routes"
+	notificationusecases "gestao-financeira/backend/internal/notification/application/usecases"
+	notificationpersistence "gestao-financeira/backend/internal/notification/infrastructure/persistence"
+	notificationhandlers "gestao-financeira/backend/internal/notification/presentation/handlers"
+	notificationroutes "gestao-financeira/backend/internal/notification/presentation/routes"
 	reportingusecases "gestao-financeira/backend/internal/reporting/application/usecases"
 	reportingservices "gestao-financeira/backend/internal/reporting/infrastructure/services"
 	reporthandlers "gestao-financeira/backend/internal/reporting/presentation/handlers"
@@ -260,6 +264,8 @@ func main() {
 
 	goalRepository := goalpersistence.NewGormGoalRepository(db)
 
+	notificationRepository := notificationpersistence.NewGormNotificationRepository(db)
+
 	// Initialize services
 	jwtService := services.NewJWTServiceWithConfig(
 		cfg.JWT.SecretKey,
@@ -339,6 +345,15 @@ func main() {
 	cancelGoalUseCase := goalusecases.NewCancelGoalUseCase(goalRepository)
 	deleteGoalUseCase := goalusecases.NewDeleteGoalUseCase(goalRepository)
 
+	// Initialize notification use cases
+	createNotificationUseCase := notificationusecases.NewCreateNotificationUseCase(notificationRepository, eventBus)
+	listNotificationsUseCase := notificationusecases.NewListNotificationsUseCase(notificationRepository)
+	getNotificationUseCase := notificationusecases.NewGetNotificationUseCase(notificationRepository)
+	markReadUseCase := notificationusecases.NewMarkNotificationReadUseCase(notificationRepository)
+	markUnreadUseCase := notificationusecases.NewMarkNotificationUnreadUseCase(notificationRepository)
+	archiveNotificationUseCase := notificationusecases.NewArchiveNotificationUseCase(notificationRepository)
+	deleteNotificationUseCase := notificationusecases.NewDeleteNotificationUseCase(notificationRepository)
+
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUserUseCase, loginUseCase)
 	accountHandler := accounthandlers.NewAccountHandler(createAccountUseCase, listAccountsUseCase, getAccountUseCase)
@@ -383,6 +398,15 @@ func main() {
 		updateProgressUseCase,
 		cancelGoalUseCase,
 		deleteGoalUseCase,
+	)
+	notificationHandler := notificationhandlers.NewNotificationHandler(
+		createNotificationUseCase,
+		listNotificationsUseCase,
+		getNotificationUseCase,
+		markReadUseCase,
+		markUnreadUseCase,
+		archiveNotificationUseCase,
+		deleteNotificationUseCase,
 	)
 	reportHandler := reporthandlers.NewReportHandler(
 		monthlyReportUseCase,
@@ -507,6 +531,9 @@ func main() {
 
 		// Setup goal routes (protected)
 		goalroutes.SetupGoalRoutes(api, goalHandler, jwtService, userRepository, cacheService)
+
+		// Setup notification routes (protected)
+		notificationroutes.SetupNotificationRoutes(api, notificationHandler, jwtService, userRepository, cacheService)
 
 		// Setup report routes (protected)
 		reportroutes.SetupReportRoutes(api, reportHandler, jwtService, userRepository, cacheService)
