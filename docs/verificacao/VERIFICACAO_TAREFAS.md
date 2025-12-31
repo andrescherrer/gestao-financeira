@@ -1,7 +1,7 @@
 # Verificação de Implementação - Comparação TAREFAS.md vs Código Real
 
 > ⚠️ **ARQUIVO HISTÓRICO** - Este documento é uma verificação histórica de 2025-12-27 e pode estar **parcialmente desatualizado**.  
-> O projeto evoluiu significativamente desde então. Para informações atualizadas, consulte [TAREFAS.md](../TAREFAS.md).
+> O projeto evoluiu significativamente desde então. Para informações atualizadas, consulte [TAREFAS.md](../tarefas/TAREFAS.md).
 
 **Data da Verificação:** 2025-12-27  
 **Última Atualização:** 2025-12-27  

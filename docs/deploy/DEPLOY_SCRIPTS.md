@@ -169,7 +169,7 @@ docker-compose -f docker-compose.prod.yml restart
 
 ## 📚 Documentação Adicional
 
-- [Configuração da API](../backend/CONFIG.md)
+- [Configuração da API](../configuracao/CONFIG.md)
 - [Guia de Backup](../docs/tarefas_concluidas/20251231_123000_OPT-002.md)
 - [Health Check Avançado](../docs/tarefas_concluidas/20251231_072100_HEALTH-001.md)
 
