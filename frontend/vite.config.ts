@@ -101,10 +101,6 @@ export default defineConfig({
         manualChunks: (id) => {
           // Vendor chunks
           if (id.includes('node_modules')) {
-            // PrimeVue and related UI libraries
-            if (id.includes('primevue') || id.includes('primeicons')) {
-              return 'vendor-ui'
-            }
             // ApexCharts (only used in reports)
             if (id.includes('apexcharts') || id.includes('vue3-apexcharts')) {
               return 'vendor-charts'
