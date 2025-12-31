@@ -40,7 +40,10 @@ build: ## Compila a aplicação
 build-recurring: ## Compila o processador de transações recorrentes
 	$(GO) build -o bin/process-recurring ./cmd/process-recurring
 
-build-all: build build-recurring ## Compila todos os binários
+build-backup: ## Compila o utilitário de backup
+	$(GO) build -o bin/backup ./cmd/backup
+
+build-all: build build-recurring build-backup ## Compila todos os binários
 
 run: ## Executa a aplicação
 	$(GO) run ./cmd/api/main.go

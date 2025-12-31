@@ -30,10 +30,14 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/api
 # Build the recurring transaction processor
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o process-recurring ./cmd/process-recurring
 
+# Build the backup utility
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o backup ./cmd/backup
+
 # Runtime stage
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates tzdata wget
+# Install PostgreSQL client tools for backup
+RUN apk --no-cache add ca-certificates tzdata wget postgresql-client
 
 WORKDIR /root/
 
@@ -43,6 +47,7 @@ RUN mkdir -p bin
 # Copy the binaries from builder
 COPY --from=builder /app/main ./bin/api
 COPY --from=builder /app/process-recurring ./bin/process-recurring
+COPY --from=builder /app/backup ./bin/backup
 
 # Expose port
 EXPOSE 8080
