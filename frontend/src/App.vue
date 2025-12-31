@@ -11,6 +11,7 @@ import { useAuthStore } from '@/stores/auth'
 import { authService } from '@/api/auth'
 import { Toaster } from '@/components/ui/toast'
 import { useTheme } from '@/composables/useTheme'
+import { useWebSocketNotifications } from '@/composables/useWebSocketNotifications'
 import PWAUpdatePrompt from '@/components/PWAUpdatePrompt.vue'
 
 const router = useRouter()
@@ -18,6 +19,9 @@ const authStore = useAuthStore()
 
 // Inicializar tema
 useTheme()
+
+// Inicializar WebSocket para notificações
+useWebSocketNotifications()
 
 onMounted(async () => {
   // Inicializar token do localStorage
