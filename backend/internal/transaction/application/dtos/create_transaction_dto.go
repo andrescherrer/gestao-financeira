@@ -7,7 +7,7 @@ type CreateTransactionInput struct {
 	Type        string  `json:"type" validate:"required,oneof=INCOME EXPENSE"`
 	Amount      float64 `json:"amount" validate:"required,gt=0"`
 	Currency    string  `json:"currency" validate:"required,oneof=BRL USD EUR"`
-	Description string  `json:"description" validate:"required,min=3,max=500"`
+	Description string  `json:"description" validate:"required,min=3,max=500,no_sql_injection,no_xss,utf8"`
 	Date        string  `json:"date" validate:"required"` // ISO 8601 format: YYYY-MM-DD
 }
 

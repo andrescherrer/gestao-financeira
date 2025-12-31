@@ -372,6 +372,9 @@ func main() {
 	// Request ID middleware (must be early in the chain)
 	app.Use(middleware.RequestIDMiddleware())
 
+	// Security headers middleware (should be early to apply to all responses)
+	app.Use(middleware.SecurityHeadersMiddleware())
+
 	// OpenTelemetry tracing middleware (must be early to trace all requests)
 	if cfg.Observability.Tracing.Enabled {
 		app.Use(observability.TracingMiddleware())

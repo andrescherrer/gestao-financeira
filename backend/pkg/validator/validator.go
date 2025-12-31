@@ -74,6 +74,16 @@ func Validate(s interface{}) error {
 					message = fmt.Sprintf("%s must be less than or equal to %s", field, fe.Param())
 				case "lt":
 					message = fmt.Sprintf("%s must be less than %s", field, fe.Param())
+				case "no_sql_injection":
+					message = fmt.Sprintf("%s contains potentially dangerous SQL patterns", field)
+				case "no_xss":
+					message = fmt.Sprintf("%s contains potentially dangerous XSS patterns", field)
+				case "no_path_traversal":
+					message = fmt.Sprintf("%s contains potentially dangerous path traversal patterns", field)
+				case "utf8":
+					message = fmt.Sprintf("%s must be valid UTF-8", field)
+				case "password_strength":
+					message = fmt.Sprintf("%s must contain at least 3 of: uppercase, lowercase, digit, special character", field)
 				default:
 					message = fmt.Sprintf("%s is invalid", field)
 				}
@@ -95,7 +105,7 @@ func Validate(s interface{}) error {
 
 // registerCustomValidations registers custom validation functions
 func registerCustomValidations() {
-	// Example: Custom validation for date format (YYYY-MM-DD)
+	// Custom validation for date format (YYYY-MM-DD)
 	validate.RegisterValidation("date_iso8601", func(fl validator.FieldLevel) bool {
 		dateStr := fl.Field().String()
 		// Simple validation for YYYY-MM-DD format
@@ -115,7 +125,10 @@ func registerCustomValidations() {
 		return true
 	})
 
-	log.Info().Msg("Custom validations registered")
+	// Register security validations
+	RegisterSecurityValidations(validate)
+
+	log.Info().Msg("Custom validations registered (including security validations)")
 }
 
 // getJSONTagName extracts the JSON tag name from a struct field
