@@ -171,6 +171,55 @@ export interface BudgetProgress {
   month?: number
 }
 
+export interface Investment {
+  investment_id: string
+  user_id: string
+  account_id: string
+  type: 'STOCK' | 'FUND' | 'CDB' | 'TREASURY' | 'CRYPTO' | 'OTHER'
+  name: string
+  ticker?: string
+  purchase_date: string
+  purchase_amount: string
+  current_value: string
+  currency: 'BRL' | 'USD' | 'EUR'
+  quantity?: string
+  context: 'PERSONAL' | 'BUSINESS'
+  return_absolute: string
+  return_percentage: number
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateInvestmentRequest {
+  account_id: string
+  type: 'STOCK' | 'FUND' | 'CDB' | 'TREASURY' | 'CRYPTO' | 'OTHER'
+  name: string
+  ticker?: string
+  purchase_date: string // YYYY-MM-DD
+  purchase_amount: number
+  currency: 'BRL' | 'USD' | 'EUR'
+  quantity?: number
+  context: 'PERSONAL' | 'BUSINESS'
+}
+
+export interface UpdateInvestmentRequest {
+  current_value?: number
+  quantity?: number
+}
+
+export interface ListInvestmentsResponse {
+  investments: Investment[]
+  count: number
+  pagination?: {
+    page: number
+    limit: number
+    total: number
+    total_pages: number
+    has_next: boolean
+    has_prev: boolean
+  }
+}
+
 // Re-export report types from reports.ts
 export type {
   MonthlyReport,

@@ -89,6 +89,24 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/investments',
+      name: 'investments',
+      component: () => import(/* webpackChunkName: "investments" */ '@/views/InvestmentsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/investments/new',
+      name: 'new-investment',
+      component: () => import(/* webpackChunkName: "investments" */ '@/views/NewInvestmentView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/investments/:id',
+      name: 'investment-details',
+      component: () => import(/* webpackChunkName: "investments" */ '@/views/InvestmentDetailsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/reports',
       name: 'reports',
       component: () => import(/* webpackChunkName: "reports" */ '@/views/ReportsView.vue'),

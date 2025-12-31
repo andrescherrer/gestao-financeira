@@ -111,6 +111,24 @@
           </li>
           <li>
             <RouterLink
+              to="/investments"
+              class="group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
+              :class="
+                $route.name === 'investments' ||
+                $route.name === 'new-investment' ||
+                $route.name === 'investment-details'
+                  ? 'bg-accent text-accent-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+              "
+            >
+              <div class="flex items-center gap-3">
+                <TrendingUp class="h-4 w-4" />
+                <span>Investimentos</span>
+              </div>
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink
               to="/reports"
               class="group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
               :class="
@@ -132,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-import { Home, Wallet, List, Tag, Target, BarChart } from 'lucide-vue-next'
+import { Home, Wallet, List, Tag, Target, BarChart, TrendingUp } from 'lucide-vue-next'
 
 defineProps<{
   isOpen?: boolean
