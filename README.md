@@ -63,10 +63,11 @@ gestao-financeira/
 
 ## 📚 Documentação
 
+- [Documentação Completa](./docs/README.md) - Índice principal da documentação
 - [Planejamento Completo](./docs/planejamento/PLANEJAMENTO_GO.md)
-- [Tarefas do Projeto](./TAREFAS.md)
-- [Guia de Deploy](./docs/DEPLOY.md)
-- [Configuração da API](./backend/CONFIG.md)
+- [Tarefas do Projeto](./docs/tarefas/TAREFAS.md)
+- [Guia de Deploy](./docs/deploy/DEPLOY.md)
+- [Configuração da API](./docs/configuracao/CONFIG.md)
 
 ## 📝 Licença
 
