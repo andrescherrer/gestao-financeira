@@ -6,6 +6,7 @@ import (
 	"gestao-financeira/backend/pkg/database"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 // HealthChecker handles health check endpoints
@@ -13,6 +14,7 @@ type HealthChecker struct {
 	cacheService interface {
 		Ping() error
 	}
+	db *gorm.DB
 }
 
 // CachePinger interface for cache services that can be pinged
@@ -29,6 +31,7 @@ func NewHealthChecker() *HealthChecker {
 func NewHealthCheckerWithCache(cacheService CachePinger) *HealthChecker {
 	return &HealthChecker{
 		cacheService: cacheService,
+		db:           database.DB,
 	}
 }
 

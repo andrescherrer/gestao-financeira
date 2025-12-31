@@ -586,7 +586,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | SEC-002 | Implementar rate limiting robusto | 🔵 | 🔴 | 4h | PERF-005 | ⏳ |
 | SEC-003 | Configurar CORS para produção | 🔵 | 🔴 | 2h | BE-003 | ⏳ |
 | SEC-004 | Implementar graceful shutdown | 🔵 | 🔴 | 4h | BE-003 | ⏳ |
-| SEC-005 | Configurar health checks robustos (liveness/readiness) | 🔵 | 🔴 | 4h | BE-005 | ⏳ |
+| HEALTH-001 | Implementar health check avançado | 🔵 | 🔴 | 4h | BE-005 | ⏳ |
 | SEC-006 | Revisar e melhorar validações de segurança | 🔵 | 🟡 | 4h | VAL-001 | ⏳ |
 
 **Entregável Sprint 4.2:** Sistema seguro e pronto para produção

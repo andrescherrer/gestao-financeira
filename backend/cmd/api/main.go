@@ -416,11 +416,13 @@ func main() {
 
 	// Initialize health checker (with cache service if available)
 	healthChecker := health.NewHealthCheckerWithCache(cacheService)
+	advancedHealthChecker := health.NewAdvancedHealthChecker(healthChecker, "1.0.0")
 
 	// Health check endpoints
 	app.Get("/health", healthChecker.HealthCheck)
 	app.Get("/health/live", healthChecker.LivenessCheck)
 	app.Get("/health/ready", healthChecker.ReadinessCheck)
+	app.Get("/health/detailed", advancedHealthChecker.DetailedHealthCheck)
 
 	// Swagger documentation
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
