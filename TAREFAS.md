@@ -591,6 +591,10 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ### Sprint 4.2: Segurança e Produção (Semana 14-15)
 
+**Prioridade de Implementação:**
+1. 🔴 **ALTA PRIORIDADE** - Essencial para produção
+2. 🟡 **MÉDIA PRIORIDADE** - Importante mas pode aguardar
+
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
 | SEC-001 | Configurar headers de segurança (Helmet) | 🔵 | 🔴 | 2h | BE-003 | ⏳ |
@@ -601,6 +605,14 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | SEC-006 | Revisar e melhorar validações de segurança | 🔵 | 🟡 | 4h | VAL-001 | ⏳ |
 
 **Entregável Sprint 4.2:** Sistema seguro e pronto para produção
+
+**Status:** 🚧 **PARCIALMENTE COMPLETO**
+- ✅ Rate limiting robusto implementado (SEC-002)
+- ✅ CORS configurado para produção (SEC-003)
+- ✅ Graceful shutdown implementado (SEC-004)
+- ✅ Health check avançado implementado (HEALTH-001)
+- ⏳ Headers de segurança (Helmet) pendente (SEC-001)
+- ⏳ Revisão de validações de segurança pendente (SEC-006)
 
 **Status:** 🚧 **PARCIALMENTE COMPLETO**
 - ✅ Rate limiting robusto implementado (SEC-002)
