@@ -150,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import Layout from '@/components/layout/Layout.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import IncomeVsExpenseChart from '@/components/reports/IncomeVsExpenseChart.vue'
@@ -178,6 +178,7 @@ import {
   exportAnnualReportToPDF,
   exportCategoryReportToPDF,
 } from '@/utils/pdfExport'
+import { registerApexCharts } from '@/plugins/apexcharts'
 
 const currentYear = new Date().getFullYear()
 const currentMonth = new Date().getMonth() + 1
@@ -196,6 +197,14 @@ const filters = ref<{
 
 const isExporting = ref(false)
 const { useMonthlyReport, useAnnualReport, useCategoryReport } = useReports()
+
+// Lazy load ApexCharts when component is mounted
+onMounted(async () => {
+  const instance = getCurrentInstance()
+  if (instance?.appContext.app) {
+    await registerApexCharts(instance.appContext.app)
+  }
+})
 
 // Queries para exportação
 const { data: monthlyReport } = useMonthlyReport({

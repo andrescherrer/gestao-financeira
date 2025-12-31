@@ -3,7 +3,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
-import VueApexCharts from 'vue3-apexcharts'
+// VueApexCharts moved to lazy loading - only load when ReportsView is accessed
 import App from './App.vue'
 import router from './router'
 import './config/vee-validate'
@@ -58,6 +58,6 @@ app.config.errorHandler = (err, instance, info) => {
 app.use(createPinia())
 app.use(router)
 app.use(VueQueryPlugin, { queryClient })
-app.use(VueApexCharts)
+// VueApexCharts will be loaded lazily in ReportsView
 
 app.mount('#app')

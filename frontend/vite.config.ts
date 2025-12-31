@@ -30,7 +30,53 @@ export default defineConfig({
         }
         return false
       },
+      output: {
+        manualChunks: (id) => {
+          // Vendor chunks
+          if (id.includes('node_modules')) {
+            // PrimeVue and related UI libraries
+            if (id.includes('primevue') || id.includes('primeicons')) {
+              return 'vendor-ui'
+            }
+            // ApexCharts (only used in reports)
+            if (id.includes('apexcharts') || id.includes('vue3-apexcharts')) {
+              return 'vendor-charts'
+            }
+            // PDF/Export libraries (only used when exporting)
+            if (id.includes('jspdf') || id.includes('html2canvas')) {
+              return 'vendor-export'
+            }
+            // Vue core and router
+            if (id.includes('vue') || id.includes('vue-router') || id.includes('pinia')) {
+              return 'vendor-vue'
+            }
+            // TanStack Query
+            if (id.includes('@tanstack')) {
+              return 'vendor-query'
+            }
+            // Validation libraries
+            if (id.includes('vee-validate') || id.includes('zod')) {
+              return 'vendor-validation'
+            }
+            // Other large dependencies
+            if (id.includes('axios')) {
+              return 'vendor-http'
+            }
+            // All other node_modules
+            return 'vendor'
+          }
+        },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+      },
     },
+    // Increase chunk size warning limit (we're splitting manually)
+    chunkSizeWarningLimit: 600,
+    // Enable source maps for production debugging (optional, can disable for smaller bundle)
+    sourcemap: false,
+    // Minification - esbuild is faster and smaller by default
+    minify: 'esbuild',
   },
   // Exclude Cypress files from build
   publicDir: 'public',

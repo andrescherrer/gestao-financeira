@@ -1,13 +1,19 @@
 /**
  * Utilitário para exportar dados para PDF
+ * Usa lazy loading para reduzir bundle inicial
  */
 
-import jsPDF from 'jspdf'
+// Lazy load jsPDF - só carrega quando necessário
+async function loadJsPDF() {
+  const { default: jsPDF } = await import('jspdf')
+  return jsPDF
+}
 
 /**
  * Exporta relatório mensal para PDF
  */
-export function exportMonthlyReportToPDF(report: any, year: number, month?: number): void {
+export async function exportMonthlyReportToPDF(report: any, year: number, month?: number): Promise<void> {
+  const jsPDF = await loadJsPDF()
   const doc = new jsPDF()
   const monthNames = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -69,7 +75,8 @@ export function exportMonthlyReportToPDF(report: any, year: number, month?: numb
 /**
  * Exporta relatório anual para PDF
  */
-export function exportAnnualReportToPDF(report: any, year: number): void {
+export async function exportAnnualReportToPDF(report: any, year: number): Promise<void> {
+  const jsPDF = await loadJsPDF()
   const doc = new jsPDF()
   const monthNames = [
     'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
@@ -128,7 +135,8 @@ export function exportAnnualReportToPDF(report: any, year: number): void {
 /**
  * Exporta relatório por categoria para PDF
  */
-export function exportCategoryReportToPDF(report: any): void {
+export async function exportCategoryReportToPDF(report: any): Promise<void> {
+  const jsPDF = await loadJsPDF()
   const doc = new jsPDF()
 
   // Título
