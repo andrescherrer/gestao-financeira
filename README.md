@@ -15,7 +15,7 @@ Sistema de gestão financeira pessoal e profissional desenvolvido em **Go** (bac
 ### Frontend
 - **Vue 3** com **TypeScript**
 - **Vite** (build tool)
-- **PrimeVue** (componentes UI)
+- **shadcn-vue** (componentes UI baseados em reka-ui)
 - **Tailwind CSS** (styling)
 - **TanStack Query** (server state)
 - **Vee-Validate + Zod** (formulários)
