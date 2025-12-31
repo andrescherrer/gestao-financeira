@@ -613,16 +613,16 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - ✅ CORS configurado para produção (SEC-003)
 - ✅ Graceful shutdown implementado (SEC-004)
 - ✅ Health check avançado implementado (HEALTH-001)
-- ⏳ Headers de segurança (Helmet) pendente (SEC-001)
-- ⏳ Revisão de validações de segurança pendente (SEC-006)
+- ✅ Headers de segurança (Helmet) implementado (SEC-001)
+- ✅ Revisão de validações de segurança implementado (SEC-006)
 
 **Status:** 🚧 **PARCIALMENTE COMPLETO**
 - ✅ Rate limiting robusto implementado (SEC-002)
 - ✅ CORS configurado para produção (SEC-003)
 - ✅ Graceful shutdown implementado (SEC-004)
 - ✅ Health check avançado implementado (HEALTH-001)
-- ⏳ Headers de segurança (Helmet) pendente (SEC-001)
-- ⏳ Revisão de validações de segurança pendente (SEC-006)
+- ✅ Headers de segurança (Helmet) implementado (SEC-001)
+- ✅ Revisão de validações de segurança implementado (SEC-006)
 
 ---
 
