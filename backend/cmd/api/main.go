@@ -26,6 +26,10 @@ import (
 	"gestao-financeira/backend/internal/identity/infrastructure/services"
 	"gestao-financeira/backend/internal/identity/presentation/handlers"
 	"gestao-financeira/backend/internal/identity/presentation/routes"
+	investmentusecases "gestao-financeira/backend/internal/investment/application/usecases"
+	investmentpersistence "gestao-financeira/backend/internal/investment/infrastructure/persistence"
+	investmenthandlers "gestao-financeira/backend/internal/investment/presentation/handlers"
+	investmentroutes "gestao-financeira/backend/internal/investment/presentation/routes"
 	reportingusecases "gestao-financeira/backend/internal/reporting/application/usecases"
 	reportingservices "gestao-financeira/backend/internal/reporting/infrastructure/services"
 	reporthandlers "gestao-financeira/backend/internal/reporting/presentation/handlers"
@@ -248,6 +252,8 @@ func main() {
 
 	budgetRepository := budgetpersistence.NewGormBudgetRepository(db)
 
+	investmentRepository := investmentpersistence.NewGormInvestmentRepository(db)
+
 	// Initialize services
 	jwtService := services.NewJWTServiceWithConfig(
 		cfg.JWT.SecretKey,
@@ -311,6 +317,13 @@ func main() {
 	categoryReportUseCase := reportingusecases.NewCategoryReportUseCase(transactionRepository)
 	incomeVsExpenseUseCase := reportingusecases.NewIncomeVsExpenseUseCase(transactionRepository)
 
+	// Initialize investment use cases
+	createInvestmentUseCase := investmentusecases.NewCreateInvestmentUseCase(investmentRepository, accountRepository, eventBus)
+	listInvestmentsUseCase := investmentusecases.NewListInvestmentsUseCase(investmentRepository)
+	getInvestmentUseCase := investmentusecases.NewGetInvestmentUseCase(investmentRepository)
+	updateInvestmentUseCase := investmentusecases.NewUpdateInvestmentUseCase(investmentRepository, eventBus)
+	deleteInvestmentUseCase := investmentusecases.NewDeleteInvestmentUseCase(investmentRepository)
+
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUserUseCase, loginUseCase)
 	accountHandler := accounthandlers.NewAccountHandler(createAccountUseCase, listAccountsUseCase, getAccountUseCase)
@@ -339,6 +352,13 @@ func main() {
 		updateBudgetUseCase,
 		deleteBudgetUseCase,
 		getBudgetProgressUseCase,
+	)
+	investmentHandler := investmenthandlers.NewInvestmentHandler(
+		createInvestmentUseCase,
+		listInvestmentsUseCase,
+		getInvestmentUseCase,
+		updateInvestmentUseCase,
+		deleteInvestmentUseCase,
 	)
 	reportHandler := reporthandlers.NewReportHandler(
 		monthlyReportUseCase,
@@ -458,7 +478,10 @@ func main() {
 		// Setup budget routes (protected)
 		budgetroutes.SetupBudgetRoutes(api, budgetHandler, jwtService, userRepository, cacheService)
 
-			// Setup report routes (protected)
+		// Setup investment routes (protected)
+		investmentroutes.SetupInvestmentRoutes(api, investmentHandler, jwtService, userRepository, cacheService)
+
+		// Setup report routes (protected)
 		reportroutes.SetupReportRoutes(api, reportHandler, jwtService, userRepository, cacheService)
 
 		// Setup log routes (public endpoint for frontend logs)

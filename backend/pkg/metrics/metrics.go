@@ -42,6 +42,7 @@ var (
 		AccountsUpdated     *prometheus.CounterVec
 		CategoriesCreated   *prometheus.CounterVec
 		BudgetsCreated      *prometheus.CounterVec
+		InvestmentsCreated  *prometheus.CounterVec
 		UsersRegistered     prometheus.Counter
 		LoginAttempts       *prometheus.CounterVec
 	}{
@@ -94,6 +95,13 @@ var (
 			},
 			[]string{"period_type"},
 		),
+		InvestmentsCreated: promauto.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "business_investments_created_total",
+				Help: "Total number of investments created",
+			},
+			[]string{"type"},
+		),
 		UsersRegistered: promauto.NewCounter(
 			prometheus.CounterOpts{
 				Name: "business_users_registered_total",
@@ -115,4 +123,3 @@ func Init() {
 	// Metrics are automatically registered via promauto
 	// This function can be used for any additional initialization if needed
 }
-
