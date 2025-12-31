@@ -57,6 +57,8 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **API-DOC-002** (2025-12-30): ✅ Documentação de API Melhorada (Postman Collection) - Completo
 - **FE-OBS-001** (2025-12-31): ✅ Logging Estruturado no Frontend - Completo
 - **HEALTH-001** (2025-12-31): ✅ Health Check Avançado - Completo
+- **SEC-001** (2025-12-31): ✅ Headers de Segurança (Helmet-like) - Completo
+- **SEC-006** (2025-12-31): ✅ Revisão e Melhoria de Validações de Segurança - Completo
 
 ### 📈 Progresso
 - **Fase 1 (Fundação e MVP)**: ✅ 100% concluído
@@ -597,12 +599,12 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| SEC-001 | Configurar headers de segurança (Helmet) | 🔵 | 🔴 | 2h | BE-003 | ⏳ |
+| SEC-001 | Configurar headers de segurança (Helmet) | 🔵 | 🔴 | 2h | BE-003 | ✅ |
 | SEC-002 | Implementar rate limiting robusto | 🔵 | 🔴 | 4h | PERF-005 | ✅ |
 | SEC-003 | Configurar CORS para produção | 🔵 | 🔴 | 2h | BE-003 | ✅ |
 | SEC-004 | Implementar graceful shutdown | 🔵 | 🔴 | 4h | BE-003 | ✅ |
 | HEALTH-001 | Implementar health check avançado | 🔵 | 🔴 | 4h | BE-005 | ✅ |
-| SEC-006 | Revisar e melhorar validações de segurança | 🔵 | 🟡 | 4h | VAL-001 | ⏳ |
+| SEC-006 | Revisar e melhorar validações de segurança | 🔵 | 🟡 | 4h | VAL-001 | ✅ |
 
 **Entregável Sprint 4.2:** Sistema seguro e pronto para produção
 
