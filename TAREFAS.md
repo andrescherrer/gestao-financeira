@@ -4,7 +4,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ## 📊 Status Geral do Projeto
 
-**Última verificação:** 2025-12-30
+**Última verificação:** 2025-12-31
 
 **Nota:** Frontend migrado de Next.js/React para Vue 3 em 2025-12-23
 
@@ -31,8 +31,18 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 - **Sprint 3.2: Recurring Transactions - Backend** (REC-001 a REC-004): ✅ Completo e Integrado
 
 ### ⏳ Em Progresso / Pendente
-- **Sprint 4.1: Observabilidade Backend**: ✅ Completo (OBS-001 a OBS-007)
-- **Demais sprints**: ⏳ Não iniciadas
+
+**Prioridade ALTA (Próximas a implementar):**
+- **Sprint 4.2: Segurança** - SEC-001 (Headers de segurança), SEC-006 (Revisão validações)
+- **Sprint 4.3: CI/CD** - CI-001, CI-002 (GitHub Actions e Docker build)
+- **Sprint 4.5: Deploy** - OPT-002 (Backup automático), DEPLOY-001, DEPLOY-002
+
+**Prioridade MÉDIA:**
+- **Sprint 4.4: Testes Frontend** - Expandir cobertura de testes
+- **Sprint 4.5: Otimizações** - OPT-001, OPT-003, OPT-004
+
+**Prioridade BAIXA (Funcionalidades avançadas):**
+- **Fase 5: Funcionalidades Avançadas** - Investment, Goals, Notifications, Dashboard completo
 
 ### ✅ Implementações Recentes
 - **SOFT-DELETE-001** (2025-12-28): ✅ Soft Delete Consistente - Completo
@@ -584,17 +594,29 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
 | SEC-001 | Configurar headers de segurança (Helmet) | 🔵 | 🔴 | 2h | BE-003 | ⏳ |
-| SEC-002 | Implementar rate limiting robusto | 🔵 | 🔴 | 4h | PERF-005 | ⏳ |
-| SEC-003 | Configurar CORS para produção | 🔵 | 🔴 | 2h | BE-003 | ⏳ |
-| SEC-004 | Implementar graceful shutdown | 🔵 | 🔴 | 4h | BE-003 | ⏳ |
+| SEC-002 | Implementar rate limiting robusto | 🔵 | 🔴 | 4h | PERF-005 | ✅ |
+| SEC-003 | Configurar CORS para produção | 🔵 | 🔴 | 2h | BE-003 | ✅ |
+| SEC-004 | Implementar graceful shutdown | 🔵 | 🔴 | 4h | BE-003 | ✅ |
 | HEALTH-001 | Implementar health check avançado | 🔵 | 🔴 | 4h | BE-005 | ✅ |
 | SEC-006 | Revisar e melhorar validações de segurança | 🔵 | 🟡 | 4h | VAL-001 | ⏳ |
 
 **Entregável Sprint 4.2:** Sistema seguro e pronto para produção
 
+**Status:** 🚧 **PARCIALMENTE COMPLETO**
+- ✅ Rate limiting robusto implementado (SEC-002)
+- ✅ CORS configurado para produção (SEC-003)
+- ✅ Graceful shutdown implementado (SEC-004)
+- ✅ Health check avançado implementado (HEALTH-001)
+- ⏳ Headers de segurança (Helmet) pendente (SEC-001)
+- ⏳ Revisão de validações de segurança pendente (SEC-006)
+
 ---
 
 ### Sprint 4.3: CI/CD Completo (Semana 15)
+
+**Prioridade de Implementação:**
+1. 🔴 **ALTA PRIORIDADE** - Essencial para automação e qualidade
+2. 🟡 **MÉDIA PRIORIDADE** - Melhora processo mas não bloqueia
 
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
@@ -610,9 +632,15 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ### Sprint 4.4: Testes Frontend (Semana 15-16)
 
+**Nota:** Vitest já está configurado e há 96 testes implementados. Estas tarefas são para expandir a cobertura.
+
+**Prioridade de Implementação:**
+1. 🟡 **MÉDIA PRIORIDADE** - Melhora qualidade mas não bloqueia
+2. 🟢 **BAIXA PRIORIDADE** - Nice to have
+
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| FE-TEST-001 | Configurar Vitest e React Testing Library | 🟤 | 🟡 | 4h | FE-001 | ⏳ |
+| FE-TEST-001 | Configurar Vitest e React Testing Library | 🟤 | 🟡 | 4h | FE-001 | ✅ |
 | FE-TEST-002 | Criar testes unitários para componentes | 🟤 | 🟡 | 8h | FE-TEST-001 | ⏳ |
 | FE-TEST-003 | Criar testes de integração frontend-backend | 🟤 | 🟡 | 8h | FE-TEST-001 | ⏳ |
 | FE-TEST-004 | Configurar Playwright para E2E | 🟤 | 🟡 | 4h | FE-001 | ⏳ |
@@ -625,15 +653,20 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 
 ### Sprint 4.5: Otimizações e Deploy (Semana 16)
 
+**Prioridade de Implementação:**
+1. 🔴 **ALTA PRIORIDADE** - Essencial para produção
+2. 🟡 **MÉDIA PRIORIDADE** - Melhora performance/experiência
+3. 🟢 **BAIXA PRIORIDADE** - Opcional
+
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
-| OPT-001 | Otimizar queries do banco de dados | 🔵 | 🟡 | 4h | PERF-006 | ⏳ |
 | OPT-002 | Implementar backup automático | 🟠 | 🔴 | 4h | SETUP-003 | ⏳ |
+| DEPLOY-001 | Configurar ambiente de produção | 🟠 | 🔴 | 8h | CI-002, CI-005 | ⏳ |
+| DEPLOY-002 | Documentação de deploy | ⚪ | 🔴 | 4h | DEPLOY-001 | ⏳ |
+| OPT-001 | Otimizar queries do banco de dados | 🔵 | 🟡 | 4h | PERF-006 | ⏳ |
 | OPT-003 | Otimizar bundle size do frontend | 🟣 | 🟡 | 4h | FE-001 | ⏳ |
 | OPT-004 | Configurar error tracking (Sentry) | 🟣 | 🟡 | 4h | FE-001 | ⏳ |
 | OPT-005 | Configurar PWA (opcional) | 🟣 | 🟢 | 6h | FE-001 | ⏳ |
-| DEPLOY-001 | Configurar ambiente de produção | 🟠 | 🔴 | 8h | CI-002, CI-005 | ⏳ |
-| DEPLOY-002 | Documentação de deploy | ⚪ | 🔴 | 4h | DEPLOY-001 | ⏳ |
 
 **Entregável Sprint 4.5:** Sistema deployado em produção
 
