@@ -328,6 +328,15 @@ class Logger {
     const entry = this.createLogEntry(LogLevel.ERROR, message, errorContext)
     this.logToConsole(entry)
     this.sendToBackend(entry)
+    
+    // Enviar para Sentry também (se configurado)
+    if (error instanceof Error) {
+      import('@/config/sentry').then(({ captureException }) => {
+        captureException(error, context)
+      }).catch(() => {
+        // Silenciosamente falhar se Sentry não estiver configurado
+      })
+    }
   }
 }
 

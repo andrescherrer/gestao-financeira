@@ -8,6 +8,7 @@ import App from './App.vue'
 import router from './router'
 import './config/vee-validate'
 import { logger } from './utils/logger'
+import { initSentry, setSentryUser } from './config/sentry'
 
 // Configure TanStack Query
 const queryClient = new QueryClient({
@@ -29,12 +30,35 @@ if (typeof window !== 'undefined') {
       lineno: event.lineno,
       colno: event.colno,
     })
+    
+    // Enviar para Sentry
+    if (event.error instanceof Error) {
+      import('./config/sentry').then(({ captureException }) => {
+        captureException(event.error, {
+          error: {
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno,
+          },
+        })
+      })
+    }
   })
 
   // Capturar promessas rejeitadas
   window.addEventListener('unhandledrejection', (event) => {
     logger.error('Unhandled promise rejection', event.reason, {
       type: 'unhandledrejection',
+    })
+    
+    // Enviar para Sentry
+    const error = event.reason instanceof Error 
+      ? event.reason 
+      : new Error(String(event.reason))
+    import('./config/sentry').then(({ captureException }) => {
+      captureException(error, {
+        type: 'unhandledrejection',
+      })
     })
   })
 
@@ -47,12 +71,27 @@ if (typeof window !== 'undefined') {
 
 const app = createApp(App)
 
+// Inicializar Sentry antes de tudo
+initSentry(app, router)
+
 // Configurar error handler global do Vue
 app.config.errorHandler = (err, instance, info) => {
   logger.error('Vue error', err, {
     component: instance?.$options.name || 'Unknown',
     info,
   })
+  
+  // Enviar para Sentry também
+  if (err instanceof Error) {
+    import('./config/sentry').then(({ captureException }) => {
+      captureException(err, {
+        component: {
+          name: instance?.$options.name || 'Unknown',
+          info,
+        },
+      })
+    })
+  }
 }
 
 app.use(createPinia())

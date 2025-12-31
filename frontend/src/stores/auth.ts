@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { authService } from '@/api/auth'
 import type { LoginRequest, RegisterRequest, User } from '@/api/types'
 import { logger } from '@/utils/logger'
+import { setSentryUser } from '@/config/sentry'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -31,9 +32,10 @@ export const useAuthStore = defineStore('auth', () => {
       if (storedUser) {
         try {
           user.value = JSON.parse(storedUser)
-          // Atualizar contexto do usuário no logger
+          // Atualizar contexto do usuário no logger e Sentry
           if (user.value) {
             logger.setUserContext(user.value.user_id, user.value.email)
+            setSentryUser(user.value.user_id, user.value.email)
           }
         } catch (error) {
           logger.error('Erro ao carregar dados do usuário do localStorage', error)
@@ -242,8 +244,9 @@ export const useAuthStore = defineStore('auth', () => {
       // Marcar como validado após login bem-sucedido
       isValidated.value = true
       
-      // Atualizar contexto do usuário no logger
+      // Atualizar contexto do usuário no logger e Sentry
       logger.setUserContext(response.user.user_id, response.user.email)
+      setSentryUser(response.user.user_id, response.user.email)
       logger.info('Login realizado com sucesso', {
         userId: response.user.user_id,
         email: response.user.email,
@@ -316,8 +319,9 @@ export const useAuthStore = defineStore('auth', () => {
       })
     })
     
-    // Limpar contexto do usuário no logger
+    // Limpar contexto do usuário no logger e Sentry
     logger.setUserContext(null, null)
+    setSentryUser(null, null)
   }
 
   return {
