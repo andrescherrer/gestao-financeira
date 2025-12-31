@@ -691,7 +691,7 @@ Este documento detalha as tarefas práticas para implementação do sistema, org
 | ID | Tarefa | Tipo | Prioridade | Esforço | Dependências | Status |
 |----|--------|------|------------|---------|--------------|--------|
 | OPT-002 | Implementar backup automático | 🟠 | 🔴 | 4h | SETUP-003 | ✅ |
-| DEPLOY-001 | Configurar ambiente de produção | 🟠 | 🔴 | 8h | CI-002, CI-005 | ⏳ |
+| DEPLOY-001 | Configurar ambiente de produção | 🟠 | 🔴 | 8h | CI-002, CI-005 | ✅ |
 | DEPLOY-002 | Documentação de deploy | ⚪ | 🔴 | 4h | DEPLOY-001 | ⏳ |
 | OPT-001 | Otimizar queries do banco de dados | 🔵 | 🟡 | 4h | PERF-006 | ⏳ |
 | OPT-003 | Otimizar bundle size do frontend | 🟣 | 🟡 | 4h | FE-001 | ⏳ |
